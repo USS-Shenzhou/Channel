@@ -2,6 +2,7 @@ package cn.ussshenzhou.channel.audio.client;
 
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.util.AudioHelper;
+import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.gui.notification.TSimpleNotification;
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
@@ -42,7 +43,7 @@ public class MicManager {
         }
         var name = deviceInfo.getName();
         ChannelClientConfig.write(channelClientConfig -> channelClientConfig.useDevice = name);
-        init(deviceInfo, new AudioFormat(cfg.micSampleRate, cfg.micSampleBits, cfg.micChannels, true, false));
+        init(deviceInfo, new AudioFormat(cfg.micSampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false));
     }
 
     public static void init(Mixer.Info deviceInfo, AudioFormat format) {

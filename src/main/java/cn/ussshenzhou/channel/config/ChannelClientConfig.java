@@ -11,10 +11,9 @@ import java.util.function.Consumer;
 public class ChannelClientConfig implements TConfig {
 
     public String useDevice = "";
-    public float micSampleRate = 44100;
-    public int micSampleBits = 16;
-    public int micChannels = 1;
+    public float micSampleRate = 16000;
     public int frameLengthMs = 20;
+    public boolean noiseCanceling = true;
 
 
     public static ChannelClientConfig get() {
