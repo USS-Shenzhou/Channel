@@ -2,15 +2,15 @@
 
 ## 版权和许可 | Copyrights and Licenses
 
-Copyright 2025 USS_Shenzhou
+Copyright (C) 2025 USS_Shenzhou
 
-本模组是自由软件，你可以再分发之和/或依照由自由软件基金会发布的 GNU 通用公共许可证修改之，无论是版本 3 许可证，还是（按你的决定）任何以后版都可以。
+本模组是自由软件：你可以根据自由软件基金会发布的GNU Affero通用公共许可证的条款，即许可证的第3版或（您选择的）任何后来的版本重新发布它和/或修改它。。
 
-发布这个软件是希望它能有用，但是并无保障；甚至连可销售和符合某个特定的目的都不保证。请参看 GNU 通用公共许可证，了解详情。
+本模组的发布是希望它能起到作用。但没有任何保证；甚至没有隐含的保证。本程序的分发是希望它是有用的，但没有任何保证，甚至没有隐含的适销对路或适合某一特定目的的保证。 参见 GNU Affero通用公共许可证了解更多细节。
 
-This mod is free software; you can redistribute it and/or modify them under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+This mod is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or(at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+This mod is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
 
 ### 额外许可和附加条款 | Exceptions and Additional terms
 
@@ -24,10 +24,10 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 ## 其他开源/版权信息 | Other Open-Source/Copyright Information
 
-1. 使用了[RNNoise](https://github.com/xiph/rnnoise)，按BSD-3取得许可。
+1. 使用了[RNNoise-java](https://github.com/Elytrium/rnnoise-java)，按AGPL-3.0取得许可。
 2. 使用了[Concentus](https://github.com/lostromb/concentus)，按其自定义许可证，一种与BSD-3相似的许可证，取得许可。
 
 <p></p>
 
-1. Uses [RNNoise](https://github.com/xiph/rnnoise), licensed under the BSD-3 Clause License.
+1. Uses [RNNoise-java](https://github.com/Elytrium/rnnoise-java), licensed under the AGPL-3.0 License.
 2. Uses [Concentus](https://github.com/lostromb/concentus), licensed under its custom license, which is similar to BSD-3 Clause.

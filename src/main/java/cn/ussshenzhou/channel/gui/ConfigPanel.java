@@ -8,6 +8,8 @@ import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.gui.advanced.TOptionsPanel;
 import cn.ussshenzhou.t88.gui.notification.TSimpleNotification;
 import cn.ussshenzhou.t88.gui.widegt.TCycleButton;
+import cn.ussshenzhou.t88.gui.widegt.TLabel;
+import cn.ussshenzhou.t88.gui.widegt.TPanel;
 import net.minecraft.network.chat.Component;
 
 import javax.sound.sampled.*;
@@ -58,7 +60,8 @@ public class ConfigPanel extends TOptionsPanel {
                     MicReader.frameLengthChange();
                 },
                 entry -> entry.getContent() == ChannelClientConfig.get().frameLengthMs
-        )*/;
+        );*/
+        addOption(Component.literal("Other Device Info"), new TLabel(Component.literal("Sample Bits: 16, Channel: 1")));
 
         updateUsableSelectionByDevice(ChannelClientConfig.get().useDevice);
     }

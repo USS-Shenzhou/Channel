@@ -3,7 +3,9 @@ package cn.ussshenzhou.channel.audio.client;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.util.ArrayHelper;
 import cn.ussshenzhou.channel.util.AudioHelper;
+import cn.ussshenzhou.channel.util.OpusHelper;
 import com.mojang.logging.LogUtils;
+import io.github.jaredmdobson.concentus.OpusException;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -35,27 +37,33 @@ public class MicReader {
     }
 
     private static void read() {
-        var line = MicManager.getLine();
-        if (line == null) {
-            return;
-        }
-        var raw = createBuffer();
-        var bytesRead = line.read(raw, 0, raw.length);
-        if (bytesRead == 0) {
-            return;
-        }
-        short[] toEncode = new short[0];
         try {
+            var line = MicManager.getLine();
+            if (line == null) {
+                return;
+            }
+            var raw = createBuffer();
+            var bytesRead = line.read(raw, 0, raw.length);
+            if (bytesRead == 0) {
+                return;
+            }
+            short[] toEncode;
             if (ChannelClientConfig.get().noiseCanceling) {
                 toEncode = NoiseCanceller.process(raw);
             } else {
                 toEncode = ArrayHelper.reinterpretB2S(raw);
             }
+            var format = MicManager.getLine().getFormat();
+            var serialized = OpusHelper.encode(toEncode, (int) format.getSampleRate());
+            var deserialized = OpusHelper.decode(serialized, (int) format.getSampleRate());
+            DebugSimplePlayer.play(ArrayHelper.reinterpretS2B(toEncode), format);
+        } catch (OpusException e) {
+            LogUtils.getLogger().error("{}", e.getMessage());
+            throw new RuntimeException(e);
         } catch (Throwable t) {
             LogUtils.getLogger().error("{}", t.getMessage());
             ChannelClientConfig.write(c -> c.noiseCanceling = false);
         }
-        DebugSimplePlayer.play(ArrayHelper.reinterpretS2B(toEncode), MicManager.getLine().getFormat());
     }
 
     private static byte[] createBuffer() {
