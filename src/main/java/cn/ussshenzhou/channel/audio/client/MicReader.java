@@ -1,9 +1,10 @@
 package cn.ussshenzhou.channel.audio.client;
 
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
+import cn.ussshenzhou.channel.network.AudioToServerPacket;
 import cn.ussshenzhou.channel.util.ArrayHelper;
-import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.OpusHelper;
+import cn.ussshenzhou.t88.network.NetworkHelper;
 import com.mojang.logging.LogUtils;
 import io.github.jaredmdobson.concentus.OpusException;
 import net.neoforged.api.distmarker.Dist;
@@ -11,7 +12,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -23,17 +23,16 @@ import java.util.concurrent.TimeUnit;
 @EventBusSubscriber(Dist.CLIENT)
 public class MicReader {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
-    private static ScheduledFuture<?> task;
-    private static ByteBuffer buffer;
+    private static ScheduledFuture<?> keepReading;
 
     @SubscribeEvent
     public static void startReading(FMLClientSetupEvent event) {
-        task = SCHEDULER.scheduleAtFixedRate(MicReader::read, 0, ChannelClientConfig.get().frameLengthMs, TimeUnit.MILLISECONDS);
+        keepReading = SCHEDULER.scheduleAtFixedRate(MicReader::read, 0, ChannelClientConfig.get().frameLengthMs, TimeUnit.MILLISECONDS);
     }
 
     public static void frameLengthChange() {
-        task.cancel(false);
-        task = SCHEDULER.scheduleAtFixedRate(MicReader::read, 0, ChannelClientConfig.get().frameLengthMs, TimeUnit.MILLISECONDS);
+        keepReading.cancel(false);
+        keepReading = SCHEDULER.scheduleAtFixedRate(MicReader::read, 0, ChannelClientConfig.get().frameLengthMs, TimeUnit.MILLISECONDS);
     }
 
     private static void read() {
@@ -55,8 +54,8 @@ public class MicReader {
             }
             var format = MicManager.getLine().getFormat();
             var serialized = OpusHelper.encode(toEncode, (int) format.getSampleRate());
-            var deserialized = OpusHelper.decode(serialized, (int) format.getSampleRate());
-            DebugSimplePlayer.play(ArrayHelper.reinterpretS2B(toEncode), format);
+            //DebugSimplePlayer.play(ArrayHelper.reinterpretS2B(toEncode), format);
+            NetworkHelper.sendToServer(new AudioToServerPacket((int) format.getSampleRate(), serialized));
         } catch (OpusException e) {
             LogUtils.getLogger().error("{}", e.getMessage());
             throw new RuntimeException(e);
