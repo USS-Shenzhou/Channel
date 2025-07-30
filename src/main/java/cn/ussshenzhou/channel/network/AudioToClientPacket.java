@@ -1,10 +1,8 @@
 package cn.ussshenzhou.channel.network;
 
 import cn.ussshenzhou.channel.Channel;
-import cn.ussshenzhou.channel.audio.server.RelayHandler;
 import cn.ussshenzhou.t88.network.annotation.*;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.concurrent.CompletableFuture;
@@ -40,6 +38,8 @@ public class AudioToClientPacket {
 
     @ClientHandler
     public void clientHandler(IPayloadContext context) {
-        CompletableFuture.runAsync(() -> );
+        CompletableFuture.runAsync(() -> {
+
+        });
     }
 }

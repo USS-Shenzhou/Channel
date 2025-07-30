@@ -10,6 +10,11 @@ group = mod_group_id
 
 repositories {
     mavenLocal()
+
+    maven {
+        name = "TarsosDSP repository"
+        url = "https://mvn.0110.be/releases"
+    }
 }
 
 base {
@@ -115,6 +120,13 @@ dependencies {
     implementation 'io.github.jaredmdobson:concentus:1.0.2'
     additionalRuntimeClasspath 'io.github.jaredmdobson:concentus:1.0.2'
     jarJar 'io.github.jaredmdobson:concentus:1.0.2'
+
+    compileOnly(group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0")
+    additionalRuntimeClasspath (group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0")
+    jarJar (group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0")
+
+    implementation group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0", classifier: "windows-x86_64"
+    additionalRuntimeClasspath group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0", classifier: "windows-x86_64"
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"

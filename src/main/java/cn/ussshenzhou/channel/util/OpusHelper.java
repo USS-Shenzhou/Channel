@@ -1,6 +1,5 @@
 package cn.ussshenzhou.channel.util;
 
-import com.mojang.logging.LogUtils;
 import io.github.jaredmdobson.concentus.*;
 
 import java.util.Arrays;
@@ -17,7 +16,7 @@ public class OpusHelper {
 
     static {
         try {
-            for (float rate : ModConstant.SAMPLE_RATE) {
+            for (float rate : ModConstant.USABLE_SAMPLE_RATE) {
                 ENCODERS.put((int) rate, new OpusEncoder((int) rate, 1, OpusApplication.OPUS_APPLICATION_AUDIO));
                 DECODERS.put((int) rate, new OpusDecoder((int) rate, 1));
             }
@@ -26,11 +25,9 @@ public class OpusHelper {
         }
     }
 
-    static int raw, baked;
-
-    public static byte[] encode(short[] audio, int sampleRate) throws OpusException {
-        byte[] result = new byte[audio.length * 2];
-        var length = ENCODERS.get(sampleRate).encode(audio, 0, audio.length, result, 0, result.length);
+    public static byte[] encode(byte[] audio, int sampleRate) throws OpusException {
+        byte[] result = new byte[audio.length];
+        var length = ENCODERS.get(sampleRate).encode(audio, 0, audio.length / 2, result, 0, result.length);
         return Arrays.copyOf(result, length);
     }
 

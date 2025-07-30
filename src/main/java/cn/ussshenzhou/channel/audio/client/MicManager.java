@@ -6,10 +6,6 @@ import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.gui.notification.TSimpleNotification;
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 import javax.annotation.Nullable;
 import javax.sound.sampled.*;
@@ -18,12 +14,10 @@ import java.util.stream.Stream;
 /**
  * @author USS_Shenzhou
  */
-@EventBusSubscriber(Dist.CLIENT)
 public class MicManager {
     private static TargetDataLine line = null;
 
-    @SubscribeEvent
-    public static void initMic(FMLClientSetupEvent event) {
+    public static void init() {
         var cfg = ChannelClientConfig.get();
         var deviceName = cfg.useDevice;
         var deviceInfo = AudioHelper.getDeviceInfo(deviceName);
@@ -43,10 +37,10 @@ public class MicManager {
         }
         var name = deviceInfo.getName();
         ChannelClientConfig.write(channelClientConfig -> channelClientConfig.useDevice = name);
-        init(deviceInfo, new AudioFormat(cfg.micSampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false));
+        refresh(deviceInfo, new AudioFormat(cfg.sampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false));
     }
 
-    public static void init(Mixer.Info deviceInfo, AudioFormat format) {
+    public static void refresh(Mixer.Info deviceInfo, AudioFormat format) {
         try {
             var lineInfo = new DataLine.Info(TargetDataLine.class, format);
             if (line != null) {

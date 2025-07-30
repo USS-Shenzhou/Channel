@@ -4,6 +4,7 @@
   "package": "cn.ussshenzhou.channel.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "NativeLoaderMixin"
   ],
   "client": [
   ],

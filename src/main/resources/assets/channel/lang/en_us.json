@@ -1,5 +1,40 @@
 {
-  "itemGroup.channel": "Example Mod Tab",
-  "block.channel.example_block": "Example Block",
-  "item.channel.example_item": "Example Item"
+  "channel.config.mic": "  采集",
+  "channel.config.mic.device": "设备",
+  "channel.config.mic.samplerate": "采样率",
+  "channel.config.mic.samplerate.tooltip": "决定记录声音的质量。\n能采集的最高频率是采样率的一半。\n较低的采样率有助于减小网络占用，较高的采样率有助于提高音频质量。",
+  "channel.config.mic.samplebits": "采样比特数",
+  "channel.config.mic.length": "帧长(ms)",
+  "channel.config.mic.length.tooltip": "决定每隔多久向服务器发送一次数据。\n较短的帧有助于减小延迟，较长的帧有助于减小网络占用。",
+  "channel.config.mic.listen": "侦听",
+
+  "channel.config.off": "关",
+  "channel.config.on": "开",
+
+  "channel.config.pre": "  前处理",
+  "channel.config.pre.trigger": "触发方式",
+  "channel.config.pre.trigger.always": "常开",
+  "channel.config.pre.trigger.vad": "自动语音检测",
+  "channel.config.pre.trigger.ptt": "按下[?]",
+  "channel.config.pre.vad": "语音检测阈值",
+  "channel.config.pre.vad.tooltip": "设定语音检测的触发阈值。\n更低的选项使同一段音频更容易被认为含有语音。",
+  "channel.config.pre.nc": "降噪",
+  "channel.config.pre.nc.tooltip": "设定降噪强度。\n更高的选项可以更强地过滤背景噪音，但也有可能会影响人声。",
+  "channel.config.pre.hpf": "高通滤波",
+  "channel.config.pre.hpf.tooltip": "消除声音中的低频成分。",
+  "channel.config.pre.ec": "回声消除",
+  "channel.config.pre.ec.tooltip": "消除麦克风收集到的扬声器回声。略微增加延迟。",
+  "channel.config.pre.0": "低",
+  "channel.config.pre.1": "中",
+  "channel.config.pre.2": "高",
+  "channel.config.pre.3": "激进",
+  "channel.config.pre.agc": "自动增益",
+  "channel.config.pre.agc.tooltip": "自动调整输入响度。",
+  "channel.config.pre.target": "目标电平",
+  "channel.config.pre.target.tooltip": "设定自动增益的的目标值。\n更大的数值使其他人听你的声音更响。",
+  "channel.config.pre.max_gain": "最大增益",
+  "channel.config.pre.max_gain.tooltip": "限制自动增益的向上调整能力。\n更大的数值有助于放大细微的声音。",
+
+  "channel.config.post": "  后处理",
+  "channel.config.post.agc": "为玩家单独调整响度"
 }

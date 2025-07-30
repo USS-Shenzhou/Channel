@@ -22,10 +22,15 @@ public class ModKeyMappingRegistry {
             "key.channel.config_screen", KeyConflictContext.UNIVERSAL, KeyModifier.ALT,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C, "key.categories.channel"
     );
+    public static final KeyMapping PTT = new KeyMapping(
+            "key.channel.ptt", KeyConflictContext.UNIVERSAL, KeyModifier.NONE,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Y, "key.categories.channel"
+    );
 
     @SubscribeEvent
     public static void onClientSetup(RegisterKeyMappingsEvent event) {
         event.register(ModKeyMappingRegistry.CONFIG);
+        event.register(ModKeyMappingRegistry.PTT);
     }
 
     @SubscribeEvent
@@ -33,6 +38,8 @@ public class ModKeyMappingRegistry {
         Minecraft minecraft = Minecraft.getInstance();
         if (CONFIG.consumeClick()) {
             minecraft.setScreen(new ConfigScreen());
+        } else if (PTT.consumeClick()) {
+            //TODO
         }
     }
 }
