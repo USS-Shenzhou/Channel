@@ -6,10 +6,12 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Collection;
 
 /**
  * @author USS_Shenzhou
  */
+@SuppressWarnings("preview")
 public class ArrayHelper {
 
     public static short[] castB2S(byte[] array) {
@@ -118,5 +120,21 @@ public class ArrayHelper {
         var result = segment.toArray(ValueLayout.JAVA_FLOAT);
         MemoryUtil.memFree(segment.asByteBuffer());
         return result;
+    }
+
+    public static short absAverage(short[] array) {
+        double sum = 0;
+        for (short i : array) {
+            sum += Math.abs(i);
+        }
+        return (short) (sum / array.length);
+    }
+
+    public static short absAverage(Collection<Short> array) {
+        double sum = 0;
+        for (short i : array) {
+            sum += Math.abs(i);
+        }
+        return (short) (sum / array.size());
     }
 }

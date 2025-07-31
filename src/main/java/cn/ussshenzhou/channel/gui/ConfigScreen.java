@@ -9,13 +9,13 @@ import net.minecraft.network.chat.Component;
  * @author USS_Shenzhou
  */
 public class ConfigScreen extends TScreen {
-    private final TLabel title = new TLabel(Component.literal("Channel Config"));
+    private final TLabel title = new TLabel(Component.translatable("channel.config.title"));
     private final ConfigPanel panel = new ConfigPanel();
 
     public ConfigScreen() {
         super(Component.literal("Channel Mod Config Screen"));
         this.add(title);
-        title.setFontSize(TLabel.STD_FONT_SIZE * 2);
+        title.setFontSize((float) (TLabel.STD_FONT_SIZE * 1.5));
         this.add(panel);
     }
 

@@ -28,4 +28,8 @@ public class AudioHelper {
         }
         return deviceInfo;
     }
+
+    public static float s2dbfs(short value) {
+        return (float) (20 * Math.log10((value + 1) / 32768f));
+    }
 }

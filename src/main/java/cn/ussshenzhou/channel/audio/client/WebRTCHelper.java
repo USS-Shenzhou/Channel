@@ -46,31 +46,34 @@ public class WebRTCHelper {
             var cfg = ChannelClientConfig.get();
             processor = new AudioProcessing();
             var config = new AudioProcessingConfig();
-            if (cfg.noiseCanceling != NC.OFF) {
-                config.noiseSuppression.enabled = true;
-                config.noiseSuppression.level = AudioProcessingConfig.NoiseSuppression.Level.values()[cfg.noiseCanceling.ordinal()];
-            } else {
-                config.noiseSuppression.enabled = false;
+            if (cfg.noiseCanceling != NC.AI){
+                if (cfg.noiseCanceling != NC.OFF) {
+                    config.noiseSuppression.enabled = true;
+                    config.noiseSuppression.level = AudioProcessingConfig.NoiseSuppression.Level.values()[cfg.noiseCanceling.ordinal()];
+                } else {
+                    config.noiseSuppression.enabled = false;
+                }
+                if (cfg.echoCanceling) {
+                    config.echoCanceller.enabled = true;
+                    config.echoCanceller.enforceHighPassFiltering = true;
+                    processor.setStreamDelayMs(80);
+                } else {
+                    config.echoCanceller.enabled = false;
+                    processor.setStreamDelayMs(0);
+                }
             }
             config.highPassFilter.enabled = cfg.highPassFilter;
-            if (cfg.echoCanceling) {
-                config.echoCanceller.enabled = true;
-                config.echoCanceller.enforceHighPassFiltering = true;
-                processor.setStreamDelayMs(80);
-            } else {
-                config.echoCanceller.enabled = false;
-                processor.setStreamDelayMs(0);
-            }
+            config.gainControl.enabled = true;
+            config.gainControl.fixedDigital.gainDb = cfg.forceGainControl;
             if (cfg.autoGainControl) {
-                config.gainControl.enabled = true;
                 config.gainControl.adaptiveDigital.enabled = true;
                 config.gainControl.adaptiveDigital.headroomDb = -cfg.targetLevel;
                 config.gainControl.adaptiveDigital.maxGainDb = cfg.maxGain;
                 config.gainControl.adaptiveDigital.initialGainDb = 0;
                 config.gainControl.adaptiveDigital.maxOutputNoiseLevelDbfs = -40;
-                config.gainControl.adaptiveDigital.maxGainChangeDbPerSecond = 12;
+                config.gainControl.adaptiveDigital.maxGainChangeDbPerSecond = 15;
             } else {
-                config.gainControl.enabled = false;
+                config.gainControl.adaptiveDigital.enabled = false;
             }
             processor.applyConfig(config);
         }
@@ -107,7 +110,7 @@ public class WebRTCHelper {
         }
         var vadLevel = ChannelClientConfig.get().voiceDetectThreshold;
         if (vadLevel == Vad.LOW) {
-            return vadInternal(audio, sampleRate) >= 0.01;
+            return vadInternal(audio, sampleRate) >= 0.005;
         }
         slidingWindow.update(vadInternal(audio, sampleRate) >= ChannelClientConfig.get().voiceDetectThreshold.ordinal() * 0.1f);
         return slidingWindow.getSmoothedValue();

@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.audio.client;
 
+import cn.ussshenzhou.channel.audio.client.nativ.NvidiaHelper;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -17,5 +18,6 @@ public class Initializer {
         MicManager.init();
         MicReader.init();
         WebRTCHelper.init();
+        NvidiaHelper.init();
     }
 }

@@ -41,29 +41,33 @@ public class MicManager {
     }
 
     public static void refresh(Mixer.Info deviceInfo, AudioFormat format) {
-        try {
-            var lineInfo = new DataLine.Info(TargetDataLine.class, format);
-            if (line != null) {
-                if (line.isRunning()) {
-                    line.stop();
+        synchronized (MicManager.class) {
+            try {
+                var lineInfo = new DataLine.Info(TargetDataLine.class, format);
+                if (line != null) {
+                    if (line.isRunning()) {
+                        line.stop();
+                    }
+                    if (line.isOpen()) {
+                        line.close();
+                    }
                 }
-                if (line.isOpen()) {
-                    line.close();
+                line = (TargetDataLine) AudioSystem.getMixer(deviceInfo).getLine(lineInfo);
+                if (!line.isOpen()) {
+                    line.open(format);
                 }
+                line.start();
+            } catch (LineUnavailableException e) {
+                LogUtils.getLogger().error("{}", e.getMessage());
+                TSimpleNotification.fire(Component.literal("Failed To Init Device " + deviceInfo.getName()), 5, TSimpleNotification.Severity.ERROR);
             }
-            line = (TargetDataLine) AudioSystem.getMixer(deviceInfo).getLine(lineInfo);
-            if (!line.isOpen()) {
-                line.open(format);
-            }
-            line.start();
-        } catch (LineUnavailableException e) {
-            LogUtils.getLogger().error("{}", e.getMessage());
-            TSimpleNotification.fire(Component.literal("Failed To Init Device " + deviceInfo.getName()), 5, TSimpleNotification.Severity.ERROR);
         }
     }
 
     @Nullable
     public static TargetDataLine getLine() {
-        return line;
+        synchronized (MicManager.class) {
+            return line;
+        }
     }
 }
