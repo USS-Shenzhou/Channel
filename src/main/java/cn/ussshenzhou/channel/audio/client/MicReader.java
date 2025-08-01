@@ -1,6 +1,7 @@
 package cn.ussshenzhou.channel.audio.client;
 
 import cn.ussshenzhou.channel.audio.Trigger;
+import cn.ussshenzhou.channel.audio.client.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.network.AudioToServerPacket;
 import cn.ussshenzhou.channel.util.ArrayHelper;
@@ -23,18 +24,21 @@ public class MicReader {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> keepReading;
     private static WebRTCHelper.SimpleSlidingBooleanWindow slidingWindow = null;
+    private static int frameLength = 0;
 
     public static void init() {
-        keepReading = SCHEDULER.scheduleAtFixedRate(MicReader::read, 0, ChannelClientConfig.get().frameLengthMs, TimeUnit.MILLISECONDS);
-        slidingWindow = new WebRTCHelper.SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / ChannelClientConfig.get().frameLengthMs);
+        frameLength = ChannelClientConfig.get().frameLengthMs;
+        keepReading = SCHEDULER.scheduleAtFixedRate(MicReader::read, 0, frameLength, TimeUnit.MILLISECONDS);
+        slidingWindow = new WebRTCHelper.SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / frameLength);
     }
 
     @Deprecated
     public static void frameLengthChange() {
         synchronized (MicReader.class) {
             keepReading.cancel(false);
-            keepReading = SCHEDULER.scheduleAtFixedRate(MicReader::read, 0, ChannelClientConfig.get().frameLengthMs, TimeUnit.MILLISECONDS);
-            slidingWindow = new WebRTCHelper.SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / ChannelClientConfig.get().frameLengthMs, slidingWindow);
+            frameLength = ChannelClientConfig.get().frameLengthMs;
+            keepReading = SCHEDULER.scheduleAtFixedRate(MicReader::read, 0, frameLength, TimeUnit.MILLISECONDS);
+            slidingWindow = new WebRTCHelper.SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / frameLength, slidingWindow);
         }
     }
 
@@ -50,39 +54,44 @@ public class MicReader {
                     braek();
                     return;
                 }
-                var raw = createBuffer();
-                var bytesRead = line.read(raw, 0, raw.length);
+                var audio = createBuffer();
+                var bytesRead = line.read(audio, 0, audio.length);
                 if (bytesRead == 0) {
                     LevelGatherer.updateRaw(null);
                     braek();
                     return;
                 }
-
-                var level = LevelGatherer.updateRaw(raw);
-                var cfg = ChannelClientConfig.get();
-                if (cfg.trigger == Trigger.THRESHOLD) {
-                    slidingWindow.update(AudioHelper.s2dbfs(level) >= cfg.triggerThresholdDBFS);
-                    if (!slidingWindow.getSmoothedValue()) {
-                        braek();
-                        return;
-                    }
+                LevelGatherer.updateRaw(audio);
+                audio = WebRTCHelper.process(NvidiaHelper.process(audio));
+                if (ChannelClientConfig.get().listen) {
+                    byte[] finalAudio = audio;
+                    Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, MicManager.getLine().getFormat()));
                 }
-                var processed = WebRTCHelper.process(raw);
-                if (cfg.listen) {
-                    Minecraft.getInstance().execute(() -> SimplePlayer.play(processed, MicManager.getLine().getFormat()));
-                }
-                if (processed == null) {
+                if (audio == null) {
                     braek();
                     return;
                 }
-                LevelGatherer.updateProcessed(processed);
-                int sampleRate = (int) line.getFormat().getSampleRate();
-                var serialized = OpusHelper.encode(processed, sampleRate);
+                if (!checkThreshold(audio)) {
+                    braek();
+                    return;
+                }
+                int sampleRate = MicManager.getSampleRate();
+                var serialized = OpusHelper.encode(audio, sampleRate);
                 NetworkHelper.sendToServer(new AudioToServerPacket(sampleRate, serialized));
             } catch (Throwable t) {
                 LogUtils.getLogger().error("{}", t.toString());
             }
         }
+    }
+
+    private static boolean checkThreshold(byte[] audio) {
+        var level = LevelGatherer.updateProcessed(audio);
+        var cfg = ChannelClientConfig.get();
+        if (cfg.trigger == Trigger.THRESHOLD) {
+            slidingWindow.update(AudioHelper.s2dbfs(level) >= cfg.triggerThresholdDBFS);
+            return slidingWindow.getSmoothedValue();
+        }
+        return true;
     }
 
     @SuppressWarnings("SpellCheckingInspection")
@@ -96,7 +105,11 @@ public class MicReader {
     private static byte[] createBuffer() {
         var format = MicManager.getLine().getFormat();
         var cfg = ChannelClientConfig.get();
-        int size = (int) (cfg.frameLengthMs * format.getFrameSize() * format.getFrameRate() / 1000);
+        int size = (int) (frameLength * format.getFrameSize() * format.getFrameRate() / 1000);
         return new byte[size];
+    }
+
+    public static int getFrameLength() {
+        return frameLength;
     }
 }

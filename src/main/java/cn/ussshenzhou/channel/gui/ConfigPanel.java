@@ -6,7 +6,6 @@ import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.audio.Vad;
 import cn.ussshenzhou.channel.audio.client.LevelGatherer;
 import cn.ussshenzhou.channel.audio.client.MicManager;
-import cn.ussshenzhou.channel.audio.client.MicReader;
 import cn.ussshenzhou.channel.audio.client.WebRTCHelper;
 import cn.ussshenzhou.channel.audio.client.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
@@ -28,8 +27,6 @@ import org.joml.Vector2i;
 import javax.sound.sampled.*;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -38,7 +35,7 @@ import java.util.stream.Stream;
 public class ConfigPanel extends TOptionsPanel {
     private final TCycleButton<String> devices;
     private final TCycleButton<Float> sampleRate;
-    private HorizontalTitledOption<?> thresholdLevel, vad, targetLevel, maxGain, nvidiaLogo, nvidiaCaution;
+    private HorizontalTitledOption<?> thresholdLevel, vad, targetLevel, maxGain, nvidiaLogo, nvidiaCaution, aiNCRatio;
 
     public ConfigPanel() {
         var cfg = ChannelClientConfig.get();
@@ -61,6 +58,7 @@ public class ConfigPanel extends TOptionsPanel {
         sampleRate = addOptionCycleButtonInit(
                 Component.translatable("channel.config.mic.samplerate"),
                 List.of(cfg.sampleRate),
+                //FIXME change during running
                 f -> _ -> ChannelClientConfig.write(c -> c.sampleRate = f),
                 entry -> entry.getContent() == cfg.sampleRate
         ).getB();
@@ -69,6 +67,7 @@ public class ConfigPanel extends TOptionsPanel {
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.mic.length"),
                 ModConstant.USABLE_FRAME_LENGTH,
+                //FIXME change during running
                 length -> _ -> ChannelClientConfig.write(c -> c.frameLengthMs = length),
                 entry -> entry.getContent() == cfg.frameLengthMs
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.length.tooltip")));
@@ -76,7 +75,8 @@ public class ConfigPanel extends TOptionsPanel {
                 Component.translatable("channel.config.level"),
                 new TProgressBar(90) {
                     {
-                        this.setProgressBarColorGradient(0xff44ff00, 0xffff5900);
+                        //this.setProgressBarColorGradient(0xff44ff00, 0xffff5900);
+                        this.setProgressBarColorGradient(0x003c91ff, 0xff3c91ff);
                         this.setTextMode(new TextMode((_, _, value) -> String.format("%.1f dBFS", value - 90)));
                         this.setTooltip(Tooltip.create(Component.translatable("channel.config.level.raw.tooltip")));
                     }
@@ -88,25 +88,20 @@ public class ConfigPanel extends TOptionsPanel {
                     }
                 }
         );
-        addOptionCycleButtonInit(
-                Component.translatable("channel.config.mic.listen"),
-                List.of(false, true),
-                bool -> _ -> ChannelClientConfig.write(c -> c.listen = bool),
-                entry -> entry.getContent() == cfg.listen
-        );
 
         addOptionSplitter(Component.translatable("channel.config.pre"));
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.pre.trigger"),
                 List.of(Trigger.values()),
-                tri -> _ -> {
+                tri -> button -> {
                     ChannelClientConfig.write(c -> c.trigger = tri);
+                    button.setTooltip(Tooltip.create(Component.translatable(tri.translateKey() + ".tooltip")));
                     vad.setVisibleT(tri == Trigger.VAD);
                     thresholdLevel.setVisibleT(tri == Trigger.THRESHOLD);
                     ConfigPanel.this.layout();
                 },
                 entry -> entry.getContent() == cfg.trigger
-        );
+        ).getB().setTooltip(Tooltip.create(Component.translatable(cfg.trigger.translateKey() + ".tooltip")));
         thresholdLevel = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.threshold"),
                 -90, 0,
@@ -126,13 +121,17 @@ public class ConfigPanel extends TOptionsPanel {
         );
         tuple.getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.vad.tooltip")));
         vad = (HorizontalTitledOption<?>) tuple.getB().getParent();
+        //noinspection DataFlowIssue
+        vad.setVisibleT(cfg.trigger == Trigger.VAD);
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.pre.nc"),
                 List.of(NC.values()),
                 n -> _ -> {
                     ChannelClientConfig.write(c -> c.noiseCanceling = n);
+                    NvidiaHelper.refresh();
                     WebRTCHelper.refresh();
                     nvidiaLogo.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
+                    aiNCRatio.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
                     if (NvidiaHelper.getStat() != NvidiaHelper.Stat.OK) {
                         nvidiaCaution.setVisibleT(cfg.noiseCanceling == NC.AI);
                     }
@@ -140,7 +139,18 @@ public class ConfigPanel extends TOptionsPanel {
                 },
                 entry -> entry.getContent() == cfg.noiseCanceling
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.nc.tooltip")));
-        vad.setVisibleT(cfg.trigger == Trigger.VAD);
+        aiNCRatio = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
+                Component.translatable("channel.config.pre.nc.ai_intense"),
+                0, 1,
+                (_, v) -> Component.literal(String.format("%d", (int) (v * 100)) + "%"),
+                Component.translatable("channel.config.pre.nc.ai_intense.tooltip"),
+                (slider, _) -> {
+                    ChannelClientConfig.write(c -> c.aiNoiseCancelingRatio = (float) slider.getAbsValue());
+                    NvidiaHelper.refresh();
+                },
+                cfg.aiNoiseCancelingRatio, false
+        ).getB().getParent();
+        aiNCRatio.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.pre.ec"),
                 List.of(false, true),
@@ -223,7 +233,8 @@ public class ConfigPanel extends TOptionsPanel {
                 Component.translatable("channel.config.level"),
                 new TProgressBar(90) {
                     {
-                        this.setProgressBarColorGradient(0xff44ff00, 0xffff5900);
+                        //this.setProgressBarColorGradient(0xff44ff00, 0xffff5900);
+                        this.setProgressBarColorGradient(0x003c91ff, 0xff3c91ff);
                         this.setTextMode(new TextMode((_, _, value) -> String.format("%.1f dBFS", value - 90)));
                         this.setTooltip(Tooltip.create(Component.translatable("channel.config.level.pro.tooltip")));
                     }
@@ -234,6 +245,12 @@ public class ConfigPanel extends TOptionsPanel {
                         super.tickT();
                     }
                 }
+        );
+        addOptionCycleButtonInit(
+                Component.translatable("channel.config.mic.listen"),
+                List.of(false, true),
+                bool -> _ -> ChannelClientConfig.write(c -> c.listen = bool),
+                entry -> entry.getContent() == cfg.listen
         );
         addOptionSplitter(Component.translatable("channel.config.post"));
 

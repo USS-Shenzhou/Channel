@@ -14,9 +14,9 @@ import static java.lang.foreign.ValueLayout.*;
  * @see <a href="https://github.com/NVIDIA-Maxine/Maxine-AFX-SDK">https://github.com/NVIDIA-Maxine/Maxine-AFX-SDK</a>
  */
 @SuppressWarnings("preview")
-public class NVAudioEffects {
+class NvAudioEffects {
 
-    NVAudioEffects() {
+    NvAudioEffects() {
         // Should not be called directly
     }
 
@@ -285,37 +285,37 @@ public class NVAudioEffects {
      * typedef long long ptrdiff_t
      *}
      */
-    public static final OfLong ptrdiff_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong ptrdiff_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef unsigned long long size_t
      *}
      */
-    public static final OfLong size_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong size_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef unsigned short wchar_t
      *}
      */
-    public static final OfShort wchar_t = NVAudioEffects.C_SHORT;
+    public static final OfShort wchar_t = NvAudioEffects.C_SHORT;
     /**
      * {@snippet lang = c:
      * typedef double max_align_t
      *}
      */
-    public static final OfDouble max_align_t = NVAudioEffects.C_DOUBLE;
+    public static final OfDouble max_align_t = NvAudioEffects.C_DOUBLE;
     /**
      * {@snippet lang = c:
      * typedef unsigned long long uintptr_t
      *}
      */
-    public static final OfLong uintptr_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong uintptr_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef char *va_list
      *}
      */
-    public static final AddressLayout va_list = NVAudioEffects.C_POINTER;
+    public static final AddressLayout va_list = NvAudioEffects.C_POINTER;
 
     /**
      * Variadic invoker class for:
@@ -325,9 +325,9 @@ public class NVAudioEffects {
      */
     public static class __va_start {
         private static final FunctionDescriptor BASE_DESC = FunctionDescriptor.ofVoid(
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_POINTER
         );
-        private static final MemorySegment ADDR = NVAudioEffects.findOrThrow("__va_start");
+        private static final MemorySegment ADDR = NvAudioEffects.findOrThrow("__va_start");
 
         private final MethodHandle handle;
         private final FunctionDescriptor descriptor;
@@ -393,18 +393,18 @@ public class NVAudioEffects {
      * typedef long long intptr_t
      *}
      */
-    public static final OfLong intptr_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong intptr_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef _Bool __vcrt_bool
      *}
      */
-    public static final OfBoolean __vcrt_bool = NVAudioEffects.C_BOOL;
+    public static final OfBoolean __vcrt_bool = NvAudioEffects.C_BOOL;
 
     private static class __security_init_cookie {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid();
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("__security_init_cookie");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("__security_init_cookie");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -458,10 +458,10 @@ public class NVAudioEffects {
 
     private static class __security_check_cookie {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-                NVAudioEffects.C_LONG_LONG
+                NvAudioEffects.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("__security_check_cookie");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("__security_check_cookie");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -515,10 +515,10 @@ public class NVAudioEffects {
 
     private static class __report_gsfailure {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-                NVAudioEffects.C_LONG_LONG
+                NvAudioEffects.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("__report_gsfailure");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("__report_gsfailure");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -571,8 +571,8 @@ public class NVAudioEffects {
     }
 
     private static class __security_cookie$constants {
-        public static final OfLong LAYOUT = NVAudioEffects.C_LONG_LONG;
-        public static final MemorySegment SEGMENT = NVAudioEffects.findOrThrow("__security_cookie").reinterpret(LAYOUT.byteSize());
+        public static final OfLong LAYOUT = NvAudioEffects.C_LONG_LONG;
+        public static final MemorySegment SEGMENT = NvAudioEffects.findOrThrow("__security_cookie").reinterpret(LAYOUT.byteSize());
     }
 
     /**
@@ -620,333 +620,191 @@ public class NVAudioEffects {
      * typedef signed char int8_t
      *}
      */
-    public static final OfByte int8_t = NVAudioEffects.C_CHAR;
+    public static final OfByte int8_t = NvAudioEffects.C_CHAR;
     /**
      * {@snippet lang = c:
      * typedef short int16_t
      *}
      */
-    public static final OfShort int16_t = NVAudioEffects.C_SHORT;
+    public static final OfShort int16_t = NvAudioEffects.C_SHORT;
     /**
      * {@snippet lang = c:
      * typedef int int32_t
      *}
      */
-    public static final OfInt int32_t = NVAudioEffects.C_INT;
+    public static final OfInt int32_t = NvAudioEffects.C_INT;
     /**
      * {@snippet lang = c:
      * typedef long long int64_t
      *}
      */
-    public static final OfLong int64_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong int64_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef unsigned char uint8_t
      *}
      */
-    public static final OfByte uint8_t = NVAudioEffects.C_CHAR;
+    public static final OfByte uint8_t = NvAudioEffects.C_CHAR;
     /**
      * {@snippet lang = c:
      * typedef unsigned short uint16_t
      *}
      */
-    public static final OfShort uint16_t = NVAudioEffects.C_SHORT;
+    public static final OfShort uint16_t = NvAudioEffects.C_SHORT;
     /**
      * {@snippet lang = c:
      * typedef unsigned int uint32_t
      *}
      */
-    public static final OfInt uint32_t = NVAudioEffects.C_INT;
+    public static final OfInt uint32_t = NvAudioEffects.C_INT;
     /**
      * {@snippet lang = c:
      * typedef unsigned long long uint64_t
      *}
      */
-    public static final OfLong uint64_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong uint64_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef signed char int_least8_t
      *}
      */
-    public static final OfByte int_least8_t = NVAudioEffects.C_CHAR;
+    public static final OfByte int_least8_t = NvAudioEffects.C_CHAR;
     /**
      * {@snippet lang = c:
      * typedef short int_least16_t
      *}
      */
-    public static final OfShort int_least16_t = NVAudioEffects.C_SHORT;
+    public static final OfShort int_least16_t = NvAudioEffects.C_SHORT;
     /**
      * {@snippet lang = c:
      * typedef int int_least32_t
      *}
      */
-    public static final OfInt int_least32_t = NVAudioEffects.C_INT;
+    public static final OfInt int_least32_t = NvAudioEffects.C_INT;
     /**
      * {@snippet lang = c:
      * typedef long long int_least64_t
      *}
      */
-    public static final OfLong int_least64_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong int_least64_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef unsigned char uint_least8_t
      *}
      */
-    public static final OfByte uint_least8_t = NVAudioEffects.C_CHAR;
+    public static final OfByte uint_least8_t = NvAudioEffects.C_CHAR;
     /**
      * {@snippet lang = c:
      * typedef unsigned short uint_least16_t
      *}
      */
-    public static final OfShort uint_least16_t = NVAudioEffects.C_SHORT;
+    public static final OfShort uint_least16_t = NvAudioEffects.C_SHORT;
     /**
      * {@snippet lang = c:
      * typedef unsigned int uint_least32_t
      *}
      */
-    public static final OfInt uint_least32_t = NVAudioEffects.C_INT;
+    public static final OfInt uint_least32_t = NvAudioEffects.C_INT;
     /**
      * {@snippet lang = c:
      * typedef unsigned long long uint_least64_t
      *}
      */
-    public static final OfLong uint_least64_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong uint_least64_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef signed char int_fast8_t
      *}
      */
-    public static final OfByte int_fast8_t = NVAudioEffects.C_CHAR;
+    public static final OfByte int_fast8_t = NvAudioEffects.C_CHAR;
     /**
      * {@snippet lang = c:
      * typedef int int_fast16_t
      *}
      */
-    public static final OfInt int_fast16_t = NVAudioEffects.C_INT;
+    public static final OfInt int_fast16_t = NvAudioEffects.C_INT;
     /**
      * {@snippet lang = c:
      * typedef int int_fast32_t
      *}
      */
-    public static final OfInt int_fast32_t = NVAudioEffects.C_INT;
+    public static final OfInt int_fast32_t = NvAudioEffects.C_INT;
     /**
      * {@snippet lang = c:
      * typedef long long int_fast64_t
      *}
      */
-    public static final OfLong int_fast64_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong int_fast64_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef unsigned char uint_fast8_t
      *}
      */
-    public static final OfByte uint_fast8_t = NVAudioEffects.C_CHAR;
+    public static final OfByte uint_fast8_t = NvAudioEffects.C_CHAR;
     /**
      * {@snippet lang = c:
      * typedef unsigned int uint_fast16_t
      *}
      */
-    public static final OfInt uint_fast16_t = NVAudioEffects.C_INT;
+    public static final OfInt uint_fast16_t = NvAudioEffects.C_INT;
     /**
      * {@snippet lang = c:
      * typedef unsigned int uint_fast32_t
      *}
      */
-    public static final OfInt uint_fast32_t = NVAudioEffects.C_INT;
+    public static final OfInt uint_fast32_t = NvAudioEffects.C_INT;
     /**
      * {@snippet lang = c:
      * typedef unsigned long long uint_fast64_t
      *}
      */
-    public static final OfLong uint_fast64_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong uint_fast64_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef long long intmax_t
      *}
      */
-    public static final OfLong intmax_t = NVAudioEffects.C_LONG_LONG;
+    public static final OfLong intmax_t = NvAudioEffects.C_LONG_LONG;
     /**
      * {@snippet lang = c:
      * typedef unsigned long long uintmax_t
      *}
      */
-    public static final OfLong uintmax_t = NVAudioEffects.C_LONG_LONG;
-    private static final int NVAFX_STATUS_SUCCESS = (int) 0L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_SUCCESS = 0
-     *}
-     */
-    public static int NVAFX_STATUS_SUCCESS() {
-        return NVAFX_STATUS_SUCCESS;
-    }
-
-    private static final int NVAFX_STATUS_FAILED = (int) 1L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_FAILED = 1
-     *}
-     */
-    public static int NVAFX_STATUS_FAILED() {
-        return NVAFX_STATUS_FAILED;
-    }
-
-    private static final int NVAFX_STATUS_INVALID_HANDLE = (int) 2L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_INVALID_HANDLE = 2
-     *}
-     */
-    public static int NVAFX_STATUS_INVALID_HANDLE() {
-        return NVAFX_STATUS_INVALID_HANDLE;
-    }
-
-    private static final int NVAFX_STATUS_INVALID_PARAM = (int) 3L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_INVALID_PARAM = 3
-     *}
-     */
-    public static int NVAFX_STATUS_INVALID_PARAM() {
-        return NVAFX_STATUS_INVALID_PARAM;
-    }
-
-    private static final int NVAFX_STATUS_IMMUTABLE_PARAM = (int) 4L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_IMMUTABLE_PARAM = 4
-     *}
-     */
-    public static int NVAFX_STATUS_IMMUTABLE_PARAM() {
-        return NVAFX_STATUS_IMMUTABLE_PARAM;
-    }
-
-    private static final int NVAFX_STATUS_INSUFFICIENT_DATA = (int) 5L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_INSUFFICIENT_DATA = 5
-     *}
-     */
-    public static int NVAFX_STATUS_INSUFFICIENT_DATA() {
-        return NVAFX_STATUS_INSUFFICIENT_DATA;
-    }
-
-    private static final int NVAFX_STATUS_EFFECT_NOT_AVAILABLE = (int) 6L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_EFFECT_NOT_AVAILABLE = 6
-     *}
-     */
-    public static int NVAFX_STATUS_EFFECT_NOT_AVAILABLE() {
-        return NVAFX_STATUS_EFFECT_NOT_AVAILABLE;
-    }
-
-    private static final int NVAFX_STATUS_OUTPUT_BUFFER_TOO_SMALL = (int) 7L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_OUTPUT_BUFFER_TOO_SMALL = 7
-     *}
-     */
-    public static int NVAFX_STATUS_OUTPUT_BUFFER_TOO_SMALL() {
-        return NVAFX_STATUS_OUTPUT_BUFFER_TOO_SMALL;
-    }
-
-    private static final int NVAFX_STATUS_MODEL_LOAD_FAILED = (int) 8L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_MODEL_LOAD_FAILED = 8
-     *}
-     */
-    public static int NVAFX_STATUS_MODEL_LOAD_FAILED() {
-        return NVAFX_STATUS_MODEL_LOAD_FAILED;
-    }
-
-    private static final int NVAFX_STATUS_32_SERVER_NOT_REGISTERED = (int) 9L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_32_SERVER_NOT_REGISTERED = 9
-     *}
-     */
-    public static int NVAFX_STATUS_32_SERVER_NOT_REGISTERED() {
-        return NVAFX_STATUS_32_SERVER_NOT_REGISTERED;
-    }
-
-    private static final int NVAFX_STATUS_32_COM_ERROR = (int) 10L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_32_COM_ERROR = 10
-     *}
-     */
-    public static int NVAFX_STATUS_32_COM_ERROR() {
-        return NVAFX_STATUS_32_COM_ERROR;
-    }
-
-    private static final int NVAFX_STATUS_GPU_UNSUPPORTED = (int) 11L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_GPU_UNSUPPORTED = 11
-     *}
-     */
-    public static int NVAFX_STATUS_GPU_UNSUPPORTED() {
-        return NVAFX_STATUS_GPU_UNSUPPORTED;
-    }
-
-    private static final int NVAFX_STATUS_CUDA_CONTEXT_CREATION_FAILED = (int) 12L;
-
-    /**
-     * {@snippet lang = c:
-     * enum <anonymous>.NVAFX_STATUS_CUDA_CONTEXT_CREATION_FAILED = 12
-     *}
-     */
-    public static int NVAFX_STATUS_CUDA_CONTEXT_CREATION_FAILED() {
-        return NVAFX_STATUS_CUDA_CONTEXT_CREATION_FAILED;
-    }
+    public static final OfLong uintmax_t = NvAudioEffects.C_LONG_LONG;
 
     /**
      * {@snippet lang = c:
      * typedef char NvAFX_Bool
      *}
      */
-    public static final OfByte NvAFX_Bool = NVAudioEffects.C_CHAR;
+    public static final OfByte NvAFX_Bool = NvAudioEffects.C_CHAR;
     /**
      * {@snippet lang = c:
      * typedef const char *NvAFX_EffectSelector
      *}
      */
-    public static final AddressLayout NvAFX_EffectSelector = NVAudioEffects.C_POINTER;
+    public static final AddressLayout NvAFX_EffectSelector = NvAudioEffects.C_POINTER;
     /**
      * {@snippet lang = c:
      * typedef const char *NvAFX_ParameterSelector
      *}
      */
-    public static final AddressLayout NvAFX_ParameterSelector = NVAudioEffects.C_POINTER;
+    public static final AddressLayout NvAFX_ParameterSelector = NvAudioEffects.C_POINTER;
     /**
      * {@snippet lang = c:
      * typedef void *NvAFX_Handle
      *}
      */
-    public static final AddressLayout NvAFX_Handle = NVAudioEffects.C_POINTER;
+    public static final AddressLayout NvAFX_Handle = NvAudioEffects.C_POINTER;
 
     private static class NvAFX_GetEffectList {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_GetEffectList");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_GetEffectList");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1000,12 +858,12 @@ public class NVAudioEffects {
 
     private static class NvAFX_CreateEffect {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_CreateEffect");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_CreateEffect");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1059,12 +917,12 @@ public class NVAudioEffects {
 
     private static class NvAFX_CreateChainedEffect {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_CreateChainedEffect");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_CreateChainedEffect");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1118,11 +976,11 @@ public class NVAudioEffects {
 
     private static class NvAFX_DestroyEffect {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_DestroyEffect");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_DestroyEffect");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1176,13 +1034,13 @@ public class NVAudioEffects {
 
     private static class NvAFX_SetU32 {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_INT
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_INT
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_SetU32");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_SetU32");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1236,14 +1094,14 @@ public class NVAudioEffects {
 
     private static class NvAFX_SetU32List {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_INT
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_INT
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_SetU32List");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_SetU32List");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1297,13 +1155,13 @@ public class NVAudioEffects {
 
     private static class NvAFX_SetString {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_SetString");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_SetString");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1357,14 +1215,14 @@ public class NVAudioEffects {
 
     private static class NvAFX_SetStringList {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_INT
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_INT
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_SetStringList");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_SetStringList");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1418,13 +1276,13 @@ public class NVAudioEffects {
 
     private static class NvAFX_SetFloat {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_FLOAT
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_FLOAT
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_SetFloat");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_SetFloat");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1478,14 +1336,14 @@ public class NVAudioEffects {
 
     private static class NvAFX_SetFloatList {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_INT
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_INT
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_SetFloatList");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_SetFloatList");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1539,13 +1397,13 @@ public class NVAudioEffects {
 
     private static class NvAFX_GetU32 {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_GetU32");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_GetU32");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1599,14 +1457,14 @@ public class NVAudioEffects {
 
     private static class NvAFX_GetString {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_INT
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_INT
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_GetString");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_GetString");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1660,15 +1518,15 @@ public class NVAudioEffects {
 
     private static class NvAFX_GetStringList {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_INT
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_INT
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_GetStringList");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_GetStringList");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1722,13 +1580,13 @@ public class NVAudioEffects {
 
     private static class NvAFX_GetFloat {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_GetFloat");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_GetFloat");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1782,14 +1640,14 @@ public class NVAudioEffects {
 
     private static class NvAFX_GetFloatList {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_INT
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_INT
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_GetFloatList");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_GetFloatList");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1843,11 +1701,11 @@ public class NVAudioEffects {
 
     private static class NvAFX_Load {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_Load");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_Load");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1901,13 +1759,13 @@ public class NVAudioEffects {
 
     private static class NvAFX_GetSupportedDevices {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_GetSupportedDevices");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_GetSupportedDevices");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1961,15 +1819,15 @@ public class NVAudioEffects {
 
     private static class NvAFX_Run {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_POINTER,
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_INT
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_POINTER,
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_INT
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_Run");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_Run");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2023,11 +1881,11 @@ public class NVAudioEffects {
 
     private static class NvAFX_Reset {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                NVAudioEffects.C_INT,
-                NVAudioEffects.C_POINTER
+                NvAudioEffects.C_INT,
+                NvAudioEffects.C_POINTER
         );
 
-        public static final MemorySegment ADDR = NVAudioEffects.findOrThrow("NvAFX_Reset");
+        public static final MemorySegment ADDR = NvAudioEffects.findOrThrow("NvAFX_Reset");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2619,56 +2477,72 @@ public class NVAudioEffects {
     }
 
     /** Denoiser Effect */
-    public static final String NVAFX_EFFECT_DENOISER = "denoiser";
+    public static final MemorySegment NVAFX_EFFECT_DENOISER = LIBRARY_ARENA.allocateUtf8String("denoiser");
     /** Dereverb Effect */
-    public static final String NVAFX_EFFECT_DEREVERB = "dereverb";
+    public static final MemorySegment NVAFX_EFFECT_DEREVERB = LIBRARY_ARENA.allocateUtf8String("dereverb");
     /** Dereverb Denoiser Effect */
-    public static final String NVAFX_EFFECT_DEREVERB_DENOISER = "dereverb_denoiser";
+    public static final MemorySegment NVAFX_EFFECT_DEREVERB_DENOISER = LIBRARY_ARENA.allocateUtf8String("dereverb_denoiser");
     /** Acoustic Echo Cancellation Effect */
-    public static final String NVAFX_EFFECT_AEC = "aec";
+    public static final MemorySegment NVAFX_EFFECT_AEC = LIBRARY_ARENA.allocateUtf8String("aec");
     /** Super-resolution Effect */
-    public static final String NVAFX_EFFECT_SUPERRES = "superres";
+    public static final MemorySegment NVAFX_EFFECT_SUPERRES = LIBRARY_ARENA.allocateUtf8String("superres");
 
     /** Parameter selectors */
-    public static final String NVAFX_CHAINED_EFFECT_DENOISER_16k_SUPERRES_16k_TO_48k = "denoiser16k_superres16kto48k";
-    public static final String NVAFX_CHAINED_EFFECT_DEREVERB_16k_SUPERRES_16k_TO_48k = "dereverb16k_superres16kto48k";
-    public static final String NVAFX_CHAINED_EFFECT_DEREVERB_DENOISER_16k_SUPERRES_16k_TO_48k = "dereverb_denoiser16k_superres16kto48k";
-    public static final String NVAFX_CHAINED_EFFECT_SUPERRES_8k_TO_16k_DENOISER_16k = "superres8kto16k_denoiser16k";
-    public static final String NVAFX_CHAINED_EFFECT_SUPERRES_8k_TO_16k_DEREVERB_16k = "superres8kto16k_dereverb16k";
-    public static final String NVAFX_CHAINED_EFFECT_SUPERRES_8k_TO_16k_DEREVERB_DENOISER_16k = "superres8kto16k_dereverb_denoiser16k";
+    public static final MemorySegment NVAFX_CHAINED_EFFECT_DENOISER_16k_SUPERRES_16k_TO_48k = LIBRARY_ARENA.allocateUtf8String("denoiser16k_superres16kto48k");
+    public static final MemorySegment NVAFX_CHAINED_EFFECT_DEREVERB_16k_SUPERRES_16k_TO_48k = LIBRARY_ARENA.allocateUtf8String("dereverb16k_superres16kto48k");
+    public static final MemorySegment NVAFX_CHAINED_EFFECT_DEREVERB_DENOISER_16k_SUPERRES_16k_TO_48k = LIBRARY_ARENA.allocateUtf8String("dereverb_denoiser16k_superres16kto48k");
+    public static final MemorySegment NVAFX_CHAINED_EFFECT_SUPERRES_8k_TO_16k_DENOISER_16k = LIBRARY_ARENA.allocateUtf8String("superres8kto16k_denoiser16k");
+    public static final MemorySegment NVAFX_CHAINED_EFFECT_SUPERRES_8k_TO_16k_DEREVERB_16k = LIBRARY_ARENA.allocateUtf8String("superres8kto16k_dereverb16k");
+    public static final MemorySegment NVAFX_CHAINED_EFFECT_SUPERRES_8k_TO_16k_DEREVERB_DENOISER_16k = LIBRARY_ARENA.allocateUtf8String("superres8kto16k_dereverb_denoiser16k");
 
 
     /** Common Effect parameters.
      *  Number of audio streams in I/O (unsigned int). */
-    public static final String NVAFX_PARAM_NUM_STREAMS = "num_streams";
+    public static final MemorySegment NVAFX_PARAM_NUM_STREAMS = LIBRARY_ARENA.allocateUtf8String("num_streams");
     /** To set if SDK should select the default GPU to run the effects in a Multi-GPU setup(unsigned int).
      * Default value is 0. Please see user manual for details.*/
-    public static final String NVAFX_PARAM_USE_DEFAULT_GPU = "use_default_gpu";
+    public static final MemorySegment NVAFX_PARAM_USE_DEFAULT_GPU = LIBRARY_ARENA.allocateUtf8String("use_default_gpu");
     /** To be set to '1' if SDK user wants to create and manage own CUDA context. Other users can simply
      * ignore this parameter. Once set to '1' this cannot be unset for that session (unsigned int) rw param
      * Note: NVAFX_PARAM_USE_DEFAULT_GPU and NVAFX_PARAM_USER_CUDA_CONTEXT cannot be used at the same time */
-    public static final String NVAFX_PARAM_USER_CUDA_CONTEXT = "user_cuda_context";
+    public static final MemorySegment NVAFX_PARAM_USER_CUDA_CONTEXT = LIBRARY_ARENA.allocateUtf8String("user_cuda_context");
     /** To be set to '1' if SDK user wants to disable cuda graphs. Other users can simply ignore this parameter.
      * Using Cuda Graphs helps to reduce the inference between GPU and CPU which makes operations quicker.*/
-    public static final String NVAFX_PARAM_DISABLE_CUDA_GRAPH = "disable_cuda_graph";
+    public static final MemorySegment NVAFX_PARAM_DISABLE_CUDA_GRAPH = LIBRARY_ARENA.allocateUtf8String("disable_cuda_graph");
     /** To be set to '1' if SDK user wants to enable VAD */
-    public static final String NVAFX_PARAM_ENABLE_VAD = "enable_vad";
+    public static final MemorySegment NVAFX_PARAM_ENABLE_VAD = LIBRARY_ARENA.allocateUtf8String("enable_vad");
     /** Effect parameters. @ref NvAFX_ParameterSelector
      * Model path (char*) */
-    public static final String NVAFX_PARAM_MODEL_PATH = "model_path";
+    public static final MemorySegment NVAFX_PARAM_MODEL_PATH = LIBRARY_ARENA.allocateUtf8String("model_path");
     /** Input Sample rate (unsigned int). Currently supported sample rate(s): 48000, 16000, 8000 */
-    public static final String NVAFX_PARAM_INPUT_SAMPLE_RATE = "input_sample_rate";
+    public static final MemorySegment NVAFX_PARAM_INPUT_SAMPLE_RATE = LIBRARY_ARENA.allocateUtf8String("input_sample_rate");
     /** Output Sample rate (unsigned int). Currently supported sample rate(s): 48000, 16000 */
-    public static final String NVAFX_PARAM_OUTPUT_SAMPLE_RATE = "output_sample_rate";
+    public static final MemorySegment NVAFX_PARAM_OUTPUT_SAMPLE_RATE = LIBRARY_ARENA.allocateUtf8String("output_sample_rate");
     /** Number of input samples per frame (unsigned int). This is immutable parameter */
-    public static final String NVAFX_PARAM_NUM_INPUT_SAMPLES_PER_FRAME = "num_input_samples_per_frame";
+    public static final MemorySegment NVAFX_PARAM_NUM_INPUT_SAMPLES_PER_FRAME = LIBRARY_ARENA.allocateUtf8String("num_input_samples_per_frame");
     /** Number of output samples per frame (unsigned int). This is immutable parameter */
-    public static final String NVAFX_PARAM_NUM_OUTPUT_SAMPLES_PER_FRAME = "num_output_samples_per_frame";
+    public static final MemorySegment NVAFX_PARAM_NUM_OUTPUT_SAMPLES_PER_FRAME = LIBRARY_ARENA.allocateUtf8String("num_output_samples_per_frame");
     /** Number of input audio channels */
-    public static final String NVAFX_PARAM_NUM_INPUT_CHANNELS = "num_input_channels";
+    public static final MemorySegment NVAFX_PARAM_NUM_INPUT_CHANNELS = LIBRARY_ARENA.allocateUtf8String("num_input_channels");
     /** Number of output audio channels */
-    public static final String NVAFX_PARAM_NUM_OUTPUT_CHANNELS = "num_output_channels";
+    public static final MemorySegment NVAFX_PARAM_NUM_OUTPUT_CHANNELS = LIBRARY_ARENA.allocateUtf8String("num_output_channels");
     /** Effect intensity factor (float) */
-    public static final String NVAFX_PARAM_INTENSITY_RATIO = "intensity_ratio";
+    public static final MemorySegment NVAFX_PARAM_INTENSITY_RATIO = LIBRARY_ARENA.allocateUtf8String("intensity_ratio");
+
+    public enum NvAFX_Status {
+        NVAFX_STATUS_SUCCESS,
+        NVAFX_STATUS_FAILED,
+        NVAFX_STATUS_INVALID_HANDLE,
+        NVAFX_STATUS_INVALID_PARAM,
+        NVAFX_STATUS_IMMUTABLE_PARAM,
+        NVAFX_STATUS_INSUFFICIENT_DATA,
+        NVAFX_STATUS_EFFECT_NOT_AVAILABLE,
+        NVAFX_STATUS_OUTPUT_BUFFER_TOO_SMALL,
+        NVAFX_STATUS_MODEL_LOAD_FAILED,
+        NVAFX_STATUS_32_SERVER_NOT_REGISTERED,
+        NVAFX_STATUS_32_COM_ERROR,
+        NVAFX_STATUS_GPU_UNSUPPORTED,
+        NVAFX_STATUS_CUDA_CONTEXT_CREATION_FAILED,
+    }
 }
 

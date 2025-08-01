@@ -6,7 +6,6 @@ import cn.ussshenzhou.t88.gui.widegt.TLabel;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -34,6 +33,8 @@ public class NvidiaCautionPanel extends TLabel {
             case UNSUPPORTED_OS -> this.setText(Component.translatable("channel.config.ai.os"));
             case UNSUPPORTED_GPU -> this.setText(Component.translatable("channel.config.ai.gpu"));
             case UNSUPPORTED_DRIVER -> this.setText(Component.translatable("channel.config.ai.driver"));
+            case CHANGE_SAMPLE_RATE -> this.setText(Component.translatable("channel.config.ai.sample_rate"));
+            case EXCEPTION -> this.setText(Component.translatable("channel.config.ai.exception"));
         }
     }
 

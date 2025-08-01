@@ -27,7 +27,7 @@ public class WebRTCHelper {
         loadNative();
         refresh();
         detector = new VoiceActivityDetector();
-        slidingWindow = new SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / ChannelClientConfig.get().frameLengthMs);
+        slidingWindow = new SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / MicReader.getFrameLength());
     }
 
     public static void loadNative() {
@@ -82,22 +82,21 @@ public class WebRTCHelper {
     @Nullable
     public static byte[] process(byte[] raw) {
         synchronized (WebRTCHelper.class) {
-            var cfg = ChannelClientConfig.get();
-            int sampleRate = (int) cfg.sampleRate;
+            int sampleRate = MicManager.getSampleRate();
             boolean vad = false;
-            var seg = cfg.frameLengthMs / 10;
-            var length = raw.length / seg;
+            var seg = MicReader.getFrameLength() / 10;
+            var stepLength = raw.length / seg;
             byte[] result = new byte[raw.length];
             for (int i = 0; i < seg; i++) {
-                var subRaw = Arrays.copyOfRange(raw, length * i, length * i + length);
-                var subResult = new byte[length];
+                var subRaw = Arrays.copyOfRange(raw, stepLength * i, stepLength * i + stepLength);
+                var subResult = new byte[stepLength];
                 processor.processStream(
                         subRaw,
                         new AudioProcessingStreamConfig(sampleRate, ModConstant.MIC_CHANNEL),
                         new AudioProcessingStreamConfig(sampleRate, ModConstant.MIC_CHANNEL),
                         subResult
                 );
-                System.arraycopy(subResult, 0, result, length * i, length);
+                System.arraycopy(subResult, 0, result, stepLength * i, stepLength);
                 vad |= vad(subResult, sampleRate);
             }
             return vad ? result : null;
@@ -122,7 +121,7 @@ public class WebRTCHelper {
     }
 
     public static void updateSlideWindow() {
-        slidingWindow = new SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / ChannelClientConfig.get().frameLengthMs, slidingWindow);
+        slidingWindow = new SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / MicReader.getFrameLength(), slidingWindow);
     }
 
     public static class SimpleSlidingBooleanWindow {

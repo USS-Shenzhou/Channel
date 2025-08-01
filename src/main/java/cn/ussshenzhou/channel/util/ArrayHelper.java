@@ -2,6 +2,7 @@ package cn.ussshenzhou.channel.util;
 
 import org.lwjgl.system.MemoryUtil;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;
@@ -25,7 +26,7 @@ public class ArrayHelper {
     public static byte[] castS2B(short[] array) {
         var result = new byte[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = (byte) (array[i] / 32767f * 127);
+            result[i] = (byte) (array[i] / 32768f * 127);
         }
         return result;
     }
@@ -49,7 +50,7 @@ public class ArrayHelper {
     public static float[] castS2F(short[] array) {
         var result = new float[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = array[i] / 32767f;
+            result[i] = array[i] / 32768f;
         }
         return result;
     }

@@ -4,7 +4,7 @@ import cn.ussshenzhou.channel.audio.client.nativ.NvidiaHelper;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
 
 /**
  * @author USS_Shenzhou
@@ -14,7 +14,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 public class Initializer {
 
     @SubscribeEvent
-    public static void init(FMLClientSetupEvent event) {
+    public static void init(ClientStartedEvent event) {
         MicManager.init();
         MicReader.init();
         WebRTCHelper.init();

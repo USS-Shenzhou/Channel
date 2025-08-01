@@ -70,4 +70,8 @@ public class MicManager {
             return line;
         }
     }
+
+    public static int getSampleRate() {
+        return (int) line.getFormat().getSampleRate();
+    }
 }
