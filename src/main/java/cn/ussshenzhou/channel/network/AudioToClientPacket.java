@@ -1,6 +1,7 @@
 package cn.ussshenzhou.channel.network;
 
 import cn.ussshenzhou.channel.Channel;
+import cn.ussshenzhou.channel.audio.client.receive.PlayerTalkAudioStreamManager;
 import cn.ussshenzhou.t88.network.annotation.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -12,9 +13,9 @@ import java.util.concurrent.CompletableFuture;
  */
 @NetPacket(modid = Channel.MODID, handleOnNetwork = true)
 public class AudioToClientPacket {
-    private final int sampleRate;
-    private final int from;
-    private final byte[] opus;
+    public final int sampleRate;
+    public final int from;
+    public final byte[] opus;
 
     public AudioToClientPacket(int sampleRate, int from, byte[] opus) {
         this.sampleRate = sampleRate;
@@ -38,8 +39,6 @@ public class AudioToClientPacket {
 
     @ClientHandler
     public void clientHandler(IPayloadContext context) {
-        CompletableFuture.runAsync(() -> {
-
-        });
+        CompletableFuture.runAsync(() -> PlayerTalkAudioStreamManager.handle(this));
     }
 }

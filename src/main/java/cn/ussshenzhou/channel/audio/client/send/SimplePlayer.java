@@ -1,4 +1,4 @@
-package cn.ussshenzhou.channel.audio.client;
+package cn.ussshenzhou.channel.audio.client.send;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;

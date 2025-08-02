@@ -1,4 +1,4 @@
-package cn.ussshenzhou.channel.audio.client;
+package cn.ussshenzhou.channel.audio.client.send;
 
 import cn.ussshenzhou.channel.audio.Vad;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;

@@ -1,6 +1,6 @@
-package cn.ussshenzhou.channel.audio.client;
+package cn.ussshenzhou.channel.audio.client.send;
 
-import cn.ussshenzhou.channel.audio.client.nativ.NvidiaHelper;
+import cn.ussshenzhou.channel.audio.client.send.nativ.NvidiaHelper;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;

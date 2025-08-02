@@ -1,0 +1,12 @@
+{
+  "player_talking": {
+    "subtitle": "channel.sound.player_talking",
+    "replace": true,
+    "sounds": [
+      {
+        "name": "channel:dumb",
+        "stream": true
+      }
+    ]
+  }
+}

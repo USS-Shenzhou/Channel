@@ -1,6 +1,6 @@
 package cn.ussshenzhou.channel.gui;
 
-import cn.ussshenzhou.channel.audio.client.nativ.NvidiaHelper;
+import cn.ussshenzhou.channel.audio.client.send.nativ.NvidiaHelper;
 import cn.ussshenzhou.t88.gui.advanced.TLabelButton;
 import cn.ussshenzhou.t88.gui.widegt.TLabel;
 import net.minecraft.Util;

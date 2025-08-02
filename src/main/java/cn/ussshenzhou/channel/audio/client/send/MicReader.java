@@ -1,10 +1,9 @@
-package cn.ussshenzhou.channel.audio.client;
+package cn.ussshenzhou.channel.audio.client.send;
 
 import cn.ussshenzhou.channel.audio.Trigger;
-import cn.ussshenzhou.channel.audio.client.nativ.NvidiaHelper;
+import cn.ussshenzhou.channel.audio.client.send.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.network.AudioToServerPacket;
-import cn.ussshenzhou.channel.util.ArrayHelper;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.channel.util.OpusHelper;

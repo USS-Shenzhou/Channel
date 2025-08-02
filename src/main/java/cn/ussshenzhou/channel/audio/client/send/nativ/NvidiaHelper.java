@@ -1,8 +1,8 @@
-package cn.ussshenzhou.channel.audio.client.nativ;
+package cn.ussshenzhou.channel.audio.client.send.nativ;
 
 import cn.ussshenzhou.channel.audio.NC;
-import cn.ussshenzhou.channel.audio.client.MicManager;
-import cn.ussshenzhou.channel.audio.client.MicReader;
+import cn.ussshenzhou.channel.audio.client.send.MicManager;
+import cn.ussshenzhou.channel.audio.client.send.MicReader;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.util.ArrayHelper;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -15,7 +15,7 @@ import java.lang.foreign.ValueLayout;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static cn.ussshenzhou.channel.audio.client.nativ.NvAudioEffects.*;
+import static cn.ussshenzhou.channel.audio.client.send.nativ.NvAudioEffects.*;
 import static java.lang.foreign.MemorySegment.NULL;
 
 /**
