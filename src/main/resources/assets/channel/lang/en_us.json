@@ -9,6 +9,7 @@
   "channel.config.mic.length": "帧长(ms)",
   "channel.config.mic.length.tooltip": "决定每隔多久向服务器发送一次数据。\n较短的帧有助于减小延迟，较长的帧有助于减小网络占用。",
   "channel.config.mic.listen": "侦听",
+  "channel.config.mic.listen.tooltip": "回放经过前处理之后的声音，其内容与其他人听到的基本相同。",
 
   "channel.config.level": "电平",
   "channel.config.level.raw.tooltip": "从选定的设备直接输出的电平",

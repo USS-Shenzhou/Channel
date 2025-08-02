@@ -32,6 +32,10 @@ public class NvidiaHelper {
     }
 
     private static void checkRequire() {
+        if (MicManager.getSampleRate() == 8000) {
+            stat = Stat.CHANGE_SAMPLE_RATE;
+            return;
+        }
         var os = System.getProperty("os.name").toLowerCase();
         if (!os.contains("windows")) {
             stat = Stat.UNSUPPORTED_OS;

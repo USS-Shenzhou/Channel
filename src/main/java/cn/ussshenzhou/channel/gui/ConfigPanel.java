@@ -163,7 +163,7 @@ public class ConfigPanel extends TOptionsPanel {
         nvidiaLogo = (HorizontalTitledOption<?>) addOption(Component.literal("Powered by"), new TImage(ResourceLocation.fromNamespaceAndPath(Channel.MODID, "textures/gui/nvidia.png")) {
             @Override
             public Vector2i getPreferredSize() {
-                return new Vector2i(0, 44);
+                return new Vector2i(0, 50);
             }
         }).getB().getParent();
         //noinspection DataFlowIssue
@@ -251,7 +251,7 @@ public class ConfigPanel extends TOptionsPanel {
                 List.of(false, true),
                 bool -> _ -> ChannelClientConfig.write(c -> c.listen = bool),
                 entry -> entry.getContent() == cfg.listen
-        );
+        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.listen.tooltip")));
         addOptionSplitter(Component.translatable("channel.config.post"));
 
         updateUsableSelectionByDevice(cfg.useDevice);

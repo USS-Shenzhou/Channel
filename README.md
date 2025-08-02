@@ -26,8 +26,10 @@ This mod is distributed in the hope that it will be useful, but WITHOUT ANY WARR
 
 1. 使用了[WebRTC-java](https://github.com/devopvoid/webrtc-java)，按Apache-2.0取得许可。
 2. 使用了[Concentus](https://github.com/lostromb/concentus)，按其自定义许可证，一种与BSD-3相似的许可证，取得许可。
+3. 使用了[NVIDIA MAXINE AFX SDK](https://github.com/NVIDIA-Maxine/Maxine-AFX-SDK)，按MIT取得许可。
 
 <p></p>
 
 1. Uses [WebRTC-java](https://github.com/devopvoid/webrtc-java), licensed under the Apache-2.0 License.
 2. Uses [Concentus](https://github.com/lostromb/concentus), licensed under its custom license, which is similar to BSD-3 Clause.
+3. Uses [NVIDIA MAXINE AFX SDK](https://github.com/NVIDIA-Maxine/Maxine-AFX-SDK), licensed under the MIT License.

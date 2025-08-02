@@ -63,10 +63,6 @@ public class MicReader {
                 }
                 LevelGatherer.updateRaw(audio);
                 audio = WebRTCHelper.process(NvidiaHelper.process(audio));
-                if (ChannelClientConfig.get().listen) {
-                    byte[] finalAudio = audio;
-                    Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, MicManager.getLine().getFormat()));
-                }
                 if (audio == null) {
                     braek();
                     return;
@@ -74,6 +70,10 @@ public class MicReader {
                 if (!checkThreshold(audio)) {
                     braek();
                     return;
+                }
+                if (ChannelClientConfig.get().listen) {
+                    byte[] finalAudio = audio;
+                    Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, MicManager.getLine().getFormat()));
                 }
                 int sampleRate = MicManager.getSampleRate();
                 var serialized = OpusHelper.encode(audio, sampleRate);
@@ -86,6 +86,9 @@ public class MicReader {
 
     private static boolean checkThreshold(byte[] audio) {
         var level = LevelGatherer.updateProcessed(audio);
+        if (level == 0) {
+            return false;
+        }
         var cfg = ChannelClientConfig.get();
         if (cfg.trigger == Trigger.THRESHOLD) {
             slidingWindow.update(AudioHelper.s2dbfs(level) >= cfg.triggerThresholdDBFS);
