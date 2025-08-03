@@ -32,54 +32,50 @@ public class MicReader {
     }
 
     @Deprecated
-    public static void frameLengthChange() {
-        synchronized (MicReader.class) {
-            keepReading.cancel(false);
-            frameLength = ChannelClientConfig.get().frameLengthMs;
-            keepReading = SCHEDULER.scheduleAtFixedRate(MicReader::read, 0, frameLength, TimeUnit.MILLISECONDS);
-            slidingWindow = new WebRTCHelper.SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / frameLength, slidingWindow);
-        }
+    public static synchronized void frameLengthChange() {
+        keepReading.cancel(false);
+        frameLength = ChannelClientConfig.get().frameLengthMs;
+        keepReading = SCHEDULER.scheduleAtFixedRate(MicReader::read, 0, frameLength, TimeUnit.MILLISECONDS);
+        slidingWindow = new WebRTCHelper.SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / frameLength, slidingWindow);
     }
 
-    private static void read() {
-        synchronized (MicReader.class) {
-            if (Minecraft.getInstance().getConnection() == null) {
+    private static synchronized void read() {
+        if (Minecraft.getInstance().getConnection() == null) {
+            return;
+        }
+        try {
+            var line = MicManager.getLine();
+            if (line == null) {
+                LevelGatherer.updateRaw(null);
+                braek();
                 return;
             }
-            try {
-                var line = MicManager.getLine();
-                if (line == null) {
-                    LevelGatherer.updateRaw(null);
-                    braek();
-                    return;
-                }
-                var audio = createBuffer();
-                var bytesRead = line.read(audio, 0, audio.length);
-                if (bytesRead == 0) {
-                    LevelGatherer.updateRaw(null);
-                    braek();
-                    return;
-                }
-                LevelGatherer.updateRaw(audio);
-                audio = WebRTCHelper.process(NvidiaHelper.process(audio));
-                if (audio == null) {
-                    braek();
-                    return;
-                }
-                if (!checkThreshold(audio)) {
-                    braek();
-                    return;
-                }
-                if (ChannelClientConfig.get().listen) {
-                    byte[] finalAudio = audio;
-                    Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, MicManager.getLine().getFormat()));
-                }
-                int sampleRate = MicManager.getSampleRate();
-                var serialized = OpusHelper.encode(audio, sampleRate);
-                NetworkHelper.sendToServer(new AudioToServerPacket(sampleRate, serialized));
-            } catch (Throwable t) {
-                LogUtils.getLogger().error("{}", t.toString());
+            var audio = createBuffer();
+            var bytesRead = line.read(audio, 0, audio.length);
+            if (bytesRead == 0) {
+                LevelGatherer.updateRaw(null);
+                braek();
+                return;
             }
+            LevelGatherer.updateRaw(audio);
+            audio = WebRTCHelper.process(NvidiaHelper.process(audio));
+            if (audio == null) {
+                braek();
+                return;
+            }
+            if (!checkThreshold(audio)) {
+                braek();
+                return;
+            }
+            if (ChannelClientConfig.get().listen) {
+                byte[] finalAudio = audio;
+                Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, MicManager.getLine().getFormat()));
+            }
+            int sampleRate = MicManager.getSampleRate();
+            var serialized = OpusHelper.encode(audio, sampleRate);
+            NetworkHelper.sendToServer(new AudioToServerPacket(sampleRate, serialized));
+        } catch (Throwable t) {
+            LogUtils.getLogger().error("{}", t.toString());
         }
     }
 

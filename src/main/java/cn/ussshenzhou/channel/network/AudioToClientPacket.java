@@ -1,7 +1,7 @@
 package cn.ussshenzhou.channel.network;
 
 import cn.ussshenzhou.channel.Channel;
-import cn.ussshenzhou.channel.audio.client.receive.PlayerTalkAudioStreamManager;
+import cn.ussshenzhou.channel.audio.client.receive.PlayerTalkManager;
 import cn.ussshenzhou.t88.network.annotation.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -39,6 +39,6 @@ public class AudioToClientPacket {
 
     @ClientHandler
     public void clientHandler(IPayloadContext context) {
-        CompletableFuture.runAsync(() -> PlayerTalkAudioStreamManager.handle(this));
+        CompletableFuture.runAsync(() -> PlayerTalkManager.handlePacket(this));
     }
 }

@@ -38,69 +38,65 @@ public class WebRTCHelper {
         //TODO
     }
 
-    public static void refresh() {
-        synchronized (WebRTCHelper.class) {
-            if (processor != null) {
-                processor.dispose();
-            }
-            var cfg = ChannelClientConfig.get();
-            processor = new AudioProcessing();
-            var config = new AudioProcessingConfig();
-            if (cfg.noiseCanceling != NC.AI){
-                if (cfg.noiseCanceling != NC.OFF) {
-                    config.noiseSuppression.enabled = true;
-                    config.noiseSuppression.level = AudioProcessingConfig.NoiseSuppression.Level.values()[cfg.noiseCanceling.ordinal()];
-                } else {
-                    config.noiseSuppression.enabled = false;
-                }
-                if (cfg.echoCanceling) {
-                    config.echoCanceller.enabled = true;
-                    config.echoCanceller.enforceHighPassFiltering = true;
-                    processor.setStreamDelayMs(80);
-                } else {
-                    config.echoCanceller.enabled = false;
-                    processor.setStreamDelayMs(0);
-                }
-            }
-            config.highPassFilter.enabled = cfg.highPassFilter;
-            config.gainControl.enabled = true;
-            config.gainControl.fixedDigital.gainDb = cfg.forceGainControl;
-            if (cfg.autoGainControl) {
-                config.gainControl.adaptiveDigital.enabled = true;
-                config.gainControl.adaptiveDigital.headroomDb = -cfg.targetLevel;
-                config.gainControl.adaptiveDigital.maxGainDb = cfg.maxGain;
-                config.gainControl.adaptiveDigital.initialGainDb = 0;
-                config.gainControl.adaptiveDigital.maxOutputNoiseLevelDbfs = -40;
-                config.gainControl.adaptiveDigital.maxGainChangeDbPerSecond = 15;
-            } else {
-                config.gainControl.adaptiveDigital.enabled = false;
-            }
-            processor.applyConfig(config);
+    public static synchronized void refresh() {
+        if (processor != null) {
+            processor.dispose();
         }
+        var cfg = ChannelClientConfig.get();
+        processor = new AudioProcessing();
+        var config = new AudioProcessingConfig();
+        if (cfg.noiseCanceling != NC.AI) {
+            if (cfg.noiseCanceling != NC.OFF) {
+                config.noiseSuppression.enabled = true;
+                config.noiseSuppression.level = AudioProcessingConfig.NoiseSuppression.Level.values()[cfg.noiseCanceling.ordinal()];
+            } else {
+                config.noiseSuppression.enabled = false;
+            }
+            if (cfg.echoCanceling) {
+                config.echoCanceller.enabled = true;
+                config.echoCanceller.enforceHighPassFiltering = true;
+                processor.setStreamDelayMs(80);
+            } else {
+                config.echoCanceller.enabled = false;
+                processor.setStreamDelayMs(0);
+            }
+        }
+        config.highPassFilter.enabled = cfg.highPassFilter;
+        config.gainControl.enabled = true;
+        config.gainControl.fixedDigital.gainDb = cfg.forceGainControl;
+        if (cfg.autoGainControl) {
+            config.gainControl.adaptiveDigital.enabled = true;
+            config.gainControl.adaptiveDigital.headroomDb = -cfg.targetLevel;
+            config.gainControl.adaptiveDigital.maxGainDb = cfg.maxGain;
+            config.gainControl.adaptiveDigital.initialGainDb = 0;
+            config.gainControl.adaptiveDigital.maxOutputNoiseLevelDbfs = -40;
+            config.gainControl.adaptiveDigital.maxGainChangeDbPerSecond = 15;
+        } else {
+            config.gainControl.adaptiveDigital.enabled = false;
+        }
+        processor.applyConfig(config);
     }
 
     @Nullable
-    public static byte[] process(byte[] raw) {
-        synchronized (WebRTCHelper.class) {
-            int sampleRate = MicManager.getSampleRate();
-            boolean vad = false;
-            var seg = MicReader.getFrameLength() / 10;
-            var stepLength = raw.length / seg;
-            byte[] result = new byte[raw.length];
-            for (int i = 0; i < seg; i++) {
-                var subRaw = Arrays.copyOfRange(raw, stepLength * i, stepLength * i + stepLength);
-                var subResult = new byte[stepLength];
-                processor.processStream(
-                        subRaw,
-                        new AudioProcessingStreamConfig(sampleRate, ModConstant.MIC_CHANNEL),
-                        new AudioProcessingStreamConfig(sampleRate, ModConstant.MIC_CHANNEL),
-                        subResult
-                );
-                System.arraycopy(subResult, 0, result, stepLength * i, stepLength);
-                vad |= vad(subResult, sampleRate);
-            }
-            return vad ? result : null;
+    public static synchronized byte[] process(byte[] raw) {
+        int sampleRate = MicManager.getSampleRate();
+        boolean vad = false;
+        var seg = MicReader.getFrameLength() / 10;
+        var stepLength = raw.length / seg;
+        byte[] result = new byte[raw.length];
+        for (int i = 0; i < seg; i++) {
+            var subRaw = Arrays.copyOfRange(raw, stepLength * i, stepLength * i + stepLength);
+            var subResult = new byte[stepLength];
+            processor.processStream(
+                    subRaw,
+                    new AudioProcessingStreamConfig(sampleRate, ModConstant.MIC_CHANNEL),
+                    new AudioProcessingStreamConfig(sampleRate, ModConstant.MIC_CHANNEL),
+                    subResult
+            );
+            System.arraycopy(subResult, 0, result, stepLength * i, stepLength);
+            vad |= vad(subResult, sampleRate);
         }
+        return vad ? result : null;
     }
 
     private static boolean vad(byte[] audio, int sampleRate) {

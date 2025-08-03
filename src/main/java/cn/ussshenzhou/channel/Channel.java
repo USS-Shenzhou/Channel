@@ -1,6 +1,5 @@
 package cn.ussshenzhou.channel;
 
-import cn.ussshenzhou.channel.audio.ModSoundEvents;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.config.ChannelServerConfig;
 import cn.ussshenzhou.t88.config.ConfigHelper;
@@ -18,6 +17,5 @@ public class Channel {
     public Channel(IEventBus modEventBus, ModContainer modContainer) {
         ConfigHelper.loadConfig(new ChannelClientConfig());
         ConfigHelper.loadConfig(new ChannelServerConfig());
-        ModSoundEvents.SOUND_EVENTS.register(modEventBus);
     }
 }

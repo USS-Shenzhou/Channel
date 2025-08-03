@@ -40,35 +40,31 @@ public class MicManager {
         refresh(deviceInfo, new AudioFormat(cfg.sampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false));
     }
 
-    public static void refresh(Mixer.Info deviceInfo, AudioFormat format) {
-        synchronized (MicManager.class) {
-            try {
-                var lineInfo = new DataLine.Info(TargetDataLine.class, format);
-                if (line != null) {
-                    if (line.isRunning()) {
-                        line.stop();
-                    }
-                    if (line.isOpen()) {
-                        line.close();
-                    }
+    public static synchronized void refresh(Mixer.Info deviceInfo, AudioFormat format) {
+        try {
+            var lineInfo = new DataLine.Info(TargetDataLine.class, format);
+            if (line != null) {
+                if (line.isRunning()) {
+                    line.stop();
                 }
-                line = (TargetDataLine) AudioSystem.getMixer(deviceInfo).getLine(lineInfo);
-                if (!line.isOpen()) {
-                    line.open(format);
+                if (line.isOpen()) {
+                    line.close();
                 }
-                line.start();
-            } catch (LineUnavailableException e) {
-                LogUtils.getLogger().error("{}", e.getMessage());
-                TSimpleNotification.fire(Component.literal("Failed To Init Device " + deviceInfo.getName()), 5, TSimpleNotification.Severity.ERROR);
             }
+            line = (TargetDataLine) AudioSystem.getMixer(deviceInfo).getLine(lineInfo);
+            if (!line.isOpen()) {
+                line.open(format);
+            }
+            line.start();
+        } catch (LineUnavailableException e) {
+            LogUtils.getLogger().error("{}", e.getMessage());
+            TSimpleNotification.fire(Component.literal("Failed To Init Device " + deviceInfo.getName()), 5, TSimpleNotification.Severity.ERROR);
         }
     }
 
     @Nullable
-    public static TargetDataLine getLine() {
-        synchronized (MicManager.class) {
-            return line;
-        }
+    public static synchronized TargetDataLine getLine() {
+        return line;
     }
 
     public static int getSampleRate() {

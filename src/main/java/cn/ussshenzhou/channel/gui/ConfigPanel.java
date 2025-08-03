@@ -77,7 +77,7 @@ public class ConfigPanel extends TOptionsPanel {
                     {
                         //this.setProgressBarColorGradient(0xff44ff00, 0xffff5900);
                         this.setProgressBarColorGradient(0x003c91ff, 0xff3c91ff);
-                        this.setTextMode(new TextMode((_, _, value) -> String.format("%.1f dBFS", value - 90)));
+                        this.setTextMode(new TextMode((_, _, value) -> value == 0 ? "-∞ dBFS" : String.format("%.1f dBFS", value - 90)));
                         this.setTooltip(Tooltip.create(Component.translatable("channel.config.level.raw.tooltip")));
                     }
 
@@ -235,7 +235,7 @@ public class ConfigPanel extends TOptionsPanel {
                     {
                         //this.setProgressBarColorGradient(0xff44ff00, 0xffff5900);
                         this.setProgressBarColorGradient(0x003c91ff, 0xff3c91ff);
-                        this.setTextMode(new TextMode((_, _, value) -> String.format("%.1f dBFS", value - 90)));
+                        this.setTextMode(new TextMode((_, _, value) -> value == 0 ? "-∞ dBFS" : String.format("%.1f dBFS", value - 90)));
                         this.setTooltip(Tooltip.create(Component.translatable("channel.config.level.pro.tooltip")));
                     }
 

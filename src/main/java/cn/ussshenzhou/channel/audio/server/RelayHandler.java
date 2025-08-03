@@ -15,7 +15,7 @@ public class RelayHandler {
 
     public static void normalTalking(ServerPlayer from, byte[] opusAudio, int sampleRate) {
         from.level().players().stream().filter(to ->
-                        //FIXME to.getId() != from.getId() &&
+                        to.getId() != from.getId() &&
                                 to.position().distanceTo(from.position()) < 24 &&
                                 (!from.isSpectator() || to.isSpectator())
                 )
