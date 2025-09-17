@@ -3,7 +3,7 @@ package cn.ussshenzhou.channel.audio.client.send;
 import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.audio.client.send.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
-import cn.ussshenzhou.channel.network.AudioToServerPacket;
+import cn.ussshenzhou.channel.network.TalkPacket2S;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.channel.util.OpusHelper;
@@ -73,7 +73,7 @@ public class MicReader {
             }
             int sampleRate = MicManager.getSampleRate();
             var serialized = OpusHelper.encode(audio, sampleRate);
-            NetworkHelper.sendToServer(new AudioToServerPacket(sampleRate, serialized));
+            NetworkHelper.sendToServer(new TalkPacket2S(sampleRate, serialized));
         } catch (Throwable t) {
             LogUtils.getLogger().error("{}", t.toString());
         }

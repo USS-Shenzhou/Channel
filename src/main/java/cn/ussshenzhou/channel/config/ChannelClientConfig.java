@@ -18,7 +18,7 @@ public class ChannelClientConfig implements TConfig {
     public float sampleRate = 16000;
     public int frameLengthMs = 20;
     public boolean listen = false;
-    public Trigger trigger = Trigger.VAD;
+    public Trigger trigger = Trigger.THRESHOLD;
     public Vad voiceDetectThreshold = Vad.LOW;
     public float triggerThresholdDBFS = -40;
     public NC noiseCanceling = NC.HIGH;

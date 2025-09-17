@@ -12,6 +12,7 @@ public enum Trigger implements ITranslatable {
     VAD("channel.config.pre.trigger.vad"),
     PTT("channel.config.pre.trigger.ptt"),
     THRESHOLD("channel.config.pre.trigger.threshold"),;
+    //TODO ALWAYS_MUTE/temp mute
 
     private final String translateKey;
 

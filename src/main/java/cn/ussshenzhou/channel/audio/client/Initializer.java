@@ -1,6 +1,6 @@
 package cn.ussshenzhou.channel.audio.client;
 
-import cn.ussshenzhou.channel.audio.client.receive.PlayerTalkManager;
+import cn.ussshenzhou.channel.audio.client.receive.AudioManagerManager;
 import cn.ussshenzhou.channel.audio.client.send.MicManager;
 import cn.ussshenzhou.channel.audio.client.send.MicReader;
 import cn.ussshenzhou.channel.audio.client.send.WebRTCHelper;
@@ -23,6 +23,6 @@ public class Initializer {
         MicReader.init();
         WebRTCHelper.init();
         NvidiaHelper.init();
-        PlayerTalkManager.init();
+        AudioManagerManager.init();
     }
 }

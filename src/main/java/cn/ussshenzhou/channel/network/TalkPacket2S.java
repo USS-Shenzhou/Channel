@@ -1,7 +1,7 @@
 package cn.ussshenzhou.channel.network;
 
-import cn.ussshenzhou.channel.Channel;
 import cn.ussshenzhou.channel.audio.server.RelayHandler;
+import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.network.annotation.Decoder;
 import cn.ussshenzhou.t88.network.annotation.Encoder;
 import cn.ussshenzhou.t88.network.annotation.NetPacket;
@@ -15,18 +15,18 @@ import java.util.concurrent.CompletableFuture;
 /**
  * @author USS_Shenzhou
  */
-@NetPacket(modid = Channel.MODID, handleOnNetwork = true)
-public class AudioToServerPacket {
+@NetPacket(modid = ModConstant.SHORT_ID, handleOnNetwork = true, id = "tsp")
+public class TalkPacket2S {
     private final int sampleRate;
     private final byte[] opus;
 
-    public AudioToServerPacket(int sampleRate, byte[] opus) {
+    public TalkPacket2S(int sampleRate, byte[] opus) {
         this.sampleRate = sampleRate;
         this.opus = opus;
     }
 
     @Decoder
-    public AudioToServerPacket(FriendlyByteBuf buf) {
+    public TalkPacket2S(FriendlyByteBuf buf) {
         this.sampleRate = buf.readVarInt();
         this.opus = buf.readByteArray();
     }

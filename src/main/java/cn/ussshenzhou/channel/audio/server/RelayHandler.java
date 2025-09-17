@@ -1,6 +1,6 @@
 package cn.ussshenzhou.channel.audio.server;
 
-import cn.ussshenzhou.channel.network.AudioToClientPacket;
+import cn.ussshenzhou.channel.network.TalkPacket2C;
 import cn.ussshenzhou.t88.network.NetworkHelper;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -19,6 +19,6 @@ public class RelayHandler {
                                 to.position().distanceTo(from.position()) < 24 &&
                                 (!from.isSpectator() || to.isSpectator())
                 )
-                .forEach(to -> NetworkHelper.sendToPlayer(to, new AudioToClientPacket(sampleRate, from.getId(), opusAudio)));
+                .forEach(to -> NetworkHelper.sendToPlayer(to, new TalkPacket2C(sampleRate, from.getId(), opusAudio)));
     }
 }
