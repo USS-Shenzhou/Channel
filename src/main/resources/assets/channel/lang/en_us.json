@@ -31,7 +31,7 @@
   "channel.config.ai.os": "§6您当前的操作系统不支持此功能。\n§6需要 Windows 10 或更高。",
   "channel.config.ai.gpu": "§6您当前的显卡不支持此功能。\n§6需要 NVIDIA GeForce RTX 2060,\n§6Quadro RTX 3000, TITAN RTX 或更高。",
   "channel.config.ai.driver": "§6您当前的显卡驱动版本不支持此功能。\n§6需要 570.x 或更高。",
-  "channel.config.ai.sample_rate": "§6不支持当前的采样率。\n§6请将采样率调整为16000Hz或48000Hz。\n§6然后重新切换降噪模式。",
+  "channel.config.ai.sample_rate": "§6不支持当前的采样率。\n§6请将采样率调整为16000Hz或48000Hz，\n§6然后重新切换降噪模式。",
   "channel.config.ai.exception": "§6程序出现异常。\n§6查看日志以获取更多信息。",
 
   "channel.config.pre": "  前处理",

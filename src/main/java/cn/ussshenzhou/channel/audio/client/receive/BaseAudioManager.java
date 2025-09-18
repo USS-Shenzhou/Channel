@@ -49,21 +49,21 @@ public abstract class BaseAudioManager {
         AL.createCapabilities(ALC.createCapabilities(alDevice));
     }
 
-    public void handle(BaseAudioPacket2C packet) {
+    public void handle(int from, int sampleRate, byte[] opus) {
         try {
-            var decoded = OpusHelper.decode(packet.opus, packet.sampleRate);
+            var decoded = OpusHelper.decode(opus, sampleRate);
             var level = Minecraft.getInstance().level;
             if (level == null) {
                 return;
             }
-            var from = level.getEntity(packet.from);
-            if (from instanceof Player player) {
+            var fromEntity = level.getEntity(from);
+            if (fromEntity instanceof Player player) {
                 playerAudios.compute(player.getId(), (id, old) -> {
                     if (old == null) {
-                        return new PlayerAudio(id, packet.sampleRate);
-                    } else if (old.sampleRate != packet.sampleRate) {
+                        return new PlayerAudio(id, sampleRate);
+                    } else if (old.sampleRate != sampleRate) {
                         old.close();
-                        return new PlayerAudio(id, packet.sampleRate);
+                        return new PlayerAudio(id, sampleRate);
                     } else {
                         return old;
                     }

@@ -72,7 +72,7 @@ neoForge {
             // "REGISTRYDUMP": For getting the contents of all registries.
             systemProperty 'forge.logging.markers', 'REGISTRIES'
 
-            jvmArguments.addAll '--enable-preview'
+            //jvmArguments.addAll '--enable-preview'
 
             // Recommended logging level for the console
             // You can set various levels here.
@@ -122,8 +122,8 @@ dependencies {
     jarJar 'io.github.jaredmdobson:concentus:1.0.2'
 
     compileOnly(group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0")
-    additionalRuntimeClasspath (group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0")
-    jarJar (group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0")
+    additionalRuntimeClasspath(group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0")
+    jarJar(group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0")
 
     implementation group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0", classifier: "windows-x86_64"
     additionalRuntimeClasspath group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.13.0", classifier: "windows-x86_64"
@@ -213,4 +213,50 @@ tasks.register("runWithRenderDoc", Exec) {
             "org.gradle.wrapper.GradleWrapperMain",
             "runClient"
     ]
+}
+
+abstract class StripPreviewMinorTask extends DefaultTask {
+    @InputDirectory
+    abstract DirectoryProperty getClassesDir()
+
+    @TaskAction
+    void strip() {
+        File root = getClassesDir().get().asFile
+        if (!root.exists()) return
+
+        Deque<File> stack = new ArrayDeque<>()
+        stack.push(root)
+        while (!stack.isEmpty()) {
+            File dir = stack.pop()
+            File[] children = dir.listFiles()
+            if (children == null) continue
+            for (File f : children) {
+                if (f.isDirectory()) {
+                    stack.push(f)
+                } else if (f.isFile() && f.name.endsWith('.class')) {
+                    byte[] b = f.bytes
+                    if (b.length >= 8
+                            && (b[0] & 0xFF) == 0xCA && (b[1] & 0xFF) == 0xFE
+                            && (b[2] & 0xFF) == 0xBA && (b[3] & 0xFF) == 0xBE) {
+                        int minor = ((b[4] & 0xFF) << 8) | (b[5] & 0xFF)
+                        int major = ((b[6] & 0xFF) << 8) | (b[7] & 0xFF)
+                        if (major >= 56 && minor == 0xFFFF) {
+                            b[4] = 0; b[5] = 0
+                            f.bytes = b
+                            println("striped preview minor version: " + f.name)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.register('stripPreviewMinor', StripPreviewMinorTask) {
+    dependsOn tasks.named('classes')
+    classesDir.set(layout.buildDirectory.dir('classes/java/main'))
+}
+
+tasks.named('classes') {
+    finalizedBy tasks.named('stripPreviewMinor')
 }

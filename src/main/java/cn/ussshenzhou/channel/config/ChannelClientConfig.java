@@ -16,6 +16,7 @@ public class ChannelClientConfig implements TConfig {
 
     public String useDevice = "";
     public float sampleRate = 16000;
+    //TODO sample at 48000, and downscale before send
     public int frameLengthMs = 20;
     public boolean listen = false;
     public Trigger trigger = Trigger.THRESHOLD;
