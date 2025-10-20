@@ -1,4 +1,4 @@
-package cn.ussshenzhou.channel.audio.client.send.nativ;
+package cn.ussshenzhou.channel.audio.nativ;
 
 import cn.ussshenzhou.channel.audio.NC;
 import cn.ussshenzhou.channel.audio.client.send.MicManager;
@@ -12,11 +12,10 @@ import com.sun.jna.platform.win32.Kernel32;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static cn.ussshenzhou.channel.audio.client.send.nativ.NvAudioEffects.*;
+import static cn.ussshenzhou.channel.audio.nativ.NvAudioEffects.*;
 import static java.lang.foreign.MemorySegment.NULL;
 
 /**

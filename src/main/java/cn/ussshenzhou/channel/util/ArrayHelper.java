@@ -2,7 +2,6 @@ package cn.ussshenzhou.channel.util;
 
 import org.lwjgl.system.MemoryUtil;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;

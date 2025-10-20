@@ -23,6 +23,49 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+sourceSets {
+    main {
+        java.srcDir 'src/main/java'
+    }
+    java22 {
+        java.srcDir 'src/java22'
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath  += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+}
+
+tasks.named('compileJava', JavaCompile) {
+    options.compilerArgs += [
+            '--enable-preview'
+    ]
+}
+
+tasks.register('compileJava22', JavaCompile) {
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(22)
+    }
+    source = sourceSets.java22.java
+    classpath = sourceSets.main.output + sourceSets.java22.compileClasspath
+    destinationDirectory = layout.buildDirectory.dir('classes-java22')
+    options.release = 22
+}
+
+tasks.named('jar', Jar) {
+    dependsOn tasks.named('compileJava22')
+    manifest {
+        attributes(
+                'Multi-Release': 'true'
+        )
+    }
+    from(tasks.named('compileJava22')) {
+        into 'META-INF/versions/22'
+    }
+}
+
 neoForge {
     version = project.neo_version
 
@@ -89,12 +132,6 @@ neoForge {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-tasks.named('compileJava', JavaCompile) {
-    options.compilerArgs += [
-            '--enable-preview'
-    ]
-}
 
 dependencies {
     // Example mod dependency with JEI

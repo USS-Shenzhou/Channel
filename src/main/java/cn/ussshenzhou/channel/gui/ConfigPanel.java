@@ -7,7 +7,7 @@ import cn.ussshenzhou.channel.audio.Vad;
 import cn.ussshenzhou.channel.audio.client.send.LevelGatherer;
 import cn.ussshenzhou.channel.audio.client.send.MicManager;
 import cn.ussshenzhou.channel.audio.client.send.WebRTCHelper;
-import cn.ussshenzhou.channel.audio.client.send.nativ.NvidiaHelper;
+import cn.ussshenzhou.channel.audio.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
