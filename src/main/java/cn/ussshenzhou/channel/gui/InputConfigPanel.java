@@ -9,6 +9,7 @@ import cn.ussshenzhou.channel.audio.client.send.MicManager;
 import cn.ussshenzhou.channel.audio.client.send.WebRTCHelper;
 import cn.ussshenzhou.channel.audio.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
+import cn.ussshenzhou.channel.input.ModKeyMappingRegistry;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.gui.advanced.TOptionsPanel;
@@ -32,12 +33,12 @@ import java.util.stream.Stream;
 /**
  * @author USS_Shenzhou
  */
-public class ConfigPanel extends TOptionsPanel {
+public class InputConfigPanel extends TOptionsPanel {
     private final TCycleButton<String> devices;
     private final TCycleButton<Float> sampleRate;
     private HorizontalTitledOption<?> thresholdLevel, vad, targetLevel, maxGain, nvidiaLogo, nvidiaCaution, aiNCRatio;
 
-    public ConfigPanel() {
+    public InputConfigPanel() {
         var cfg = ChannelClientConfig.get();
 
         addOptionSplitter(Component.translatable("channel.config.mic"));
@@ -91,17 +92,46 @@ public class ConfigPanel extends TOptionsPanel {
 
         addOptionSplitter(Component.translatable("channel.config.pre"));
         addOptionCycleButtonInit(
+                Component.translatable("channel.config.pre.nc"),
+                List.of(NC.values()),
+                n -> _ -> {
+                    ChannelClientConfig.write(c -> c.noiseCanceling = n);
+                    NvidiaHelper.refresh();
+                    WebRTCHelper.refresh();
+                    nvidiaLogo.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
+                    aiNCRatio.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
+                    if (NvidiaHelper.getStat() != NvidiaHelper.Stat.OK) {
+                        nvidiaCaution.setVisibleT(cfg.noiseCanceling == NC.AI);
+                    }
+                    InputConfigPanel.this.layout();
+                },
+                entry -> entry.getContent() == cfg.noiseCanceling
+        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.nc.tooltip")));
+        aiNCRatio = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
+                Component.translatable("channel.config.pre.nc.ai_intense"),
+                0, 1,
+                (_, v) -> Component.literal(String.format("%d", (int) (v * 100)) + "%"),
+                Component.translatable("channel.config.pre.nc.ai_intense.tooltip"),
+                (slider, _) -> {
+                    ChannelClientConfig.write(c -> c.aiNoiseCancelingRatio = (float) slider.getAbsValue());
+                    NvidiaHelper.refresh();
+                },
+                cfg.aiNoiseCancelingRatio, false
+        ).getB().getParent();
+        aiNCRatio.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
+
+        addOptionCycleButtonInit(
                 Component.translatable("channel.config.pre.trigger"),
                 List.of(Trigger.values()),
                 tri -> button -> {
                     ChannelClientConfig.write(c -> c.trigger = tri);
-                    button.setTooltip(Tooltip.create(Component.translatable(tri.translateKey() + ".tooltip")));
+                    button.setTooltip(Tooltip.create(Component.translatable(tri.translateKey() + ".tooltip", ModKeyMappingRegistry.PTT.getKey().getDisplayName().getString())));
                     vad.setVisibleT(tri == Trigger.VAD);
                     thresholdLevel.setVisibleT(tri == Trigger.THRESHOLD);
-                    ConfigPanel.this.layout();
+                    InputConfigPanel.this.layout();
                 },
                 entry -> entry.getContent() == cfg.trigger
-        ).getB().setTooltip(Tooltip.create(Component.translatable(cfg.trigger.translateKey() + ".tooltip")));
+        ).getB().setTooltip(Tooltip.create(Component.translatable(cfg.trigger.translateKey() + ".tooltip", ModKeyMappingRegistry.PTT.getKey().getDisplayName().getString())));
         thresholdLevel = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.threshold"),
                 -90, 0,
@@ -123,34 +153,7 @@ public class ConfigPanel extends TOptionsPanel {
         vad = (HorizontalTitledOption<?>) tuple.getB().getParent();
         //noinspection DataFlowIssue
         vad.setVisibleT(cfg.trigger == Trigger.VAD);
-        addOptionCycleButtonInit(
-                Component.translatable("channel.config.pre.nc"),
-                List.of(NC.values()),
-                n -> _ -> {
-                    ChannelClientConfig.write(c -> c.noiseCanceling = n);
-                    NvidiaHelper.refresh();
-                    WebRTCHelper.refresh();
-                    nvidiaLogo.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
-                    aiNCRatio.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
-                    if (NvidiaHelper.getStat() != NvidiaHelper.Stat.OK) {
-                        nvidiaCaution.setVisibleT(cfg.noiseCanceling == NC.AI);
-                    }
-                    ConfigPanel.this.layout();
-                },
-                entry -> entry.getContent() == cfg.noiseCanceling
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.nc.tooltip")));
-        aiNCRatio = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
-                Component.translatable("channel.config.pre.nc.ai_intense"),
-                0, 1,
-                (_, v) -> Component.literal(String.format("%d", (int) (v * 100)) + "%"),
-                Component.translatable("channel.config.pre.nc.ai_intense.tooltip"),
-                (slider, _) -> {
-                    ChannelClientConfig.write(c -> c.aiNoiseCancelingRatio = (float) slider.getAbsValue());
-                    NvidiaHelper.refresh();
-                },
-                cfg.aiNoiseCancelingRatio, false
-        ).getB().getParent();
-        aiNCRatio.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
+
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.pre.ec"),
                 List.of(false, true),
@@ -201,7 +204,7 @@ public class ConfigPanel extends TOptionsPanel {
                     WebRTCHelper.refresh();
                     targetLevel.setVisibleT(bool);
                     maxGain.setVisibleT(bool);
-                    ConfigPanel.this.layout();
+                    InputConfigPanel.this.layout();
                 },
                 entry -> entry.getContent() == cfg.autoGainControl
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.agc.tooltip")));
@@ -252,7 +255,6 @@ public class ConfigPanel extends TOptionsPanel {
                 bool -> _ -> ChannelClientConfig.write(c -> c.listen = bool),
                 entry -> entry.getContent() == cfg.listen
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.listen.tooltip")));
-        addOptionSplitter(Component.translatable("channel.config.post"));
 
         updateUsableSelectionByDevice(cfg.useDevice);
     }

@@ -10,7 +10,7 @@ import net.minecraft.locale.Language;
 public enum Trigger implements ITranslatable {
     ALWAYS("channel.config.pre.trigger.always"),
     VAD("channel.config.pre.trigger.vad"),
-    PTT("channel.config.pre.trigger.ptt"),
+    PUSH_TO_TALK("channel.config.pre.trigger.ptt"),
     THRESHOLD("channel.config.pre.trigger.threshold"),;
     //TODO ALWAYS_MUTE/temp mute
 
@@ -22,9 +22,6 @@ public enum Trigger implements ITranslatable {
 
     @Override
     public String translateKey() {
-        if (this == PTT) {
-            return Language.getInstance().getOrDefault(translateKey).replace("?", ModKeyMappingRegistry.PTT.getKey().getDisplayName().getString());
-        }
         return translateKey;
     }
 }
