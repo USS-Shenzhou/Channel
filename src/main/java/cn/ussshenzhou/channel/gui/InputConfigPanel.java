@@ -125,13 +125,13 @@ public class InputConfigPanel extends TOptionsPanel {
                 List.of(Trigger.values()),
                 tri -> button -> {
                     ChannelClientConfig.write(c -> c.trigger = tri);
-                    button.setTooltip(Tooltip.create(Component.translatable(tri.translateKey() + ".tooltip", ModKeyMappingRegistry.PTT.getKey().getDisplayName().getString())));
+                    button.setTooltip(Tooltip.create(Component.translatable(tri.directTranslateKey() + ".tooltip")));
                     vad.setVisibleT(tri == Trigger.VAD);
                     thresholdLevel.setVisibleT(tri == Trigger.THRESHOLD);
                     InputConfigPanel.this.layout();
                 },
                 entry -> entry.getContent() == cfg.trigger
-        ).getB().setTooltip(Tooltip.create(Component.translatable(cfg.trigger.translateKey() + ".tooltip", ModKeyMappingRegistry.PTT.getKey().getDisplayName().getString())));
+        ).getB().setTooltip(Tooltip.create(Component.translatable(cfg.trigger.directTranslateKey() + ".tooltip")));
         thresholdLevel = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.threshold"),
                 -90, 0,

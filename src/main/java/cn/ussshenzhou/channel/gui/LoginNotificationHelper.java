@@ -8,6 +8,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 /**
  * @author USS_Shenzhou
@@ -17,9 +18,6 @@ public class LoginNotificationHelper {
 
     @SubscribeEvent
     public static void showNotification(LevelEvent.Load event) {
-        if (Minecraft.getInstance().level != null) {
-            return;
-        }
         TSimpleNotification.fire(
                 Component.translatable("channel.welcome",
                         ModKeyMappingRegistry.CONFIG.getKeyModifier().getCombinedName(ModKeyMappingRegistry.CONFIG.getKey(), () -> ModKeyMappingRegistry.CONFIG.getKey().getDisplayName()).getString()

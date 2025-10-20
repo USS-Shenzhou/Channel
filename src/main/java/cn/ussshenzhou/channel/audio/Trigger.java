@@ -12,7 +12,7 @@ public enum Trigger implements ITranslatable {
     VAD("channel.config.pre.trigger.vad"),
     PUSH_TO_TALK("channel.config.pre.trigger.ptt"),
     THRESHOLD("channel.config.pre.trigger.threshold"),;
-    //TODO ALWAYS_MUTE/temp mute
+    //TODO switch
 
     private final String translateKey;
 
@@ -22,6 +22,13 @@ public enum Trigger implements ITranslatable {
 
     @Override
     public String translateKey() {
+        if (this == PUSH_TO_TALK) {
+            return Language.getInstance().getOrDefault(translateKey).replace("%1$s", ModKeyMappingRegistry.PTT.getKey().getDisplayName().getString());
+        }
+        return translateKey;
+    }
+
+    public String directTranslateKey() {
         return translateKey;
     }
 }
