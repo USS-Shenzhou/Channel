@@ -9,13 +9,14 @@
 
   "channel.config.title": "沉浸语音 配置",
 
+  "channel.config.tab.input": "输入",
+
   "channel.config.mic": "  采集",
   "channel.config.mic.device": "设备",
   "channel.config.mic.samplerate": "采样率",
-  "channel.config.mic.samplerate.tooltip": "决定记录声音的质量。\n能采集的最高声音频率是采样率的一半。\n较低的采样率有助于减小网络占用，较高的采样率有助于提高音频质量。",
+  "channel.config.mic.samplerate.tooltip": "默认采样率。\n能采集的最高声音频率是采样率的一半。\n如果您的麦克风需要特殊的采样率，\n可以在配置文件中更改。",
   "channel.config.mic.samplebits": "采样比特数",
-  "channel.config.mic.length": "帧长(ms)",
-  "channel.config.mic.length.tooltip": "决定每隔多久向服务器发送一次数据。\n较短的帧有助于减小延迟，较长的帧有助于减小网络占用。",
+  "channel.config.mic.samplebits.tooltip": "默认采样比特数不可更改。",
   "channel.config.mic.listen": "侦听",
   "channel.config.mic.listen.tooltip": "回放经过前处理之后的声音。\n不考虑触发方式，其内容与其他人听到的基本相同。",
 
@@ -33,10 +34,6 @@
   "channel.config.ai.driver": "§6您当前的显卡驱动版本不支持此功能。\n§6需要 570.x 或更高。",
   "channel.config.ai.sample_rate": "§6不支持当前的采样率。\n§6请将采样率调整为16000Hz或48000Hz，\n§6然后重新切换降噪模式。",
   "channel.config.ai.exception": "§6程序出现异常。\n§6查看日志以获取更多信息。",
-
-  "channel.config.tab.input": "输入",
-  "channel.config.tab.transmit": "传输",
-  "channel.config.tab.output": "输出",
 
   "channel.config.pre": "  前处理",
   "channel.config.pre.trigger": "触发方式",
@@ -73,6 +70,15 @@
   "channel.config.pre.max_gain": "最大增益",
   "channel.config.pre.max_gain.tooltip": "限制自动增益的向上调整能力。\n更大的值会放大细微的声音。",
 
+  "channel.config.tab.transmit": "传输",
+
+  "channel.config.net": "网络传输",
+  "channel.config.net.length": "帧长(ms)",
+  "channel.config.net.length.tooltip": "决定每隔多久向服务器发送一次数据。\n较短的帧有助于减小延迟，较长的帧有助于减小网络占用。",
+  "channel.config.net.samplerate": "传输采样率",
+  "channel.config.net.samplerate.tooltip": "决定传输声音的质量。\n能传输的最高声音频率是采样率的一半。\n较低的采样率有助于减小网络占用，\n较高的采样率有助于提高音频质量。",
+
+  "channel.config.tab.output": "输出",
   "channel.config.post": "  后处理",
   "channel.config.post.agc": "为玩家单独调整响度"
 }

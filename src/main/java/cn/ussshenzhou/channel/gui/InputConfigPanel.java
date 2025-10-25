@@ -9,7 +9,6 @@ import cn.ussshenzhou.channel.audio.client.send.MicManager;
 import cn.ussshenzhou.channel.audio.client.send.WebRTCHelper;
 import cn.ussshenzhou.channel.audio.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
-import cn.ussshenzhou.channel.input.ModKeyMappingRegistry;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.gui.advanced.TOptionsPanel;
@@ -35,7 +34,6 @@ import java.util.stream.Stream;
  */
 public class InputConfigPanel extends TOptionsPanel {
     private final TCycleButton<String> devices;
-    private final TCycleButton<Float> sampleRate;
     private HorizontalTitledOption<?> thresholdLevel, vad, targetLevel, maxGain, nvidiaLogo, nvidiaCaution, aiNCRatio;
 
     public InputConfigPanel() {
@@ -51,27 +49,14 @@ public class InputConfigPanel extends TOptionsPanel {
                         .toList(),
                 deviceName -> _ -> {
                     ChannelClientConfig.write(c -> c.useDevice = deviceName);
-                    updateUsableSelectionByDevice(deviceName);
                     notifyMicManager();
                 },
                 entry -> entry.getContent().equals(cfg.useDevice)
         ).getB();
-        sampleRate = addOptionCycleButtonInit(
-                Component.translatable("channel.config.mic.samplerate"),
-                List.of(cfg.sampleRate),
-                //FIXME change during running
-                f -> _ -> ChannelClientConfig.write(c -> c.sampleRate = f),
-                entry -> entry.getContent() == cfg.sampleRate
-        ).getB();
-        sampleRate.setTooltip(Tooltip.create(Component.translatable("channel.config.mic.samplerate.tooltip")));
-        addOption(Component.translatable("channel.config.mic.samplebits"), new TLabel(Component.literal(String.valueOf(ModConstant.MIC_SAMPLE_BITS))));
-        addOptionCycleButtonInit(
-                Component.translatable("channel.config.mic.length"),
-                ModConstant.USABLE_FRAME_LENGTH,
-                //FIXME change during running
-                length -> _ -> ChannelClientConfig.write(c -> c.frameLengthMs = length),
-                entry -> entry.getContent() == cfg.frameLengthMs
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.length.tooltip")));
+        addOption(Component.translatable("channel.config.mic.samplerate"), new TLabel(Component.literal(String.valueOf(cfg.micSampleRate))))
+                .getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.samplerate.tooltip")));
+        addOption(Component.translatable("channel.config.mic.samplebits"), new TLabel(Component.literal(String.valueOf(ModConstant.MIC_SAMPLE_BITS))))
+                .getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.samplebits.tooltip")));
         addOption(
                 Component.translatable("channel.config.level"),
                 new TProgressBar(90) {
@@ -255,33 +240,10 @@ public class InputConfigPanel extends TOptionsPanel {
                 bool -> _ -> ChannelClientConfig.write(c -> c.listen = bool),
                 entry -> entry.getContent() == cfg.listen
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.listen.tooltip")));
-
-        updateUsableSelectionByDevice(cfg.useDevice);
-    }
-
-    private void updateUsableSelectionByDevice(String deviceName) {
-        var supportedSampleRate = new LinkedHashSet<Float>();
-        var deviceInfo = AudioHelper.getDeviceInfo(deviceName);
-        var mixer = AudioSystem.getMixer(deviceInfo);
-        Stream.of(mixer.getTargetLineInfo())
-                .filter(lineInfo -> lineInfo instanceof DataLine.Info)
-                .flatMap(lineInfo -> Stream.of(((DataLine.Info) lineInfo).getFormats()))
-                .forEach(audioFormat -> {
-                    if (audioFormat.getSampleRate() != -1 && ModConstant.USABLE_SAMPLE_RATE.contains(audioFormat.getSampleRate())) {
-                        supportedSampleRate.add(audioFormat.getSampleRate());
-                    }
-                });
-        if (supportedSampleRate.isEmpty()) {
-            supportedSampleRate.addAll(ModConstant.USABLE_SAMPLE_RATE);
-        }
-        var oldRate = sampleRate.getSelected().getContent();
-        sampleRate.getValues().clear();
-        supportedSampleRate.forEach(f -> sampleRate.addElement(f, _ -> ChannelClientConfig.write(c -> c.sampleRate = f)));
-        sampleRate.select(oldRate);
     }
 
     private void notifyMicManager() {
-        AudioFormat format = new AudioFormat(sampleRate.getSelected().getContent(), ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false);
+        AudioFormat format = new AudioFormat(ChannelClientConfig.get().micSampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false);
         var deviceName = devices.getSelected().getContent();
         var deviceInfo = AudioHelper.getDeviceInfo(deviceName);
         if (deviceInfo == null) {

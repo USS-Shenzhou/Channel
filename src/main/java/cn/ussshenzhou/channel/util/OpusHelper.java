@@ -1,6 +1,6 @@
 package cn.ussshenzhou.channel.util;
 
-import com.mojang.logging.LogUtils;
+import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import io.github.jaredmdobson.concentus.*;
 
 import java.util.Arrays;
@@ -17,10 +17,9 @@ public class OpusHelper {
 
     static {
         try {
-            for (float rate : ModConstant.USABLE_SAMPLE_RATE) {
-                ENCODERS.put((int) rate, new OpusEncoder((int) rate, 1, OpusApplication.OPUS_APPLICATION_AUDIO));
-                DECODERS.put((int) rate, new OpusDecoder((int) rate, 1));
-            }
+            int rate = (int) ChannelClientConfig.get().micSampleRate;
+            ENCODERS.put(rate, new OpusEncoder((int) rate, 1, OpusApplication.OPUS_APPLICATION_AUDIO));
+            DECODERS.put(rate, new OpusDecoder((int) rate, 1));
         } catch (OpusException e) {
             throw new RuntimeException(e);
         }

@@ -102,7 +102,6 @@ public class MicReader {
 
     private static byte[] createBuffer() {
         var format = MicManager.getLine().getFormat();
-        var cfg = ChannelClientConfig.get();
         int size = (int) (frameLength * format.getFrameSize() * format.getFrameRate() / 1000);
         return new byte[size];
     }

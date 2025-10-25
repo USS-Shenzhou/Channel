@@ -37,7 +37,7 @@ public class MicManager {
         }
         var name = deviceInfo.getName();
         ChannelClientConfig.write(channelClientConfig -> channelClientConfig.useDevice = name);
-        refresh(deviceInfo, new AudioFormat(cfg.sampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false));
+        refresh(deviceInfo, new AudioFormat(cfg.micSampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false));
     }
 
     public static synchronized void refresh(Mixer.Info deviceInfo, AudioFormat format) {

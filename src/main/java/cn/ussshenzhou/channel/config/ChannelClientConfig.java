@@ -15,8 +15,8 @@ import java.util.function.Consumer;
 public class ChannelClientConfig implements TConfig {
 
     public String useDevice = "";
-    public float sampleRate = 16000;
-    //TODO sample at 48000, and downscale before send
+    public float networkSampleRate = 24000;
+    public float micSampleRate = 48000;
     public int frameLengthMs = 20;
     public boolean listen = false;
     public Trigger trigger = Trigger.THRESHOLD;
