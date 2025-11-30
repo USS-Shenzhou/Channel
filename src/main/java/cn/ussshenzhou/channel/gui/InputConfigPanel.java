@@ -130,7 +130,6 @@ public class InputConfigPanel extends TOptionsPanel {
         var tuple = addOptionCycleButtonInit(
                 Component.translatable("channel.config.pre.vad"),
                 List.of(Vad.values()),
-                //TODO remove button when not needed
                 v -> _ -> ChannelClientConfig.write(c -> c.voiceDetectThreshold = v),
                 entry -> entry.getContent() == cfg.voiceDetectThreshold
         );

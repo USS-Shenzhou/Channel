@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.audio.client.send;
 
+import cn.ussshenzhou.channel.util.ModConstant;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 
@@ -13,17 +14,18 @@ public class SimplePlayer {
     private static SourceDataLine line = null;
     private static AudioFormat audioFormat = null;
 
-    public static void play(@Nullable byte[] audio, AudioFormat format) {
+    public static void play(@Nullable byte[] audio, int sampleRate) {
         if (!Minecraft.getInstance().isSameThread()) {
             LogUtils.getLogger().error("Must call this on main thread.");
         }
-        if (line == null) {
-            initLine(format);
-        }
-        if (!audioFormat.equals(format)) {
+        if (audioFormat == null || audioFormat.getFrameRate() != sampleRate) {
+            audioFormat = new AudioFormat(sampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false);
             line.stop();
             line.close();
-            initLine(format);
+            initLine();
+        }
+        if (line == null) {
+            initLine();
         }
         if (audio == null) {
             line.flush();
@@ -35,16 +37,15 @@ public class SimplePlayer {
         line.write(audio, 0, audio.length);
     }
 
-    private static void initLine(AudioFormat format) {
-        DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
+    private static void initLine() {
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
         try {
             line = (SourceDataLine) AudioSystem.getLine(info);
-            line.open(format);
+            line.open(audioFormat);
         } catch (LineUnavailableException e) {
             throw new RuntimeException(e);
         }
         line.start();
-        audioFormat = format;
     }
 
     public static void flush() {

@@ -44,7 +44,7 @@
   "channel.config.pre.trigger.always.tooltip": "采集到的所有声音都会发送至服务器。",
   "channel.config.pre.trigger.vad.tooltip": "只有采集到的声音中含有语音时才会发送至服务器。",
   "channel.config.pre.trigger.threshold.tooltip": "只有超过指定响度的声音才会发送至服务器。",
-  "channel.config.pre.trigger.ptt.tooltip": "只有按下按键时才会把采集到的声音发送至服务器。",
+  "channel.config.pre.trigger.ptt.tooltip": "只有按住按键时才会把采集到的声音发送至服务器。",
   "channel.config.pre.vad": "语音检测阈值",
   "channel.config.pre.vad.tooltip": "设定语音检测的触发阈值。\n更低的选项使同一段音频更容易被认为含有语音。",
   "channel.config.pre.threshold": "触发响度阈值",
@@ -72,7 +72,7 @@
 
   "channel.config.tab.transmit": "传输",
 
-  "channel.config.net": "网络传输",
+  "channel.config.net": "  网络传输",
   "channel.config.net.length": "帧长(ms)",
   "channel.config.net.length.tooltip": "决定每隔多久向服务器发送一次数据。\n较短的帧有助于减小延迟，较长的帧有助于减小网络占用。",
   "channel.config.net.samplerate": "传输采样率",

@@ -5,10 +5,7 @@ import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.audio.NC;
 import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.util.ModConstant;
-import dev.onvoid.webrtc.media.audio.AudioProcessing;
-import dev.onvoid.webrtc.media.audio.AudioProcessingConfig;
-import dev.onvoid.webrtc.media.audio.AudioProcessingStreamConfig;
-import dev.onvoid.webrtc.media.audio.VoiceActivityDetector;
+import dev.onvoid.webrtc.media.audio.*;
 import net.minecraft.SharedConstants;
 
 import javax.annotation.Nullable;
@@ -22,6 +19,8 @@ public class WebRTCHelper {
     private volatile static AudioProcessing processor = null;
     private volatile static VoiceActivityDetector detector = null;
     private static SimpleSlidingBooleanWindow slidingWindow = null;
+    private volatile static AudioResampler resampler = null;
+    private volatile static int inSampleRate, outSampleRate;
 
     public static void init() {
         loadNative();
@@ -78,25 +77,46 @@ public class WebRTCHelper {
     }
 
     @Nullable
-    public static synchronized byte[] process(byte[] raw) {
-        int sampleRate = MicManager.getSampleRate();
-        boolean vad = false;
-        var seg = MicReader.getFrameLength() / 10;
-        var stepLength = raw.length / seg;
-        byte[] result = new byte[raw.length];
-        for (int i = 0; i < seg; i++) {
-            var subRaw = Arrays.copyOfRange(raw, stepLength * i, stepLength * i + stepLength);
-            var subResult = new byte[stepLength];
+    public static synchronized byte[] process(byte[] raw, int sampleRateIn, int sampleRateOut) {
+        boolean vadPass = false;
+        var segAmount = MicReader.getFrameLength() / 10;
+        var inStepLength = raw.length / segAmount;
+        byte[] processed = new byte[raw.length];
+        for (int i = 0; i < segAmount; i++) {
+            var subRaw = Arrays.copyOfRange(raw, inStepLength * i, inStepLength * (i + 1));
+            var subResult = new byte[inStepLength];
             processor.processStream(
                     subRaw,
-                    new AudioProcessingStreamConfig(sampleRate, ModConstant.MIC_CHANNEL),
-                    new AudioProcessingStreamConfig(sampleRate, ModConstant.MIC_CHANNEL),
+                    new AudioProcessingStreamConfig(sampleRateIn, ModConstant.MIC_CHANNEL),
+                    new AudioProcessingStreamConfig(sampleRateIn, ModConstant.MIC_CHANNEL),
                     subResult
             );
-            System.arraycopy(subResult, 0, result, stepLength * i, stepLength);
-            vad |= vad(subResult, sampleRate);
+            System.arraycopy(subResult, 0, processed, inStepLength * i, inStepLength);
+            vadPass |= vad(subResult, sampleRateIn);
         }
-        return vad ? result : null;
+        return vadPass ? resample(processed, sampleRateIn, sampleRateOut) : null;
+    }
+
+    private static byte[] resample(byte[] raw, int sampleRateIn, int sampleRateOut) {
+        if (sampleRateIn == sampleRateOut) {
+            return raw;
+        }
+        if (resampler == null || inSampleRate != sampleRateIn || outSampleRate != sampleRateOut) {
+            resampler = new AudioResampler(sampleRateIn, sampleRateOut, ModConstant.MIC_CHANNEL);
+            inSampleRate = sampleRateIn;
+            outSampleRate = sampleRateOut;
+        }
+        var seg = MicReader.getFrameLength() / 10;
+        var inStepLength = raw.length / seg;
+        var outStepLength = (int) ((float) raw.length / sampleRateIn * sampleRateOut / seg);
+        byte[] result = new byte[(int) ((float) raw.length / sampleRateIn * sampleRateOut)];
+        for (int i = 0; i < seg; i++) {
+            var subRaw = Arrays.copyOfRange(raw, inStepLength * i, inStepLength * (i + 1));
+            var subResult = new byte[outStepLength];
+            resampler.resample(subRaw, sampleRateIn / 100, subResult, sampleRateOut / 100, ModConstant.MIC_CHANNEL);
+            System.arraycopy(subResult, 0, result, outStepLength * i, outStepLength);
+        }
+        return result;
     }
 
     private static boolean vad(byte[] audio, int sampleRate) {

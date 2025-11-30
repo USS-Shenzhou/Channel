@@ -11,6 +11,7 @@ import cn.ussshenzhou.t88.network.NetworkHelper;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 
+import javax.sound.sampled.AudioFormat;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -58,7 +59,8 @@ public class MicReader {
                 return;
             }
             LevelGatherer.updateRaw(audio);
-            audio = WebRTCHelper.process(NvidiaHelper.process(audio));
+            int sampleRate = (int) ChannelClientConfig.get().networkSampleRate;
+            audio = WebRTCHelper.process(NvidiaHelper.process(audio), MicManager.getSampleRate(), sampleRate);
             if (audio == null) {
                 braek();
                 return;
@@ -69,9 +71,8 @@ public class MicReader {
             }
             if (ChannelClientConfig.get().listen) {
                 byte[] finalAudio = audio;
-                Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, MicManager.getLine().getFormat()));
+                Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, sampleRate));
             }
-            int sampleRate = MicManager.getSampleRate();
             var serialized = OpusHelper.encode(audio, sampleRate);
             NetworkHelper.sendToServer(new TalkPacket2S(sampleRate, serialized));
         } catch (Throwable t) {

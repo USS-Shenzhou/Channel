@@ -16,13 +16,15 @@ public class OpusHelper {
     private static final Map<Integer, OpusDecoder> DECODERS = new HashMap<>();
 
     static {
-        try {
-            int rate = (int) ChannelClientConfig.get().micSampleRate;
-            ENCODERS.put(rate, new OpusEncoder((int) rate, 1, OpusApplication.OPUS_APPLICATION_AUDIO));
-            DECODERS.put(rate, new OpusDecoder((int) rate, 1));
-        } catch (OpusException e) {
-            throw new RuntimeException(e);
-        }
+        ModConstant.USABLE_NETWORK_SAMPLE_RATE.forEach(sampleRate -> {
+            try {
+                int rate = (int) (float) sampleRate;
+                ENCODERS.put(rate, new OpusEncoder(rate, 1, OpusApplication.OPUS_APPLICATION_AUDIO));
+                DECODERS.put(rate, new OpusDecoder(rate, 1));
+            } catch (OpusException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public static byte[] encode(byte[] audio, int sampleRate) throws OpusException {
