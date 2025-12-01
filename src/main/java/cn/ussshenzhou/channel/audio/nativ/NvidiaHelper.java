@@ -5,15 +5,11 @@ import cn.ussshenzhou.channel.audio.client.send.MicManager;
 import cn.ussshenzhou.channel.audio.client.send.MicReader;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.util.ArrayHelper;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
-import com.sun.jna.platform.win32.Kernel32;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static cn.ussshenzhou.channel.audio.nativ.NvAudioEffects.*;
 import static java.lang.foreign.MemorySegment.NULL;
@@ -23,49 +19,12 @@ import static java.lang.foreign.MemorySegment.NULL;
  */
 @SuppressWarnings("preview")
 public class NvidiaHelper {
-    private static Stat stat;
+    protected static Stat stat;
 
     public static void init() {
-        checkRequire();
-        tryLoadDll();
+        NvidiaInit.checkRequire();
+        NvidiaInit.tryLoadDll();
         refresh();
-    }
-
-    private static void checkRequire() {
-        if (MicManager.getSampleRate() == 8000) {
-            stat = Stat.CHANGE_SAMPLE_RATE;
-            return;
-        }
-        var os = System.getProperty("os.name").toLowerCase();
-        if (!os.contains("windows")) {
-            stat = Stat.UNSUPPORTED_OS;
-            return;
-        }
-        var gpudevice = RenderSystem.getDevice();
-        if (!gpudevice.getRenderer().contains("RTX")) {
-            stat = Stat.UNSUPPORTED_GPU;
-            return;
-        }
-        var splitDriver = gpudevice.getVersion().split(" ");
-        var driver = splitDriver[splitDriver.length - 1];
-        int version = Integer.parseInt(driver.split("\\.")[0]);
-        if (version < 570) {
-            stat = Stat.UNSUPPORTED_DRIVER;
-            return;
-        }
-        stat = Stat.OK;
-    }
-
-    private static void tryLoadDll() {
-        var path = "C:\\Program Files\\NVIDIA Corporation\\NVIDIA Audio Effects SDK\\NVAudioEffects.dll";
-        var dllPath = Paths.get(path);
-        if (!Files.exists(dllPath)) {
-            stat = Stat.NEED_DOWNLOAD;
-            return;
-        }
-        // flag 0x8: LOAD_WITH_ALTERED_SEARCH_PATH
-        Kernel32.INSTANCE.LoadLibraryEx("C:\\Program Files\\NVIDIA Corporation\\NVIDIA Audio Effects SDK\\NVAudioEffects.dll", null, 0x8);
-        System.load(path);
     }
 
     public static Stat getStat() {
@@ -140,7 +99,7 @@ public class NvidiaHelper {
 
     public static byte[] process(byte[] raw) {
         synchronized (NvidiaHelper.class) {
-            if (nvAFXHandle == NULL) {
+            if (nvAFXHandle == NULL || stat != Stat.OK) {
                 return raw;
             }
             try (Arena arena = Arena.ofConfined()) {

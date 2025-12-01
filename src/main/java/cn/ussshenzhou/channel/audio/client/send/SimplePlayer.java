@@ -20,11 +20,11 @@ public class SimplePlayer {
         }
         if (audioFormat == null || audioFormat.getFrameRate() != sampleRate) {
             audioFormat = new AudioFormat(sampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false);
+            if (line == null) {
+                initLine();
+            }
             line.stop();
             line.close();
-            initLine();
-        }
-        if (line == null) {
             initLine();
         }
         if (audio == null) {

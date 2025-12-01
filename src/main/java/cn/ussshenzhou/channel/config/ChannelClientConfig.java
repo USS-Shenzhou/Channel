@@ -30,7 +30,7 @@ public class ChannelClientConfig implements TConfig {
     public float forceGainControl = 0;
     public float targetLevel = -5;
     public float maxGain = 20;
-
+    public String nvidiaDllPath = "";
 
     public static ChannelClientConfig get() {
         return ConfigHelper.getConfigRead(ChannelClientConfig.class);

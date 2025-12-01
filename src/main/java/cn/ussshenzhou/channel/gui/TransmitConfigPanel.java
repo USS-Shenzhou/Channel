@@ -20,7 +20,6 @@ public class TransmitConfigPanel extends TOptionsPanel {
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.net.length"),
                 ModConstant.USABLE_FRAME_LENGTH,
-                //FIXME change during running
                 length -> _ -> ChannelClientConfig.write(c -> c.frameLengthMs = length),
                 entry -> entry.getContent() == cfg.frameLengthMs
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.net.length.tooltip")));
@@ -28,7 +27,6 @@ public class TransmitConfigPanel extends TOptionsPanel {
 
                 Component.translatable("channel.config.net.samplerate"),
                 ModConstant.USABLE_NETWORK_SAMPLE_RATE,
-                //FIXME change during running
                 f -> _ -> ChannelClientConfig.write(c -> c.networkSampleRate = f),
                 entry -> entry.getContent() == cfg.networkSampleRate
         ).getB();

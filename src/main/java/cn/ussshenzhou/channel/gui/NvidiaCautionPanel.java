@@ -20,7 +20,9 @@ public class NvidiaCautionPanel extends TLabel {
     public NvidiaCautionPanel(NvidiaHelper.Stat stat) {
         switch (stat) {
             case NEED_DOWNLOAD -> {
+                //TODO download here
                 this.setText(Component.translatable("channel.config.ai.down"));
+                this.setTooltip(Tooltip.create(Component.translatable("channel.config.ai.down.tooltip")));
                 var lang = Minecraft.getInstance().getLanguageManager().getSelected();
                 var useChinaLink = "lzh".equals(lang) || "zh_cn".equals(lang);
                 downloadButton = new TLabelButton(Component.translatable("channel.config.ai.down.here"),

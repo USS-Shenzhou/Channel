@@ -25,46 +25,9 @@ public class NvidiaHelper {
     private static Stat stat;
 
     public static void init() {
-        checkRequire();
-        tryLoadDll();
+        NvidiaInit.checkRequire();
+        NvidiaInit.tryLoadDll();
         refresh();
-    }
-
-    private static void checkRequire() {
-        if (MicManager.getSampleRate() == 8000) {
-            stat = Stat.CHANGE_SAMPLE_RATE;
-            return;
-        }
-        var os = System.getProperty("os.name").toLowerCase();
-        if (!os.contains("windows")) {
-            stat = Stat.UNSUPPORTED_OS;
-            return;
-        }
-        var gpudevice = RenderSystem.getDevice();
-        if (!gpudevice.getRenderer().contains("RTX")) {
-            stat = Stat.UNSUPPORTED_GPU;
-            return;
-        }
-        var splitDriver = gpudevice.getVersion().split(" ");
-        var driver = splitDriver[splitDriver.length - 1];
-        int version = Integer.parseInt(driver.split("\\.")[0]);
-        if (version < 570) {
-            stat = Stat.UNSUPPORTED_DRIVER;
-            return;
-        }
-        stat = Stat.OK;
-    }
-
-    private static void tryLoadDll() {
-        var path = "C:\\Program Files\\NVIDIA Corporation\\NVIDIA Audio Effects SDK\\NVAudioEffects.dll";
-        var dllPath = Paths.get(path);
-        if (!Files.exists(dllPath)) {
-            stat = Stat.NEED_DOWNLOAD;
-            return;
-        }
-        // flag 0x8: LOAD_WITH_ALTERED_SEARCH_PATH
-        Kernel32.INSTANCE.LoadLibraryEx("C:\\Program Files\\NVIDIA Corporation\\NVIDIA Audio Effects SDK\\NVAudioEffects.dll", null, 0x8);
-        System.load(path);
     }
 
     public static Stat getStat() {

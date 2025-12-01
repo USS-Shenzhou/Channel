@@ -23,18 +23,9 @@ public class WebRTCHelper {
     private volatile static int inSampleRate, outSampleRate;
 
     public static void init() {
-        loadNative();
         refresh();
         detector = new VoiceActivityDetector();
         slidingWindow = new SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / MicReader.getFrameLength());
-    }
-
-    public static void loadNative() {
-        if (SharedConstants.IS_RUNNING_IN_IDE) {
-            System.load(Path.of(System.getProperty("user.dir"), "../run/webrtc-java.dll").normalize().toAbsolutePath().toString());
-            return;
-        }
-        //TODO
     }
 
     public static synchronized void refresh() {
