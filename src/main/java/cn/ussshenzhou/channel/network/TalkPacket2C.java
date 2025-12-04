@@ -5,13 +5,15 @@ import cn.ussshenzhou.t88.network.annotation.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import java.util.UUID;
+
 /**
  * @author USS_Shenzhou
  */
 @NetPacket(modid = ModConstant.SHORT_ID, handleOnNetwork = true, id = "tcp")
 public class TalkPacket2C extends BaseAudioPacket2C {
 
-    public TalkPacket2C(int sampleRate, int from, byte[] opus) {
+    public TalkPacket2C(int sampleRate, UUID from, byte[] opus) {
         super(sampleRate, from, opus);
     }
 

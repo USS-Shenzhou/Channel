@@ -4,6 +4,7 @@ import cn.ussshenzhou.channel.audio.client.receive.AudioManagerManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -11,10 +12,10 @@ import java.util.concurrent.CompletableFuture;
  */
 public abstract class BaseAudioPacket2C {
     public final int sampleRate;
-    public final int from;
+    public final UUID from;
     public final byte[] opus;
 
-    public BaseAudioPacket2C(int sampleRate, int from, byte[] opus) {
+    public BaseAudioPacket2C(int sampleRate, UUID from, byte[] opus) {
         this.sampleRate = sampleRate;
         this.from = from;
         this.opus = opus;
@@ -22,13 +23,13 @@ public abstract class BaseAudioPacket2C {
 
     public BaseAudioPacket2C(FriendlyByteBuf buf) {
         this.sampleRate = buf.readVarInt();
-        this.from = buf.readVarInt();
+        this.from = buf.readUUID();
         this.opus = buf.readByteArray();
     }
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeVarInt(this.sampleRate);
-        buf.writeVarInt(this.from);
+        buf.writeUUID(this.from);
         buf.writeByteArray(this.opus);
     }
 

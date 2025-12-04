@@ -11,20 +11,37 @@ import net.minecraft.network.chat.Component;
  */
 public class ConfigScreen extends TScreen {
     private final TLabel title = new TLabel(Component.translatable("channel.config.title"));
-    private final TTabPageContainer tabs = new TTabPageContainer();
+    final TTabPageContainer tabs = new TTabPageContainer();
+    private TTabPageContainer.Tab input, transmit, output, general;
 
     public ConfigScreen() {
         super(Component.literal("Channel Mod Config Screen"));
         this.add(title);
         title.setFontSize((float) (TLabel.STD_FONT_SIZE * 1.5));
-
         this.add(tabs);
-        var input = tabs.newTab(Component.translatable("channel.config.tab.input"), new InputConfigPanel());
+        tInit();
+    }
+
+    public void tInit() {
+        input = tabs.newTab(Component.translatable("channel.config.tab.input"), new InputConfigPanel());
         input.setCloseable(false);
-        var transmit = tabs.newTab(Component.translatable("channel.config.tab.transmit"), new TransmitConfigPanel());
+
+        transmit = tabs.newTab(Component.translatable("channel.config.tab.transmit"), new TransmitConfigPanel());
         transmit.setCloseable(false);
-        var output = tabs.newTab(Component.translatable("channel.config.tab.output"), new OutputConfigPanel());
+
+        output = tabs.newTab(Component.translatable("channel.config.tab.output"), new OutputConfigPanel());
         output.setCloseable(false);
+
+        general = tabs.newTab(Component.translatable("channel.config.tab.general"), new GeneralConfigPanel());
+        general.setCloseable(false);
+    }
+
+    public void forceUpdate() {
+        this.tabs.removeTab(input);
+        this.tabs.removeTab(transmit);
+        this.tabs.removeTab(output);
+        this.tabs.removeTab(general);
+        this.tInit();
     }
 
     @Override

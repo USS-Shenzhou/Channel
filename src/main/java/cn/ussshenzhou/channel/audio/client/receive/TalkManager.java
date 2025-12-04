@@ -1,9 +1,12 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
+import cn.ussshenzhou.channel.config.ChannelPlayerConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 import java.nio.ByteBuffer;
+import java.util.UUID;
 
 import static org.lwjgl.openal.AL10.*;
 import static org.lwjgl.openal.AL10.AL_BUFFERS_PROCESSED;
@@ -24,7 +27,7 @@ import static org.lwjgl.openal.AL10.alSourceUnqueueBuffers;
  */
 public class TalkManager extends BaseAudioManager {
     @Override
-    protected boolean play(Level level, int playerId, PlayerAudio audio) {
+    protected boolean play(Level level, UUID playerId, PlayerAudio audio) {
         var player = level.getEntity(playerId);
         if (player == null) {
             audio.close();
@@ -33,6 +36,9 @@ public class TalkManager extends BaseAudioManager {
         var partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
         var pos = player.getEyePosition(partialTick);
         alSource3f(audio.alSource, AL_POSITION, (float) pos.x, (float) pos.y, (float) pos.z);
+        if (player instanceof Player p) {
+            alSourcef(audio.alSource, AL_GAIN, ChannelPlayerConfig.getOrDefault(p));
+        }
         int processed = alGetSourcei(audio.alSource, AL_BUFFERS_PROCESSED);
         while (processed-- > 0) {
             int buf = alSourceUnqueueBuffers(audio.alSource);

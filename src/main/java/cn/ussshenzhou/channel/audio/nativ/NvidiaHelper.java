@@ -59,6 +59,7 @@ public class NvidiaHelper {
                 return;
             }
             var effect = dereverb ? NVAFX_EFFECT_DEREVERB_DENOISER : NVAFX_EFFECT_DENOISER;
+            //TODO
             try (Arena arena = Arena.ofConfined()) {
                 var handle = arena.allocate(ValueLayout.ADDRESS);
                 checkStatus(NvAFX_CreateEffect(effect, handle), "NvAFX_CreateEffect");

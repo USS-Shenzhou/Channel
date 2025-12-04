@@ -3,6 +3,7 @@ package cn.ussshenzhou.channel.config;
 import cn.ussshenzhou.channel.audio.NC;
 import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.audio.Vad;
+import cn.ussshenzhou.channel.audio.Unit;
 import cn.ussshenzhou.t88.config.ConfigHelper;
 import cn.ussshenzhou.t88.config.TConfig;
 
@@ -31,6 +32,7 @@ public class ChannelClientConfig implements TConfig {
     public float targetLevel = -5;
     public float maxGain = 20;
     public String nvidiaDllPath = "";
+    public Unit unit = Unit.DB;
 
     public static ChannelClientConfig get() {
         return ConfigHelper.getConfigRead(ChannelClientConfig.class);

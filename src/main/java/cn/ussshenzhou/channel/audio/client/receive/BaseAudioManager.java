@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,7 +26,7 @@ import static org.lwjgl.openal.ALC10.alcMakeContextCurrent;
  */
 public abstract class BaseAudioManager {
     protected final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    protected final ConcurrentHashMap<Integer, PlayerAudio> playerAudios = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<UUID, PlayerAudio> playerAudios = new ConcurrentHashMap<>();
     protected final int BUFFER_LENGTH = 5;
     protected long alCtx, alDevice;
 
@@ -49,7 +50,7 @@ public abstract class BaseAudioManager {
         AL.createCapabilities(ALC.createCapabilities(alDevice));
     }
 
-    public void handle(int from, int sampleRate, byte[] opus) {
+    public void handle(UUID from, int sampleRate, byte[] opus) {
         try {
             var decoded = OpusHelper.decode(opus, sampleRate);
             var level = Minecraft.getInstance().level;
@@ -58,7 +59,7 @@ public abstract class BaseAudioManager {
             }
             var fromEntity = level.getEntity(from);
             if (fromEntity instanceof Player player) {
-                playerAudios.compute(player.getId(), (id, old) -> {
+                playerAudios.compute(player.getUUID(), (id, old) -> {
                     if (old == null) {
                         return new PlayerAudio(id, sampleRate);
                     } else if (old.sampleRate != sampleRate) {
@@ -97,5 +98,5 @@ public abstract class BaseAudioManager {
     /**
      * @return true, if want to remove player and their audio. Must close audio before return true.
      */
-    protected abstract boolean play(Level level, int playerId, PlayerAudio audio);
+    protected abstract boolean play(Level level, UUID playerId, PlayerAudio audio);
 }

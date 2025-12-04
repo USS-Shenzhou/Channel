@@ -19,6 +19,6 @@ public class RelayHandler {
                                 to.position().distanceTo(from.position()) < 24 &&
                                 (!from.isSpectator() || to.isSpectator())
                 )
-                .forEach(to -> NetworkHelper.sendToPlayer(to, new TalkPacket2C(sampleRate, from.getId(), opusAudio)));
+                .forEach(to -> NetworkHelper.sendToPlayer(to, new TalkPacket2C(sampleRate, from.getUUID(), opusAudio)));
     }
 }

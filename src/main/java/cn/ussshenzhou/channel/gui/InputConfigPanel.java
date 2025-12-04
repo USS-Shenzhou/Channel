@@ -63,7 +63,7 @@ public class InputConfigPanel extends TOptionsPanel {
                     {
                         //this.setProgressBarColorGradient(0xff44ff00, 0xffff5900);
                         this.setProgressBarColorGradient(0x003c91ff, 0xff3c91ff);
-                        this.setTextMode(new TextMode((_, _, value) -> value == 0 ? "-∞ dBFS" : String.format("%.1f dBFS", value - 90)));
+                        this.setTextMode(new TextMode((_, _, value) -> cfg.unit.getFS90(value)));
                         this.setTooltip(Tooltip.create(Component.translatable("channel.config.level.raw.tooltip")));
                     }
 
@@ -120,7 +120,7 @@ public class InputConfigPanel extends TOptionsPanel {
         thresholdLevel = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.threshold"),
                 -90, 0,
-                (_, v) -> Component.literal(String.format("%.1f", v) + " dBFS"),
+                (_, v) -> Component.literal(cfg.unit.getFS(v)),
                 Component.translatable("channel.config.pre.threshold.tooltip"),
                 (slider, _) -> ChannelClientConfig.write(c -> c.triggerThresholdDBFS = (float) slider.getAbsValue()),
                 cfg.triggerThresholdDBFS, false
@@ -172,7 +172,7 @@ public class InputConfigPanel extends TOptionsPanel {
         addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.mgc"),
                 -30, 30,
-                (_, v) -> Component.literal(String.format("%.1f", v) + " dB"),
+                (_, v) -> Component.literal(cfg.unit.get(v)),
                 Component.translatable("channel.config.pre.mgc.tooltip"),
                 (slider, _) -> {
                     ChannelClientConfig.write(c -> c.forceGainControl = (float) slider.getAbsValue());
@@ -195,7 +195,7 @@ public class InputConfigPanel extends TOptionsPanel {
         targetLevel = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.target"),
                 -26, -2,
-                (_, v) -> Component.literal(String.format("%.1f", v) + " dBFS"),
+                (_, v) -> Component.literal(cfg.unit.getFS(v)),
                 Component.translatable("channel.config.pre.target.tooltip"),
                 (slider, _) -> {
                     ChannelClientConfig.write(c -> c.targetLevel = (float) slider.getAbsValue());
@@ -206,7 +206,7 @@ public class InputConfigPanel extends TOptionsPanel {
         maxGain = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.max_gain"),
                 0, 30,
-                (_, v) -> Component.literal(String.format("%.1f", v) + " dB"),
+                (_, v) -> Component.literal(cfg.unit.get(v)),
                 Component.translatable("channel.config.pre.max_gain.tooltip"),
                 (slider, _) -> {
                     ChannelClientConfig.write(c -> c.maxGain = (float) slider.getAbsValue());
@@ -222,7 +222,7 @@ public class InputConfigPanel extends TOptionsPanel {
                     {
                         //this.setProgressBarColorGradient(0xff44ff00, 0xffff5900);
                         this.setProgressBarColorGradient(0x003c91ff, 0xff3c91ff);
-                        this.setTextMode(new TextMode((_, _, value) -> value == 0 ? "-∞ dBFS" : String.format("%.1f dBFS", value - 90)));
+                        this.setTextMode(new TextMode((_, _, value) -> cfg.unit.getFS90(value)));
                         this.setTooltip(Tooltip.create(Component.translatable("channel.config.level.pro.tooltip")));
                     }
 

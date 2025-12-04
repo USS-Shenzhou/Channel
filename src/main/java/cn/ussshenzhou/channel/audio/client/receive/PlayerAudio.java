@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -16,9 +17,10 @@ import static org.lwjgl.openal.AL10.*;
  */
 public class PlayerAudio {
     private final BlockingQueue<short[]> audioBuffer = new ArrayBlockingQueue<>(20);
-    protected final int playerId, alSource, sampleRate;
+    protected final int alSource, sampleRate;
+    protected final UUID playerId;
 
-    public PlayerAudio(int playerId, int sampleRate) {
+    public PlayerAudio(UUID playerId, int sampleRate) {
         this.playerId = playerId;
         this.sampleRate = sampleRate;
         this.alSource = alGenSources();

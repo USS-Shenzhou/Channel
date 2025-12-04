@@ -13,7 +13,7 @@
 
   "channel.config.mic": "  采集",
   "channel.config.mic.device": "设备",
-  "channel.config.mic.samplerate": "采样率",
+  "channel.config.mic.samplerate": "采样率(Hz)",
   "channel.config.mic.samplerate.tooltip": "默认采样率。\n能采集的最高声音频率是采样率的一半。\n§7如果您的麦克风需要特殊的采样率，\n可以在配置文件中更改。\n智能降噪仅支持16000Hz或48000Hz。",
   "channel.config.mic.samplebits": "采样比特数",
   "channel.config.mic.samplebits.tooltip": "默认采样比特数不可更改。",
@@ -76,10 +76,15 @@
   "channel.config.net": "  网络传输",
   "channel.config.net.length": "帧长(ms)",
   "channel.config.net.length.tooltip": "决定每隔多久向服务器发送一次数据。\n较短的帧有助于减小延迟，较长的帧有助于减小网络占用。",
-  "channel.config.net.samplerate": "传输采样率",
+  "channel.config.net.samplerate": "传输采样率(Hz)",
   "channel.config.net.samplerate.tooltip": "决定传输声音的质量。\n能传输的最高声音频率是采样率的一半。\n较低的采样率有助于减小网络占用，\n较高的采样率有助于提高音频质量。",
 
   "channel.config.tab.output": "输出",
   "channel.config.post": "  后处理",
-  "channel.config.post.agc": "为玩家单独调整响度"
+  "channel.config.post.player_control": "  单独调整响度",
+
+  "channel.config.tab.general": "通用",
+  "Channel.config.unit": "显示单位",
+  "Channel.config.unit.db": "分贝 dB",
+  "Channel.config.unit.per": "百分比 %"
 }
