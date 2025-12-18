@@ -13,6 +13,10 @@ public class AudioManagerManager {
         TALK.init();
     }
 
+    public static void reset() {
+        TALK.reset();
+    }
+
     public static void handlePacket(BaseAudioPacket2C packet) {
         switch (packet) {
             case TalkPacket2C talk -> TALK.handle(packet.from, packet.sampleRate, packet.opus);

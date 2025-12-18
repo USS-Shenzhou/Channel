@@ -1,6 +1,5 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
-import cn.ussshenzhou.channel.network.BaseAudioPacket2C;
 import cn.ussshenzhou.channel.util.OpusHelper;
 import com.mojang.logging.LogUtils;
 import io.github.jaredmdobson.concentus.OpusException;
@@ -25,20 +24,26 @@ import static org.lwjgl.openal.ALC10.alcMakeContextCurrent;
  * @author USS_Shenzhou
  */
 public abstract class BaseAudioManager {
-    protected final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    public static final ScheduledExecutorService AUDIO_EXECUTOR = Executors.newSingleThreadScheduledExecutor(r ->
+            Thread.ofPlatform()
+                    .name("Channel Audio Thread")
+                    .daemon(true)
+                    .factory()
+                    .newThread(r)
+    );
     protected final ConcurrentHashMap<UUID, PlayerAudio> playerAudios = new ConcurrentHashMap<>();
-    protected final int BUFFER_LENGTH = 5;
+    public static final int PLAY_RATE10 = 2;
     protected long alCtx, alDevice;
 
     public void init() {
-        scheduler.submit(() -> {
+        AUDIO_EXECUTOR.submit(() -> {
             while (!Minecraft.getInstance().getSoundManager().soundEngine.loaded) {
                 LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(500));
             }
             initAL();
             alDistanceModel(AL_EXPONENT_DISTANCE);
         });
-        scheduler.scheduleAtFixedRate(this::playing, 0, BUFFER_LENGTH * 10, TimeUnit.MILLISECONDS);
+        AUDIO_EXECUTOR.scheduleAtFixedRate(this::playing, 0, PLAY_RATE10 * 10, TimeUnit.MILLISECONDS);
     }
 
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
@@ -59,7 +64,7 @@ public abstract class BaseAudioManager {
             }
             var fromEntity = level.getEntity(from);
             if (fromEntity instanceof Player player) {
-                playerAudios.compute(player.getUUID(), (id, old) -> {
+                AUDIO_EXECUTOR.execute(() -> playerAudios.compute(player.getUUID(), (id, old) -> {
                     if (old == null) {
                         return new PlayerAudio(id, sampleRate);
                     } else if (old.sampleRate != sampleRate) {
@@ -68,7 +73,7 @@ public abstract class BaseAudioManager {
                     } else {
                         return old;
                     }
-                }).push(decoded);
+                }).push(decoded));
             }
         } catch (OpusException e) {
             LogUtils.getLogger().error(e.toString());
@@ -79,20 +84,23 @@ public abstract class BaseAudioManager {
         try {
             var level = Minecraft.getInstance().level;
             if (level == null) {
-                playerAudios.values().forEach(PlayerAudio::close);
-                playerAudios.clear();
+                reset();
                 return;
             }
             var library = Minecraft.getInstance().getSoundManager().soundEngine.library;
             if (library.context != alCtx || library.currentDevice != alDevice) {
-                playerAudios.values().forEach(PlayerAudio::close);
-                playerAudios.clear();
+                reset();
                 initAL();
             }
             playerAudios.entrySet().removeIf(entry -> play(level, entry.getKey(), entry.getValue()));
         } catch (Throwable e) {
             LogUtils.getLogger().error(e.toString());
         }
+    }
+
+    public void reset() {
+        playerAudios.values().forEach(PlayerAudio::close);
+        playerAudios.clear();
     }
 
     /**

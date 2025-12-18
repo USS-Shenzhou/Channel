@@ -2,6 +2,7 @@ package cn.ussshenzhou.channel.util;
 
 import cn.ussshenzhou.t88.gui.HudManager;
 import cn.ussshenzhou.t88.gui.notification.TSimpleNotification;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nullable;
@@ -39,5 +40,9 @@ public class AudioHelper {
 
     public static float factor2db(float factor) {
         return (float) (20 * Math.log10(factor + 0.000001));
+    }
+
+    public static void onSoundThread(Runnable r) {
+        Minecraft.getInstance().getSoundManager().soundEngine.executor.execute(r);
     }
 }

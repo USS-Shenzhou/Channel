@@ -4,6 +4,7 @@ import cn.ussshenzhou.channel.Channel;
 import cn.ussshenzhou.channel.audio.NC;
 import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.audio.Vad;
+import cn.ussshenzhou.channel.audio.client.receive.AudioManagerManager;
 import cn.ussshenzhou.channel.audio.client.send.LevelGatherer;
 import cn.ussshenzhou.channel.audio.client.send.MicManager;
 import cn.ussshenzhou.channel.audio.client.send.WebRTCHelper;
@@ -41,6 +42,14 @@ public class OutputConfigPanel extends TOptionsPanel {
     public OutputConfigPanel() {
         var cfg = ChannelClientConfig.get();
         addOptionSplitter(Component.translatable("channel.config.post"));
+        addOptionCycleButtonInit(Component.translatable("channel.config.post.rt"),
+                List.of(true, false),
+                bool -> _ -> {
+                    ChannelClientConfig.write(c -> c.rayTraceAudio = bool);
+                    AudioManagerManager.reset();
+                },
+                entry -> entry.getContent() == cfg.rayTraceAudio
+        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.rt.tooltip")));
 
         addOptionSplitter(Component.translatable("channel.config.post.player_control"));
         this.container.add(new PlayerVolumePanel());
@@ -54,6 +63,7 @@ public class OutputConfigPanel extends TOptionsPanel {
         private static boolean dirty = true;
 
         public PlayerVolumePanel() {
+            // FIXME remove
             add(Minecraft.getInstance().player.getUUID(), 0);
         }
 

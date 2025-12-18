@@ -81,6 +81,8 @@
 
   "channel.config.tab.output": "输出",
   "channel.config.post": "  后处理",
+  "channel.config.post.rt": "路径追踪",
+  "channel.config.post.rt.tooltip": "§6实验性功能§r\n使用路径追踪来获得更真实的音频体验。\n会额外占用CPU资源。",
   "channel.config.post.player_control": "  单独调整响度",
 
   "channel.config.tab.general": "通用",

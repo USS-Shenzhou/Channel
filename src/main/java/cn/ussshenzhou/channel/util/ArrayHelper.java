@@ -130,10 +130,10 @@ public class ArrayHelper {
         return (short) (sum / array.length);
     }
 
-    public static short absAverage(Collection<Short> array) {
+    public static <T extends Number> short absAverage(Collection<T> array) {
         double sum = 0;
-        for (short i : array) {
-            sum += Math.abs(i);
+        for (var i : array) {
+            sum += Math.abs(i.doubleValue());
         }
         return (short) (sum / array.size());
     }

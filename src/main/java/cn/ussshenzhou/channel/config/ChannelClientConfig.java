@@ -33,6 +33,7 @@ public class ChannelClientConfig implements TConfig {
     public float maxGain = 20;
     public String nvidiaDllPath = "";
     public Unit unit = Unit.DB;
+    public boolean rayTraceAudio = true;
 
     public static ChannelClientConfig get() {
         return ConfigHelper.getConfigRead(ChannelClientConfig.class);

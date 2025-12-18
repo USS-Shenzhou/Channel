@@ -119,7 +119,7 @@ public class InputConfigPanel extends TOptionsPanel {
         ).getB().setTooltip(Tooltip.create(Component.translatable(cfg.trigger.directTranslateKey() + ".tooltip")));
         thresholdLevel = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.threshold"),
-                -90, 0,
+                -90, -1,
                 (_, v) -> Component.literal(cfg.unit.getFS(v)),
                 Component.translatable("channel.config.pre.threshold.tooltip"),
                 (slider, _) -> ChannelClientConfig.write(c -> c.triggerThresholdDBFS = (float) slider.getAbsValue()),
