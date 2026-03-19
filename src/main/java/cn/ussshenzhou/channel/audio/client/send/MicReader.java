@@ -4,6 +4,7 @@ import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.audio.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.network.TalkPacket2S;
+import cn.ussshenzhou.channel.util.ArrayHelper;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.channel.util.OpusHelper;
@@ -59,8 +60,8 @@ public class MicReader {
                 return;
             }
             LevelGatherer.updateRaw(audio);
-            int sampleRate = (int) ChannelClientConfig.get().networkSampleRate;
-            audio = WebRTCHelper.process(NvidiaHelper.process(audio), MicManager.getSampleRate(), sampleRate);
+            int networkSampleRate = (int) ChannelClientConfig.get().networkSampleRate;
+            audio = WebRTCHelper.process(NvidiaHelper.process(audio), MicManager.getSampleRate(), networkSampleRate);
             if (audio == null) {
                 braek();
                 return;
@@ -71,10 +72,10 @@ public class MicReader {
             }
             if (ChannelClientConfig.get().listen) {
                 byte[] finalAudio = audio;
-                Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, sampleRate));
+                Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, networkSampleRate));
             }
-            var serialized = OpusHelper.encode(audio, sampleRate);
-            NetworkHelper.sendToServer(new TalkPacket2S(sampleRate, serialized));
+            var opus = OpusHelper.encode(audio, networkSampleRate);
+            NetworkHelper.sendToServer(new TalkPacket2S(networkSampleRate, opus));
         } catch (Throwable t) {
             LogUtils.getLogger().error("{}", t.toString());
         }

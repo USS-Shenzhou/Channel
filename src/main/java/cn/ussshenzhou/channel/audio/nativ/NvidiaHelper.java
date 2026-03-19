@@ -17,7 +17,6 @@ import static java.lang.foreign.MemorySegment.NULL;
 /**
  * @author USS_Shenzhou
  */
-@SuppressWarnings("preview")
 public class NvidiaHelper {
     protected static Stat stat;
 
@@ -58,8 +57,7 @@ public class NvidiaHelper {
             if (!denoise) {
                 return;
             }
-            var effect = dereverb ? NVAFX_EFFECT_DEREVERB_DENOISER : NVAFX_EFFECT_DENOISER;
-            //TODO
+            var effect = dereverb ? NVAFX_EFFECT_DEREVERB_DENOISER() : NVAFX_EFFECT_DENOISER();
             try (Arena arena = Arena.ofConfined()) {
                 var handle = arena.allocate(ValueLayout.ADDRESS);
                 checkStatus(NvAFX_CreateEffect(effect, handle), "NvAFX_CreateEffect");
@@ -79,8 +77,8 @@ public class NvidiaHelper {
                     }
                 }
                 modelPath.append(".trtpkg");
-                checkStatus(NvAFX_SetString(nvAFXHandle, NVAFX_PARAM_MODEL_PATH, arena.allocateUtf8String(modelPath.toString())), "NvAFX_SetString");
-                checkStatus(NvAFX_SetFloat(nvAFXHandle, NVAFX_PARAM_INTENSITY_RATIO, cfg.aiNoiseCancelingRatio), "NvAFX_SetFloat");
+                checkStatus(NvAFX_SetString(nvAFXHandle, NVAFX_PARAM_MODEL_PATH(), arena.allocateFrom(modelPath.toString())), "NvAFX_SetString");
+                checkStatus(NvAFX_SetFloat(nvAFXHandle, NVAFX_PARAM_INTENSITY_RATIO(), cfg.aiNoiseCancelingRatio), "NvAFX_SetFloat");
                 checkStatus(NvAFX_Load(nvAFXHandle), "NvAFX_Load");
             } catch (RuntimeException ignored) {
             }
@@ -100,19 +98,19 @@ public class NvidiaHelper {
 
     public static byte[] process(byte[] raw) {
         synchronized (NvidiaHelper.class) {
-            if (nvAFXHandle == NULL || stat != Stat.OK) {
+            if (nvAFXHandle == NULL) {
                 return raw;
             }
             try (Arena arena = Arena.ofConfined()) {
-                var in = arena.allocateArray(ValueLayout.JAVA_FLOAT, ArrayHelper.castS2F(ArrayHelper.reinterpretB2S(raw)));
+                var in = arena.allocateFrom(ValueLayout.JAVA_FLOAT, ArrayHelper.castS2F(ArrayHelper.reinterpretB2S(raw)));
                 var out = arena.allocate(in.byteSize());
                 var seg = MicReader.getFrameLength() / 10;
                 var stepLength = raw.length / 2 / seg;
                 for (int i = 0; i < seg; i++) {
                     var inSlice = in.asSlice(i * stepLength * 4L, stepLength * 4L);
                     var outSlice = out.asSlice(i * stepLength * 4L, stepLength * 4L);
-                    var inPtr = arena.allocateArray(ValueLayout.ADDRESS, 1);
-                    var outPtr = arena.allocateArray(ValueLayout.ADDRESS, 1);
+                    var inPtr = arena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
+                    var outPtr = arena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
                     inPtr.setAtIndex(ValueLayout.ADDRESS, 0, inSlice);
                     outPtr.setAtIndex(ValueLayout.ADDRESS, 0, outSlice);
                     checkStatus(NvAFX_Run(nvAFXHandle, inPtr, outPtr, stepLength, 1), "NvAFX_Run");

@@ -2,11 +2,20 @@ package cn.ussshenzhou.channel.audio.client.receive;
 
 import cn.ussshenzhou.channel.network.BaseAudioPacket2C;
 import cn.ussshenzhou.channel.network.TalkPacket2C;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author USS_Shenzhou
  */
 public class AudioManagerManager {
+    public static final ExecutorService HANDLER_THREAD = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
+            .setNameFormat("Channel-Audio-Handler-SingleThread-%d")
+            .build());
+
     public static final TalkManager TALK = new TalkManager();
 
     public static void init() {
@@ -18,11 +27,13 @@ public class AudioManagerManager {
     }
 
     public static void handlePacket(BaseAudioPacket2C packet) {
-        switch (packet) {
-            case TalkPacket2C talk -> TALK.handle(packet.from, packet.sampleRate, packet.opus);
-            //TODO case SpeakerPacket2C speaker -> SPEAKER.handle(packet.from, packet.sampleRate, packet.opus);
-            default -> {
+        CompletableFuture.runAsync(() -> {
+            switch (packet) {
+                case TalkPacket2C talk -> TALK.handle(packet.from, packet.sampleRate, packet.opus);
+                //TODO case SpeakerPacket2C speaker -> SPEAKER.handle(packet.from, packet.sampleRate, packet.opus);
+                default -> {
+                }
             }
-        }
+        }, HANDLER_THREAD);
     }
 }

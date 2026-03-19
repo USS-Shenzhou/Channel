@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.121'
+    id 'net.neoforged.moddev' version '2.0.137'
 }
 
 version = mod_version
@@ -21,49 +21,18 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 sourceSets {
     main {
         java.srcDir 'src/main/java'
     }
-    java22 {
-        java.srcDir 'src/java22'
-        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
-        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.release = 21
 }
 
 tasks.named('compileJava', JavaCompile) {
     options.compilerArgs += [
             '--enable-preview'
     ]
-}
-
-tasks.register('compileJava22', JavaCompile) {
-    javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(22)
-    }
-    source = sourceSets.java22.java
-    classpath = sourceSets.main.output + sourceSets.java22.compileClasspath
-    destinationDirectory = layout.buildDirectory.dir('classes-java22')
-    options.release = 22
-}
-
-tasks.named('jar', Jar) {
-    dependsOn tasks.named('compileJava22')
-    manifest {
-        attributes(
-                'Multi-Release': 'true'
-        )
-    }
-    from(tasks.named('compileJava22')) {
-        into 'META-INF/versions/22'
-    }
 }
 
 neoForge {
@@ -140,30 +109,15 @@ dependencies {
     // compileOnly "mezz.jei:jei-${mc_version}-forge-api:${jei_version}"
     // runtimeOnly "mezz.jei:jei-${mc_version}-forge:${jei_version}"
 
-    implementation("cn.ussshenzhou:t88:+") {
-        exclude group: "curse.maven", module: "irisshaders-455508"
-        exclude group: "org.sinytra.forgified-fabric-api", module: "fabric-renderer-api-v1"
-        exclude group: "org.sinytra.forgified-fabric-api", module: "fabric-api-base"
-        exclude group: "org.sinytra.forgified-fabric-api", module: "fabric-rendering-data-attachment-v1"
-        exclude group: "org.sinytra.forgified-fabric-api", module: "fabric-block-view-api-v2"
-    }
-    annotationProcessor("cn.ussshenzhou:t88:+") {
-        exclude group: "curse.maven", module: "irisshaders-455508"
-        exclude group: "org.sinytra.forgified-fabric-api", module: "fabric-renderer-api-v1"
-        exclude group: "org.sinytra.forgified-fabric-api", module: "fabric-api-base"
-        exclude group: "org.sinytra.forgified-fabric-api", module: "fabric-rendering-data-attachment-v1"
-        exclude group: "org.sinytra.forgified-fabric-api", module: "fabric-block-view-api-v2"
-    }
+    implementation(annotationProcessor("cn.ussshenzhou:t88:26.+"))
+
     implementation 'io.github.jaredmdobson:concentus:1.0.2'
-    additionalRuntimeClasspath 'io.github.jaredmdobson:concentus:1.0.2'
     jarJar 'io.github.jaredmdobson:concentus:1.0.2'
 
-    compileOnly(group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.14.0")
-    additionalRuntimeClasspath(group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.14.0")
+    implementation(group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.14.0")
     jarJar(group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.14.0")
 
     implementation group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.14.0", classifier: "windows-x86_64"
-    additionalRuntimeClasspath group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.14.0", classifier: "windows-x86_64"
     jarJar(group: "dev.onvoid.webrtc", name: "webrtc-java", version: "0.14.0", classifier: "windows-x86_64")
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar

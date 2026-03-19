@@ -18,7 +18,7 @@ public class Channel {
     public static final String MODID = "channel";
 
     public Channel(IEventBus modEventBus, ModContainer modContainer) {
-        if (FMLEnvironment.dist == Dist.CLIENT) {
+        if (FMLEnvironment.getDist() == Dist.CLIENT) {
             ConfigHelper.loadConfig(new ChannelClientConfig());
             ConfigHelper.loadConfig(new ChannelPlayerConfig());
         }

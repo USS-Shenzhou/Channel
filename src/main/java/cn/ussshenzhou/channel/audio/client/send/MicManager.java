@@ -41,8 +41,17 @@ public class MicManager {
     }
 
     public static synchronized void refresh(Mixer.Info deviceInfo, AudioFormat format) {
+        var lineInfo = new DataLine.Info(TargetDataLine.class, format);
+        var mixer = AudioSystem.getMixer(deviceInfo);
+        if (!mixer.isLineSupported(new DataLine.Info(TargetDataLine.class, format))) {
+            TSimpleNotification.fire(
+                    Component.literal("Selected Device Parameters Are Not Supported."),
+                    5,
+                    TSimpleNotification.Severity.ERROR
+            );
+            return;
+        }
         try {
-            var lineInfo = new DataLine.Info(TargetDataLine.class, format);
             if (line != null) {
                 if (line.isRunning()) {
                     line.stop();
@@ -51,13 +60,13 @@ public class MicManager {
                     line.close();
                 }
             }
-            // FIXME same name?
-            line = (TargetDataLine) AudioSystem.getMixer(AudioSystem.getMixerInfo()[23]).getLine(lineInfo);
+            line = (TargetDataLine) mixer.getLine(lineInfo);
             if (!line.isOpen()) {
                 line.open(format);
             }
             line.start();
-        } catch (LineUnavailableException e) {
+        } catch (Exception e) {
+            line = null;
             LogUtils.getLogger().error("{}", e.getMessage());
             TSimpleNotification.fire(Component.literal("Failed To Init Device " + deviceInfo.getName()), 5, TSimpleNotification.Severity.ERROR);
         }
@@ -69,6 +78,6 @@ public class MicManager {
     }
 
     public static int getSampleRate() {
-        return (int) line.getFormat().getSampleRate();
+        return line != null ? (int) line.getFormat().getSampleRate() : (int) ChannelClientConfig.get().micSampleRate;
     }
 }

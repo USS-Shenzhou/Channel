@@ -34,6 +34,6 @@ public abstract class BaseAudioPacket2C {
     }
 
     public void clientHandler(IPayloadContext context) {
-        CompletableFuture.runAsync(() -> AudioManagerManager.handlePacket(this));
+        AudioManagerManager.handlePacket(this);
     }
 }

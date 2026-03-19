@@ -4,13 +4,10 @@ import cn.ussshenzhou.channel.audio.client.receive.BaseAudioManager;
 import cn.ussshenzhou.channel.audio.client.receive.PlayerAudio;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import com.google.common.collect.EvictingQueue;
-import com.mojang.logging.LogUtils;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Tuple;
+import net.minecraft.util.Util;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -55,7 +52,7 @@ public class RayTraceManager {
     public static void play(double x, double y, double z, PlayerAudio audio) {
         long t = Util.getNanos();
         var sourcePos = new Vec3(x, y, z);
-        if (sourcePos.distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition()) > MAX_DISTANCE * MAX_DISTANCE) {
+        if (sourcePos.distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().position()) > MAX_DISTANCE * MAX_DISTANCE) {
             audio.read(BaseAudioManager.PLAY_RATE10);
             return;
         }
@@ -69,7 +66,7 @@ public class RayTraceManager {
     }
 
     private static SourceAudioData calculateSourceAudioData(Vec3 sourcePos) {
-        var cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        var cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
         var tuple = calculateVirtualDirection(sourcePos);
         double meanReverbWeight = tuple.getA();
         var hitA = shoot(sourcePos, cameraPos);
@@ -295,7 +292,7 @@ public class RayTraceManager {
 
     private static void updateReflectionPan() {
         var camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        var camPos = camera.getPosition();
+        var camPos = camera.position();
         var inverseRotation = new Quaternionf(camera.rotation()).conjugate();
 
         var earlyPos = new Vector3f(

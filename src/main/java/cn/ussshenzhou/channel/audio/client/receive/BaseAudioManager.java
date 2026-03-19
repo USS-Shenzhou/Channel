@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
+import cn.ussshenzhou.channel.util.ArrayHelper;
 import cn.ussshenzhou.channel.util.OpusHelper;
 import com.mojang.logging.LogUtils;
 import io.github.jaredmdobson.concentus.OpusException;
@@ -75,7 +76,7 @@ public abstract class BaseAudioManager {
                     }
                 }).push(decoded));
             }
-        } catch (OpusException e) {
+        } catch (Exception e) {
             LogUtils.getLogger().error(e.toString());
         }
     }

@@ -22,7 +22,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -146,7 +146,7 @@ public class OutputConfigPanel extends TOptionsPanel {
             super.render(graphics, pMouseX, pMouseY, pPartialTick);
             var playerInfo = Minecraft.getInstance().getConnection().getPlayerInfo(uuid);
             if (playerInfo != null) {
-                PlayerFaceRenderer.draw(graphics, playerInfo.getSkin().texture(), width / 2 - 16, this.getYT() + 2, 16, playerInfo.showHat(), false, -1);
+                PlayerFaceRenderer.draw(graphics, playerInfo.getSkin(), width / 2 - 16, this.getYT() + 2, 16, -1);
             }
         }
 

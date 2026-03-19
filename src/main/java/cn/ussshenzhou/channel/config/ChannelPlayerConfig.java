@@ -17,13 +17,13 @@ public class ChannelPlayerConfig implements TConfig {
     private HashMap<String, Float> playerVolumeAdjust = new HashMap<>();
 
     public static float getOrDefault(Player player) {
-        float r = get().playerVolumeAdjust.computeIfAbsent(player.getGameProfile().getName(), name -> 0f);
+        float r = get().playerVolumeAdjust.computeIfAbsent(player.getGameProfile().name(), name -> 0f);
         OutputConfigPanel.PlayerVolumePanel.add(player.getUUID(), r);
         return r;
     }
 
     public static void set(Player player, float db) {
-        write(thiz -> thiz.playerVolumeAdjust.put(player.getGameProfile().getName(), db));
+        write(thiz -> thiz.playerVolumeAdjust.put(player.getGameProfile().name(), db));
     }
 
     private static ChannelPlayerConfig get() {

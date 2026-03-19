@@ -1,6 +1,6 @@
 package cn.ussshenzhou.channel.util;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import net.minecraft.client.sounds.AudioStream;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -10,8 +10,8 @@ import java.nio.ByteBuffer;
 /**
  * @author USS_Shenzhou
  */
-@MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class DumbAudioStream implements AudioStream {
     private final AudioFormat format;
     public static final DumbAudioStream INSTANCE = new DumbAudioStream();

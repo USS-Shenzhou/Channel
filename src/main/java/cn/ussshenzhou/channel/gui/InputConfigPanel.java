@@ -20,7 +20,7 @@ import cn.ussshenzhou.t88.gui.widegt.TLabel;
 import cn.ussshenzhou.t88.gui.widegt.TProgressBar;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.joml.Vector2i;
 
@@ -147,7 +147,7 @@ public class InputConfigPanel extends TOptionsPanel {
                 },
                 entry -> entry.getContent() == cfg.echoCanceling
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.ec.tooltip")));
-        nvidiaLogo = (HorizontalTitledOption<?>) addOption(Component.literal("Powered by"), new TImage(ResourceLocation.fromNamespaceAndPath(Channel.MODID, "textures/gui/nvidia.png")) {
+        nvidiaLogo = (HorizontalTitledOption<?>) addOption(Component.literal("Powered by"), new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/nvidia.png")) {
             @Override
             public Vector2i getPreferredSize() {
                 return new Vector2i(0, 50);
@@ -246,14 +246,6 @@ public class InputConfigPanel extends TOptionsPanel {
         var deviceName = devices.getSelected().getContent();
         var deviceInfo = AudioHelper.getDeviceInfo(deviceName);
         if (deviceInfo == null) {
-            return;
-        }
-        if (!AudioSystem.getMixer(AudioSystem.getMixerInfo()[23]).isLineSupported(new DataLine.Info(TargetDataLine.class, format))) {
-            TSimpleNotification.fire(
-                    Component.literal("Selected Device Parameters Are Not Supported."),
-                    5,
-                    TSimpleNotification.Severity.ERROR
-            );
             return;
         }
         MicManager.refresh(deviceInfo, format);
