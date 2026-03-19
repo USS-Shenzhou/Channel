@@ -22,7 +22,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Replace classifier in build.gradle
         run: sed -i 's/windows-x86_64/${{ matrix.classifier }}/g' build.gradle
