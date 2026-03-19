@@ -15,6 +15,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout t88 repository
+        uses: actions/checkout@v4
+        with:
+          repository: USS-Shenzhou/t88
+          path: t88
+
       - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
@@ -23,6 +29,12 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
+
+      - name: Publish t88 to Maven Local
+        working-directory: ./t88
+        run: |
+          chmod +x gradlew
+          ./gradlew publishToMavenLocal
 
       - name: Replace classifier in build.gradle
         run: sed -i 's/windows-x86_64/${{ matrix.classifier }}/g' build.gradle
