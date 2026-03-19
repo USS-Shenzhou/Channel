@@ -51,7 +51,8 @@ public class MicManager {
                     line.close();
                 }
             }
-            line = (TargetDataLine) AudioSystem.getMixer(deviceInfo).getLine(lineInfo);
+            // FIXME same name?
+            line = (TargetDataLine) AudioSystem.getMixer(AudioSystem.getMixerInfo()[23]).getLine(lineInfo);
             if (!line.isOpen()) {
                 line.open(format);
             }

@@ -24,4 +24,5 @@ public class Channel {
         }
         ConfigHelper.loadConfig(new ChannelServerConfig());
     }
+    //TODO 参考发光/泛光，声音越大，回声越强
 }

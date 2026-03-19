@@ -66,7 +66,6 @@ public class RayTraceManager {
         alFilterf(audio.alReverbFilter, AL_LOWPASS_GAINHF, 1);
         alSource3f(audio.alSource, AL_POSITION, (float) data.virtualPos().x, (float) data.virtualPos().y, (float) data.virtualPos().z);
         audio.play();
-        LogUtils.getLogger().info("play took {} ms", (Util.getNanos() - t) / 1000_000.0);
     }
 
     private static SourceAudioData calculateSourceAudioData(Vec3 sourcePos) {
@@ -156,7 +155,6 @@ public class RayTraceManager {
         lastUpdate = Util.getMillis();
         clear();
         update();
-        LogUtils.getLogger().warn("update took {} ms", Util.getMillis() - lastUpdate);
     }
 
     private static void clear() {

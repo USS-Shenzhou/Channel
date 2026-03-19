@@ -2,6 +2,47 @@
 
 ![logo](src/main/resources/channel.png)
 
+## 简介 | Introduction
+
+沉浸语音是一个开源的游戏内对讲模组。
+
+*Channel* is an open-source in-game voice chat mod.
+
+### 和Simple Voice Chat有什么不同？| How does it differ from Simple Voice Chat?
+
+| 沉浸语音</br>Channel                                         | SVC                                 |
+| ------------------------------------------------------------ |-------------------------------------|
+| ✅自由许可证</br>Free License                                 | ❌保留所有权利</br>All Rights Reserved     |
+| ✅固定降噪算法+基于Nvidia Broadcast的AI降噪</br>Fixed Noise Suppression + NVIDIA Broadcast AI Denoiser | ❌RNNoise降噪</br>RNNoise Suppression  |
+| ✅基于路径追踪的混响模拟</br>Path-Traced Reverb Simulation    | ❌简单位置音频</br>Simple Positional Audio |
+| ✅开箱即用，不需要额外端口，无需配置</br>Out-of-the-box, no extra ports or configuration required | ❌需要额外端口</br>Requires extra ports    |
+| ❌仅NeoForge</br>NeoForge Only                                | ✅Fabric/Quilt/Forge/Bukkit          |
+|                                                              | ✅API插件</br>API Plugins              |
+
+### 饼 | TODO
+
+- 路径追踪音频：
+  - [ ] 针对栅栏/玻璃板等半透过方块的处理
+  - [ ] 针对流体方块的处理
+  - [ ] 模拟绝对响度
+- 转发：
+  - [ ] 独立的转发程序
+- 游戏内：
+  - [ ] 话筒和音响方块
+  - [ ] 对讲机物品
+
+
+- Path-Traced Audio:
+    - [ ] Handling of semi-transparent blocks (e.g., fences, glass panes)
+    - [ ] Handling of fluid blocks
+    - [ ] Absolute loudness simulation
+- Forwarding:
+    - [ ] Standalone forwarding application
+- In-game:
+    - [ ] Microphone and Speaker blocks
+    - [ ] Walkie-talkie items
+
+
 ## 给Linux/MacOS用户 | For Linux/MacOS Users
 
 要在Linux/MacOS x86_64或arm64上使用此模组，请自行构建：

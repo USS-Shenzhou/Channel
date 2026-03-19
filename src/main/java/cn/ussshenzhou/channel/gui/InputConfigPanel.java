@@ -248,7 +248,7 @@ public class InputConfigPanel extends TOptionsPanel {
         if (deviceInfo == null) {
             return;
         }
-        if (!AudioSystem.getMixer(deviceInfo).isLineSupported(new DataLine.Info(TargetDataLine.class, format))) {
+        if (!AudioSystem.getMixer(AudioSystem.getMixerInfo()[23]).isLineSupported(new DataLine.Info(TargetDataLine.class, format))) {
             TSimpleNotification.fire(
                     Component.literal("Selected Device Parameters Are Not Supported."),
                     5,

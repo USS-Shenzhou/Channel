@@ -2,10 +2,7 @@ package cn.ussshenzhou.channel.audio.client.receive;
 
 import cn.ussshenzhou.channel.audio.client.rt.RayTraceManager;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
-import cn.ussshenzhou.channel.config.ChannelPlayerConfig;
 import cn.ussshenzhou.channel.util.AudioHelper;
-import com.mojang.logging.LogUtils;
-import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
@@ -23,8 +20,8 @@ import static org.lwjgl.openal.EXTEfx.*;
  * @author USS_Shenzhou
  */
 public class PlayerAudio {
-    private static final int MAX_BUFFER = 50;
-    private static final int MIN_PLAY_THRESHOLD = 4;
+    private static final int MAX_BUFFER = 100;
+    private static final int MIN_PLAY_THRESHOLD = 5;
     private final BlockingQueue<short[]> audioBuffer = new ArrayBlockingQueue<>(MAX_BUFFER);
     private static int readyBuffer10ms = 0;
     public final int alSource, sampleRate, alDirectFilter, alReverbFilter;
