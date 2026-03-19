@@ -51,5 +51,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mod-${{ matrix.classifier }}
+          name: channel_${{ matrix.classifier }}
           path: build/libs/*_github_${{ matrix.classifier }}.jar
