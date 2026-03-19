@@ -52,4 +52,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mod-${{ matrix.classifier }}
-          path: build/libs/*-${{ matrix.classifier }}.jar
+          path: build/libs/*_github_${{ matrix.classifier }}.jar
