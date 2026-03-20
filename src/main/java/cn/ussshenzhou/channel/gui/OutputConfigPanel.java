@@ -139,6 +139,7 @@ public class OutputConfigPanel extends TOptionsPanel {
             } else {
                 name.setText(Component.literal(uuid.toString()));
             }
+            //TODO click face to mute
         }
 
         @Override

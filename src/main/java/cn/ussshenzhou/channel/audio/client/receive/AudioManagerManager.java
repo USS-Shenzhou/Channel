@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
  */
 public class AudioManagerManager {
     public static final ExecutorService HANDLER_THREAD = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
-            .setNameFormat("Channel-Audio-Handler-SingleThread-%d")
+            .setNameFormat("Channel-Audio-Data-Handler-%d")
             .build());
 
     public static final TalkManager TALK = new TalkManager();

@@ -10,14 +10,14 @@
 
 ### 和Simple Voice Chat有什么不同？| How does it differ from Simple Voice Chat?
 
-| 沉浸语音</br>Channel                                         | SVC                                 |
-| ------------------------------------------------------------ |-------------------------------------|
-| ✅自由许可证</br>Free License                                 | ❌保留所有权利</br>All Rights Reserved     |
+| 沉浸语音</br>Channel                                                                           | SVC                                 |
+|--------------------------------------------------------------------------------------------|-------------------------------------|
+| ✅自由许可证</br>Free License                                                                    | ❌保留所有权利</br>All Rights Reserved     |
 | ✅固定降噪算法+基于Nvidia Broadcast的AI降噪</br>Fixed Noise Suppression + NVIDIA Broadcast AI Denoiser | ❌RNNoise降噪</br>RNNoise Suppression  |
-| ✅基于路径追踪的混响模拟</br>Path-Traced Reverb Simulation    | ❌简单位置音频</br>Simple Positional Audio |
-| ✅开箱即用，不需要额外端口，无需配置</br>Out-of-the-box, no extra ports or configuration required | ❌需要额外端口</br>Requires extra ports    |
-| ❌仅NeoForge</br>NeoForge Only                                | ✅Fabric/Quilt/Forge/Bukkit          |
-|                                                              | ✅API插件</br>API Plugins              |
+| ✅基于路径追踪的混响模拟</br>Path-Traced Reverb Simulation                                             | ❌简单位置音频</br>Simple Positional Audio |
+| ✅开箱即用，不需要额外端口，无需配置</br>Out-of-the-box, no extra ports or configuration required            | ❌需要额外端口</br>Requires extra ports    |
+| ❌仅NeoForge</br>NeoForge only                                                               | ✅Fabric/Quilt/Forge/Bukkit          |
+| ❌无扩展功能</br>No extensions                                                                   | ✅API插件</br>API Plugins              |
 
 ### 饼 | TODO
 
@@ -45,31 +45,17 @@
 
 ## 给Linux/MacOS用户 | For Linux/MacOS Users
 
-要在Linux/MacOS x86_64或arm64上使用此模组，请自行构建：
-
-1. 将`build.gradle`中的所有`classifier: "windows-x86_64"`改为：
-   1. classifier: "linux-x86_64"
-   2. 或classifier: "linux-aarch64"
-   3. 或classifier: "macos-x86_64"
-   4. 或classifier: "macos-aarch64"；
-2. 运行`./gradlew build`，构建产物将会保存在`build/libs`。
+要在Linux/MacOS x86_64或arm64上使用此模组，请从[Actions](https://github.com/USS-Shenzhou/Channel/actions)中下载。
 
 由于Nvidia AFX SDK客户端仅支持Windows，故智能降噪在Linux/MacOS上不可用。如果确实有此需求，可以自行修改`NvidiaInit.java`，更多信息可以在[Nvidia的用户指南](https://docs.nvidia.com/maxine/afx/LinuxAFXSDK/GetStartedOnLinux.html)查看。
 
-由于能力有限，只对Linux提供有限支持。不对MacOS提供支持。
+由于能力有限，只对Linux提供有限支持。不对MacOS提供积极支持。
 
-To use this mod on Linux/MacOS x86_64 or arm64, you need to build it yourself:
-
-1. Replace all occurrences of `classifier: "windows-x86_64"` in `build.gradle` with one of the following:
-    1. `classifier: "linux-x86_64"`
-    2. or `classifier: "linux-aarch64"`
-    3. or `classifier: "macos-x86_64"`
-    4. or `classifier: "macos-aarch64"`
-2. Run `./gradlew build`. The build output will be located in `build/libs`.
+To use this mod on Linux/MacOS x86_64 or arm64, you need to download from [Actions](https://github.com/USS-Shenzhou/Channel/actions).
 
 Since the Nvidia AFX SDK client only supports Windows, smart mode of noise-canceling is not available on Linux or macOS. If you do need this functionality, you may modify `NvidiaInit.java` yourself. For more information, see the [Nvidia User Guide](https://docs.nvidia.com/maxine/afx/LinuxAFXSDK/GetStartedOnLinux.html).
 
-Due to limited resources, only partial support is provided for Linux. MacOS is not supported.
+Due to limited resources, only partial support is provided for Linux. MacOS is not actively supported.
 
 
 ## 版权和许可 | Copyrights and Licenses

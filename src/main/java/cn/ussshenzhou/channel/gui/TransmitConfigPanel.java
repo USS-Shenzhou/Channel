@@ -6,7 +6,10 @@ import cn.ussshenzhou.t88.gui.advanced.TOptionsPanel;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author USS_Shenzhou
@@ -19,7 +22,7 @@ public class TransmitConfigPanel extends TOptionsPanel {
         addOptionSplitter(Component.translatable("channel.config.net"));
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.net.length"),
-                ModConstant.USABLE_FRAME_LENGTH,
+                Stream.concat(ModConstant.USABLE_FRAME_LENGTH.stream(), Stream.of(cfg.frameLengthMs)).distinct().collect(Collectors.toList()),
                 length -> _ -> ChannelClientConfig.write(c -> c.frameLengthMs = length),
                 entry -> entry.getContent() == cfg.frameLengthMs
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.net.length.tooltip")));

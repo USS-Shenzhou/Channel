@@ -242,13 +242,7 @@ public class InputConfigPanel extends TOptionsPanel {
     }
 
     private void notifyMicManager() {
-        AudioFormat format = new AudioFormat(ChannelClientConfig.get().micSampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false);
-        var deviceName = devices.getSelected().getContent();
-        var deviceInfo = AudioHelper.getDeviceInfo(deviceName);
-        if (deviceInfo == null) {
-            return;
-        }
-        MicManager.refresh(deviceInfo, format);
+        MicManager.update(devices.getSelected().getContent());
     }
 
 }

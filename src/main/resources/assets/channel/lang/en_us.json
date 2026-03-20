@@ -88,5 +88,10 @@
   "channel.config.tab.general": "通用",
   "Channel.config.unit": "显示单位",
   "Channel.config.unit.db": "分贝 dB",
-  "Channel.config.unit.per": "百分比 %"
+  "Channel.config.unit.per": "百分比 %",
+
+  "channel.notify.failed_find": "未找到设备 %1$s.\n已使用默认输入设备。",
+  "channel.notify.no_valid": "无可用的输入设备。",
+  "channel.notify.unsupported": "选择的参数不受此输入设备支持。",
+  "channel.notify.failed_init": "初始化设备 %1$s 失败。"
 }

@@ -19,36 +19,57 @@ public class MicManager {
 
     public static void init() {
         var cfg = ChannelClientConfig.get();
-        var deviceName = cfg.useDevice;
-        var deviceInfo = AudioHelper.getDeviceInfo(deviceName);
-        if (deviceInfo == null) {
-            deviceInfo = Stream.of(AudioSystem.getMixerInfo())
-                    .filter(info -> "DirectAudioDeviceInfo".equals(info.getClass().getSimpleName()) &&
-                            AudioSystem.getMixer(info).getTargetLineInfo().length > 0)
-                    .findFirst().orElse(null);
-        }
-        if (deviceInfo == null) {
-            TSimpleNotification.fire(
-                    Component.literal("No Input Audio Device Found."),
-                    5,
-                    TSimpleNotification.Severity.ERROR
-            );
-            return;
-        }
-        var name = deviceInfo.getName();
-        ChannelClientConfig.write(channelClientConfig -> channelClientConfig.useDevice = name);
-        refresh(deviceInfo, new AudioFormat(cfg.micSampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false));
+        update(cfg.useDevice);
     }
 
-    public static synchronized void refresh(Mixer.Info deviceInfo, AudioFormat format) {
+    public static void update(String deviceName) {
+        refresh(findMixerByName(deviceName));
+    }
+
+    private static Mixer findMixerByName(String name) {
+        var mixer = Stream.of(AudioSystem.getMixerInfo())
+                .filter(info -> info.getName().equals(name))
+                .map(AudioSystem::getMixer)
+                .filter(m -> m.getTargetLineInfo().length > 0)
+                .findFirst().orElse(null);
+        if (mixer != null) {
+            return mixer;
+        }
+        mixer = Stream.of(AudioSystem.getMixerInfo())
+                .filter(info -> "DirectAudioDeviceInfo".equals(info.getClass().getSimpleName()) && AudioSystem.getMixer(info).getTargetLineInfo().length > 0)
+                .findFirst()
+                .map(AudioSystem::getMixer)
+                .orElse(null);
+        TSimpleNotification.fire(
+                Component.translatable("channel.notify.failed_find", name),
+                5,
+                TSimpleNotification.Severity.WARN
+        );
+        if (mixer != null) {
+            return mixer;
+        }
+        TSimpleNotification.fire(
+                Component.translatable("channel.notify.no_valid"),
+                5,
+                TSimpleNotification.Severity.ERROR
+        );
+        return null;
+    }
+
+    private static synchronized void refresh(@Nullable Mixer mixer) {
+        if (mixer == null) {
+            line = null;
+            return;
+        }
+        var format = new AudioFormat(ChannelClientConfig.get().micSampleRate, ModConstant.MIC_SAMPLE_BITS, ModConstant.MIC_CHANNEL, true, false);
         var lineInfo = new DataLine.Info(TargetDataLine.class, format);
-        var mixer = AudioSystem.getMixer(deviceInfo);
         if (!mixer.isLineSupported(new DataLine.Info(TargetDataLine.class, format))) {
             TSimpleNotification.fire(
-                    Component.literal("Selected Device Parameters Are Not Supported."),
+                    Component.translatable("channel.notify.unsupported"),
                     5,
                     TSimpleNotification.Severity.ERROR
             );
+            line = null;
             return;
         }
         try {
@@ -68,7 +89,10 @@ public class MicManager {
         } catch (Exception e) {
             line = null;
             LogUtils.getLogger().error("{}", e.getMessage());
-            TSimpleNotification.fire(Component.literal("Failed To Init Device " + deviceInfo.getName()), 5, TSimpleNotification.Severity.ERROR);
+            TSimpleNotification.fire(
+                    Component.translatable("channel.notify.failed_init", mixer.getMixerInfo().getName()),
+                    5,
+                    TSimpleNotification.Severity.ERROR);
         }
     }
 

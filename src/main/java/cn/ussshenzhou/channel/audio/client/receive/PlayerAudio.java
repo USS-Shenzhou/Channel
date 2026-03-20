@@ -7,9 +7,7 @@ import cn.ussshenzhou.channel.util.AudioHelper;
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -20,10 +18,10 @@ import static org.lwjgl.openal.EXTEfx.*;
  * @author USS_Shenzhou
  */
 public class PlayerAudio {
-    private static final int MAX_BUFFER = 100;
-    private static final int MIN_PLAY_THRESHOLD = 5;
+    private static final int MAX_BUFFER = 500;
+    private static final int MIN_PLAY_THRESHOLD = 51;
     private final BlockingQueue<short[]> audioBuffer = new ArrayBlockingQueue<>(MAX_BUFFER);
-    private static int readyBuffer10ms = 0;
+    private int readyBufferMs = 0;
     public final int alSource, sampleRate, alDirectFilter, alReverbFilter;
     public final UUID playerId;
 
@@ -60,39 +58,42 @@ public class PlayerAudio {
     }
 
     @Nullable
-    public ByteBuffer read(int sizeIn10Ms) {
+    public List<ByteBuffer> read(int sizeIn10Ms) {
         int available = audioBuffer.size();
         if (available == 0) {
             return null;
         }
         int toRead = Math.min(sizeIn10Ms, available);
         int length = sampleRate / 100;
-        var buffer = ByteBuffer.allocateDirect(toRead * length * 2).order(ByteOrder.LITTLE_ENDIAN);
-        for (int i = 0; i < sizeIn10Ms; i++) {
+        List<ByteBuffer> buffers = new ArrayList<>(toRead);
+        for (int i = 0; i < toRead; i++) {
             var chunk = audioBuffer.poll();
             if (chunk != null) {
-                buffer.slice(i * length * 2, length * 2).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(chunk);
+                var buffer = ByteBuffer.allocateDirect(length * 2).order(ByteOrder.LITTLE_ENDIAN);
+                buffer.asShortBuffer().put(chunk).rewind();
+                buffers.add(buffer);
             }
         }
-        buffer.rewind();
-        return buffer;
+        return buffers;
     }
 
     public void play() {
         int processed = alGetSourcei(alSource, AL_BUFFERS_PROCESSED);
         while (processed-- > 0) {
             int buf = alSourceUnqueueBuffers(alSource);
-            readyBuffer10ms -= alGetBufferi(buf, AL_SIZE) * 1000 / 2 / sampleRate / 10;
+            readyBufferMs -= 10;
             alDeleteBuffers(buf);
         }
-        ByteBuffer pcm = read(MAX_BUFFER);
-        if (pcm != null) {
-            int buf = alGenBuffers();
-            alBufferData(buf, AL_FORMAT_MONO16, pcm, sampleRate);
-            alSourceQueueBuffers(alSource, buf);
-            readyBuffer10ms += pcm.capacity() * 1000 / 2 / sampleRate / 10;
+        var pcms = read(MAX_BUFFER);
+        if (pcms != null) {
+            for (ByteBuffer pcm : pcms) {
+                int buf = alGenBuffers();
+                alBufferData(buf, AL_FORMAT_MONO16, pcm, sampleRate);
+                alSourceQueueBuffers(alSource, buf);
+                readyBufferMs += 10;
+            }
         }
-        if (alGetSourcei(alSource, AL_SOURCE_STATE) != AL_PLAYING && readyBuffer10ms > MIN_PLAY_THRESHOLD) {
+        if (alGetSourcei(alSource, AL_SOURCE_STATE) != AL_PLAYING && readyBufferMs > MIN_PLAY_THRESHOLD) {
             alSourcePlay(alSource);
         }
     }

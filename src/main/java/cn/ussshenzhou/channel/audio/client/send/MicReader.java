@@ -9,6 +9,7 @@ import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.channel.util.OpusHelper;
 import cn.ussshenzhou.t88.network.NetworkHelper;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 
@@ -22,7 +23,9 @@ import java.util.concurrent.TimeUnit;
  * @author USS_Shenzhou
  */
 public class MicReader {
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
+            .setNameFormat("Channel-Mic-Reader-%d")
+            .build());
     private static ScheduledFuture<?> keepReading;
     private static WebRTCHelper.SimpleSlidingBooleanWindow slidingWindow = null;
     private static int frameLength = 0;
