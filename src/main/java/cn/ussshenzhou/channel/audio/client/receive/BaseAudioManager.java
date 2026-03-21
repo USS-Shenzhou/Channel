@@ -38,7 +38,7 @@ public abstract class BaseAudioManager {
     protected long alCtx, alDevice;
 
     public void init() {
-        AUDIO_EXECUTOR.submit(() -> {
+        AUDIO_EXECUTOR.execute(() -> {
             while (!Minecraft.getInstance().getSoundManager().soundEngine.loaded) {
                 LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(500));
             }

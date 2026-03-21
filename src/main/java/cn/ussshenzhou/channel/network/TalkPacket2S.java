@@ -10,8 +10,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.concurrent.CompletableFuture;
-
 /**
  * @author USS_Shenzhou
  */
@@ -39,6 +37,6 @@ public class TalkPacket2S {
 
     @ServerHandler
     public void serverHandler(IPayloadContext context) {
-        CompletableFuture.runAsync(() -> RelayHandler.process((ServerPlayer) context.player(), opus, sampleRate));
+        RelayHandler.process((ServerPlayer) context.player(), opus, sampleRate);
     }
 }

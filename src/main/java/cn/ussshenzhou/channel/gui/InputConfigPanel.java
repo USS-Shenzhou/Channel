@@ -171,7 +171,7 @@ public class InputConfigPanel extends TOptionsPanel {
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.hpf.tooltip")));
         addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.mgc"),
-                -30, 30,
+                0, 30,
                 (_, v) -> Component.literal(cfg.unit.get(v)),
                 Component.translatable("channel.config.pre.mgc.tooltip"),
                 (slider, _) -> {

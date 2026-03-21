@@ -4,7 +4,6 @@ import cn.ussshenzhou.channel.network.BaseAudioPacket2C;
 import cn.ussshenzhou.channel.network.TalkPacket2C;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,13 +27,13 @@ public class AudioManagerManager {
     }
 
     public static void handlePacket(BaseAudioPacket2C packet) {
-        CompletableFuture.runAsync(() -> {
+        HANDLER_THREAD.execute(() -> {
             switch (packet) {
                 case TalkPacket2C talk -> TALK.handle(packet);
                 //TODO case SpeakerPacket2C speaker -> SPEAKER.handle(packet.from, packet.sampleRate, packet.opus);
                 default -> {
                 }
             }
-        }, HANDLER_THREAD);
+        });
     }
 }

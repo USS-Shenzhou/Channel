@@ -131,6 +131,7 @@ public class OutputConfigPanel extends TOptionsPanel {
                     ChannelPlayerConfig.set(player, (float) volume.getAbsValue());
                 }
             });
+            volume.setTooltip(Tooltip.create(Component.translatable("channel.config.post.player_control.tooltip")));
             name.setHorizontalAlignment(cn.ussshenzhou.t88.gui.util.HorizontalAlignment.RIGHT).setAutoScroll(false);
 
             var player = Minecraft.getInstance().level.getPlayerByUUID(uuid);

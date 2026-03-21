@@ -15,28 +15,22 @@ public abstract class BaseAudioPacket2C {
     public final UUID from;
     public final byte[] opus;
 
-    public final int id;
-    public static AtomicInteger ID = new AtomicInteger(0);
-
     public BaseAudioPacket2C(int sampleRate, UUID from, byte[] opus) {
         this.sampleRate = sampleRate;
         this.from = from;
         this.opus = opus;
-        this.id = ID.getAndIncrement();
     }
 
     public BaseAudioPacket2C(FriendlyByteBuf buf) {
         this.sampleRate = buf.readVarInt();
         this.from = buf.readUUID();
         this.opus = buf.readByteArray();
-        this.id = buf.readVarInt();
     }
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeVarInt(this.sampleRate);
         buf.writeUUID(this.from);
         buf.writeByteArray(this.opus);
-        buf.writeVarInt(this.id);
     }
 
     public void clientHandler(IPayloadContext context) {

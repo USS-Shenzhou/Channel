@@ -56,6 +56,7 @@ public class MicReader {
                 braek();
                 return;
             }
+            //-----raw data from mic-----
             var audio = createBuffer();
             var bytesRead = line.read(audio, 0, audio.length);
             if (bytesRead == 0) {
@@ -64,6 +65,7 @@ public class MicReader {
                 return;
             }
             LevelGatherer.updateRaw(audio);
+            //-----pre-process-----
             int networkSampleRate = (int) ChannelClientConfig.get().networkSampleRate;
             audio = WebRTCHelper.process(NvidiaHelper.process(audio), MicManager.getSampleRate(), networkSampleRate);
             if (audio == null) {
@@ -74,10 +76,12 @@ public class MicReader {
                 braek();
                 return;
             }
+            //-----playback-----
             if (ChannelClientConfig.get().listen) {
                 byte[] finalAudio = audio;
                 Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, networkSampleRate));
             }
+            //-----encode-----
             var opus = OpusHelper.encode(audio, networkSampleRate);
             NetworkHelper.sendToServer(new TalkPacket2S(networkSampleRate, opus));
         } catch (Throwable t) {
