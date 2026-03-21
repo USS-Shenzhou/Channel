@@ -3,13 +3,13 @@ package cn.ussshenzhou.channel.audio.client.receive;
 import cn.ussshenzhou.channel.audio.client.rt.RayTraceManager;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.util.AudioHelper;
+import com.mojang.logging.LogUtils;
+import io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueue;
 
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 import static org.lwjgl.openal.AL11.*;
 import static org.lwjgl.openal.EXTEfx.*;
@@ -18,9 +18,9 @@ import static org.lwjgl.openal.EXTEfx.*;
  * @author USS_Shenzhou
  */
 public class PlayerAudio {
-    private static final int MAX_BUFFER = 500;
-    private static final int MIN_PLAY_THRESHOLD = 51;
-    private final BlockingQueue<short[]> audioBuffer = new ArrayBlockingQueue<>(MAX_BUFFER);
+    private static final int MAX_BUFFER_10MS = 2 * 100;
+    private static final int MIN_PLAY_THRESHOLD_MS = 49;
+    private final MpscArrayQueue<short[]> audioBuffer = new MpscArrayQueue<>((int) (1.1 * MAX_BUFFER_10MS));
     private int readyBufferMs = 0;
     public final int alSource, sampleRate, alDirectFilter, alReverbFilter;
     public final UUID playerId;
@@ -74,6 +74,10 @@ public class PlayerAudio {
                 buffers.add(buffer);
             }
         }
+        if (audioBuffer.size() >= MAX_BUFFER_10MS) {
+            audioBuffer.clear();
+            LogUtils.getLogger().warn("DROP");
+        }
         return buffers;
     }
 
@@ -84,7 +88,7 @@ public class PlayerAudio {
             readyBufferMs -= 10;
             alDeleteBuffers(buf);
         }
-        var pcms = read(MAX_BUFFER);
+        var pcms = read(MAX_BUFFER_10MS);
         if (pcms != null) {
             for (ByteBuffer pcm : pcms) {
                 int buf = alGenBuffers();
@@ -93,7 +97,7 @@ public class PlayerAudio {
                 readyBufferMs += 10;
             }
         }
-        if (alGetSourcei(alSource, AL_SOURCE_STATE) != AL_PLAYING && readyBufferMs > MIN_PLAY_THRESHOLD) {
+        if (alGetSourcei(alSource, AL_SOURCE_STATE) != AL_PLAYING && readyBufferMs > MIN_PLAY_THRESHOLD_MS) {
             alSourcePlay(alSource);
         }
     }

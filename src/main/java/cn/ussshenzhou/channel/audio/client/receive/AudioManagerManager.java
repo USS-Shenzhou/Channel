@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 public class AudioManagerManager {
     public static final ExecutorService HANDLER_THREAD = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
             .setNameFormat("Channel-Audio-Data-Handler-%d")
+            .setDaemon(true)
             .build());
 
     public static final TalkManager TALK = new TalkManager();
@@ -29,7 +30,7 @@ public class AudioManagerManager {
     public static void handlePacket(BaseAudioPacket2C packet) {
         CompletableFuture.runAsync(() -> {
             switch (packet) {
-                case TalkPacket2C talk -> TALK.handle(packet.from, packet.sampleRate, packet.opus);
+                case TalkPacket2C talk -> TALK.handle(packet);
                 //TODO case SpeakerPacket2C speaker -> SPEAKER.handle(packet.from, packet.sampleRate, packet.opus);
                 default -> {
                 }

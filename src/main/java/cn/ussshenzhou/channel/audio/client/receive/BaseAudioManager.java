@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
+import cn.ussshenzhou.channel.network.BaseAudioPacket2C;
 import cn.ussshenzhou.channel.util.ArrayHelper;
 import cn.ussshenzhou.channel.util.OpusHelper;
 import com.mojang.logging.LogUtils;
@@ -27,7 +28,7 @@ import static org.lwjgl.openal.ALC10.alcMakeContextCurrent;
 public abstract class BaseAudioManager {
     public static final ScheduledExecutorService AUDIO_EXECUTOR = Executors.newSingleThreadScheduledExecutor(r ->
             Thread.ofPlatform()
-                    .name("Channel Audio Thread")
+                    .name("Channel-Audio-Play-Thread")
                     .daemon(true)
                     .factory()
                     .newThread(r)
@@ -44,7 +45,7 @@ public abstract class BaseAudioManager {
             initAL();
             alDistanceModel(AL_EXPONENT_DISTANCE);
         });
-        AUDIO_EXECUTOR.scheduleAtFixedRate(this::playing, 0, PLAY_RATE10 * 10, TimeUnit.MILLISECONDS);
+        AUDIO_EXECUTOR.scheduleAtFixedRate(this::playing, 0, 10, TimeUnit.MILLISECONDS);
     }
 
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
@@ -56,7 +57,10 @@ public abstract class BaseAudioManager {
         AL.createCapabilities(ALC.createCapabilities(alDevice));
     }
 
-    public void handle(UUID from, int sampleRate, byte[] opus) {
+    public void handle(BaseAudioPacket2C packet) {
+        var opus = packet.opus;
+        var sampleRate = packet.sampleRate;
+        var from = packet.from;
         try {
             var decoded = OpusHelper.decode(opus, sampleRate);
             var level = Minecraft.getInstance().level;
@@ -65,7 +69,7 @@ public abstract class BaseAudioManager {
             }
             var fromEntity = level.getEntity(from);
             if (fromEntity instanceof Player player) {
-                AUDIO_EXECUTOR.execute(() -> playerAudios.compute(player.getUUID(), (id, old) -> {
+                playerAudios.compute(player.getUUID(), (id, old) -> {
                     if (old == null) {
                         return new PlayerAudio(id, sampleRate);
                     } else if (old.sampleRate != sampleRate) {
@@ -74,7 +78,7 @@ public abstract class BaseAudioManager {
                     } else {
                         return old;
                     }
-                }).push(decoded));
+                }).push(decoded);
             }
         } catch (Exception e) {
             LogUtils.getLogger().error(e.toString());

@@ -24,7 +24,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class MicReader {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
-            .setNameFormat("Channel-Mic-Reader-%d")
+            .setNameFormat("Channel-Mic-Reader-Thread-%d")
+            .setDaemon(true)
             .build());
     private static ScheduledFuture<?> keepReading;
     private static WebRTCHelper.SimpleSlidingBooleanWindow slidingWindow = null;

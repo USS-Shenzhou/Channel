@@ -7,6 +7,8 @@ import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import net.minecraft.util.Util;
 
+import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,15 +35,17 @@ public class OpusHelper {
     }
 
     public static byte[] encode(byte[] audio, int sampleRate) throws OpusException {
-        byte[] result = new byte[audio.length];
-        var length = ENCODERS.get(sampleRate).encode(audio, 0, audio.length / 2, result, 0, result.length);
-        return Arrays.copyOf(result, length);
+        return audio;
+        //byte[] result = new byte[audio.length];
+        //var length = ENCODERS.get(sampleRate).encode(audio, 0, audio.length / 2, result, 0, result.length);
+        //return Arrays.copyOf(result, length);
     }
 
     public static short[] decode(byte[] opus, int sampleRate) throws OpusException {
-        var length = OpusPacketInfo.getNumSamples(opus, 0, opus.length, sampleRate);
-        var outArray = new short[length];
-        DECODERS.get(sampleRate).decode(opus, 0, opus.length, outArray, 0, length, false);
-        return outArray;
+        return ArrayHelper.reinterpretB2S(opus);
+        //var length = OpusPacketInfo.getNumSamples(opus, 0, opus.length, sampleRate);
+        //var outArray = new short[length];
+        //DECODERS.get(sampleRate).decode(opus, 0, opus.length, outArray, 0, length, false);
+        //return outArray;
     }
 }
