@@ -4,16 +4,14 @@ import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.audio.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.network.TalkPacket2S;
-import cn.ussshenzhou.channel.util.ArrayHelper;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
-import cn.ussshenzhou.channel.util.OpusHelper;
+import cn.ussshenzhou.channel.audio.OpusManager;
 import cn.ussshenzhou.t88.network.NetworkHelper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 
-import javax.sound.sampled.AudioFormat;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -82,7 +80,7 @@ public class MicReader {
                 Minecraft.getInstance().execute(() -> SimplePlayer.play(finalAudio, networkSampleRate));
             }
             //-----encode-----
-            var opus = OpusHelper.encode(audio, networkSampleRate);
+            var opus = OpusManager.encode(audio, networkSampleRate);
             NetworkHelper.sendToServer(new TalkPacket2S(networkSampleRate, opus));
         } catch (Throwable t) {
             LogUtils.getLogger().error("{}", t.toString());

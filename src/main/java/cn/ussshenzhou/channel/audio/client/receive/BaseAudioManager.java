@@ -1,10 +1,8 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
 import cn.ussshenzhou.channel.network.BaseAudioPacket2C;
-import cn.ussshenzhou.channel.util.ArrayHelper;
-import cn.ussshenzhou.channel.util.OpusHelper;
+import cn.ussshenzhou.channel.audio.OpusManager;
 import com.mojang.logging.LogUtils;
-import io.github.jaredmdobson.concentus.OpusException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -62,7 +60,7 @@ public abstract class BaseAudioManager {
         var sampleRate = packet.sampleRate;
         var from = packet.from;
         try {
-            var decoded = OpusHelper.decode(opus, sampleRate);
+            var decoded = OpusManager.decode(opus, sampleRate, from);
             var level = Minecraft.getInstance().level;
             if (level == null) {
                 return;
