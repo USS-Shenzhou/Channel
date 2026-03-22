@@ -139,7 +139,7 @@ public class RayTraceCalculator {
             double collisionCount = -6 / Math.log10(1 - absorptionWeightedTotal / weightTotal);
             openSpaceCorrection = Mth.clamp(pointTotalAmount / ((float) getRayAmount() * MAX_BOUNCE_ROUND), 0, 1);
             double r = collisionCount * distanceMean / 340 * openSpaceCorrection;
-            rt60 = (float) Mth.clamp(20 - 400 / (r + 20), 0, 20);
+            rt60 = (float) Mth.clamp(20 - 400 / (r + 20), 0.1, 20);
         });
     }
 
