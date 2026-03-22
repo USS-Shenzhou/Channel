@@ -2,9 +2,13 @@ package cn.ussshenzhou.channel.audio.client.receive;
 
 import cn.ussshenzhou.channel.audio.client.rt.RayTraceManager;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
+import cn.ussshenzhou.channel.config.ChannelPlayerConfig;
+import cn.ussshenzhou.channel.gui.OutputConfigPanel;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import com.mojang.logging.LogUtils;
 import io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueue;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
@@ -88,6 +92,10 @@ public class PlayerAudio {
     }
 
     public void play() {
+        var vol = ChannelPlayerConfig.getOrDefault(playerId);
+        alSourcef(alSource, AL_GAIN, AudioHelper.db2factor(vol));
+        OutputConfigPanel.PlayerVolumePanel.update(playerId, vol);
+
         int processed = alGetSourcei(alSource, AL_BUFFERS_PROCESSED);
         while (processed-- > 0) {
             int buf = alSourceUnqueueBuffers(alSource);

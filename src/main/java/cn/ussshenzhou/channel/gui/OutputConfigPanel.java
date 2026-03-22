@@ -1,38 +1,22 @@
 package cn.ussshenzhou.channel.gui;
 
-import cn.ussshenzhou.channel.Channel;
-import cn.ussshenzhou.channel.audio.NC;
-import cn.ussshenzhou.channel.audio.Trigger;
-import cn.ussshenzhou.channel.audio.Vad;
 import cn.ussshenzhou.channel.audio.client.receive.AudioManagerManager;
-import cn.ussshenzhou.channel.audio.client.send.LevelGatherer;
-import cn.ussshenzhou.channel.audio.client.send.MicManager;
-import cn.ussshenzhou.channel.audio.client.send.WebRTCHelper;
-import cn.ussshenzhou.channel.audio.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.config.ChannelPlayerConfig;
-import cn.ussshenzhou.channel.util.AudioHelper;
-import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.gui.advanced.TOptionsPanel;
-import cn.ussshenzhou.t88.gui.notification.TSimpleNotification;
-import cn.ussshenzhou.t88.gui.util.ImageFit;
 import cn.ussshenzhou.t88.gui.widegt.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import org.joml.Vector2i;
 
-import javax.sound.sampled.*;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * @author USS_Shenzhou
@@ -51,7 +35,21 @@ public class OutputConfigPanel extends TOptionsPanel {
                 entry -> entry.getContent() == cfg.rayTraceAudio
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.rt.tooltip")));
 
+        addOptionSplitter(Component.translatable("channel.config.post.control"));
+        addOptionSliderDoubleInit(Component.translatable("channel.config.post.control_adjust"),
+                -30, 30,
+                (_, v) -> Component.literal(cfg.unit.get(v)),
+                Component.translatable("channel.config.post.control_adjust.tooltip"),
+                (slider, _) -> {
+                    ChannelClientConfig.write(c -> c.outputAdjust = (float) slider.getAbsValue());
+                },
+                cfg.outputAdjust, false
+        );
         addOptionSplitter(Component.translatable("channel.config.post.player_control"));
+        addOption(Component.empty(), new TButton(Component.translatable("channel.config.post.player_control_clear"), _ -> {
+            ChannelPlayerConfig.clear();
+            PlayerVolumePanel.PLAYER_VOLUME.replaceAll((_, _) -> 0f);
+        })).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.player_control_clear.tooltip")));
         this.container.add(new PlayerVolumePanel());
     }
 
@@ -64,10 +62,10 @@ public class OutputConfigPanel extends TOptionsPanel {
 
         public PlayerVolumePanel() {
             // FIXME remove
-            add(Minecraft.getInstance().player.getUUID(), 0);
+            update(Minecraft.getInstance().player.getUUID(), 0);
         }
 
-        public static void add(UUID id, float db) {
+        public static void update(UUID id, float db) {
             PLAYER_VOLUME.put(id, db);
             dirty = true;
         }
@@ -78,7 +76,7 @@ public class OutputConfigPanel extends TOptionsPanel {
             dirty = true;
         }
 
-        private void update() {
+        private void refresh() {
             if (!dirty) {
                 return;
             }
@@ -89,8 +87,13 @@ public class OutputConfigPanel extends TOptionsPanel {
         }
 
         @Override
+        public Vector2i getPreferredSize() {
+            return new Vector2i(0, 20 * PLAYER_VOLUME.size());
+        }
+
+        @Override
         public void tickT() {
-            update();
+            refresh();
             super.tickT();
         }
 

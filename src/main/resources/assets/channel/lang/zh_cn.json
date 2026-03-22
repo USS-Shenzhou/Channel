@@ -84,7 +84,12 @@
   "channel.config.post.rt": "路径追踪",
   "channel.config.post.rt.tooltip": "§6实验性功能§r\n使用路径追踪来获得更真实的音频体验。\n会额外占用CPU资源。",
   "channel.config.post.player_control": "  单独调整响度",
-  "channel.config.post.player_control.tooltip": "单独调整此人的声音响度。\n更大的值使你听到的的声音更响。\n§6不受限幅器控制。",
+  "channel.config.post.player_control.tooltip": "单独调整此人的声音响度。\n将会覆盖总体响度。\n更大的值使你听到的的声音更响。\n§6不受限幅器控制。",
+  "channel.config.post.control": "  整体调整响度",
+  "channel.config.post.control_adjust": "整体调整响度",
+  "channel.config.post.control_adjust.tooltip": "调整所有输出的声音响度。\n更大的值使你听到的的声音更响。\n§6不受限幅器控制。",
+  "channel.config.post.player_control_clear": "§6重置全部",
+  "channel.config.post.player_control_clear.tooltip": "重置以下全部单独调整响度。",
 
   "channel.config.tab.general": "通用",
   "Channel.config.unit": "显示单位",

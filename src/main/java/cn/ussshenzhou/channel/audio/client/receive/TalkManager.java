@@ -3,6 +3,7 @@ package cn.ussshenzhou.channel.audio.client.receive;
 import cn.ussshenzhou.channel.audio.client.rt.RayTraceManager;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.config.ChannelPlayerConfig;
+import cn.ussshenzhou.channel.gui.OutputConfigPanel;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
@@ -38,9 +39,6 @@ public class TalkManager extends BaseAudioManager {
 
     private void simplePlay(PlayerAudio audio, Vec3 pos, Entity player) {
         alSource3f(audio.alSource, AL_POSITION, (float) pos.x, (float) pos.y, (float) pos.z);
-        if (player instanceof Player p) {
-            alSourcef(audio.alSource, AL_GAIN, AudioHelper.db2factor(ChannelPlayerConfig.getOrDefault(p)));
-        }
         audio.play();
     }
 }
