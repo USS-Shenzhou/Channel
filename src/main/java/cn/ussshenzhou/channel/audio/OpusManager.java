@@ -1,12 +1,11 @@
 package cn.ussshenzhou.channel.audio;
 
-import cn.ussshenzhou.channel.util.ModConstant;
+import cn.ussshenzhou.channel.util.TimeCounter;
 import com.mojang.logging.LogUtils;
 import io.github.jaredmdobson.concentus.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -23,6 +22,7 @@ public class OpusManager {
 
     private static Encoder encoder;
     private static HashMap<UUID, Decoder> decoders = new HashMap<>();
+    public static final TimeCounter SEND_SPEED = new TimeCounter(1000);
 
     public static byte[] encode(byte[] audio, int sampleRate) throws OpusException {
         if (encoder == null || encoder.sampleRate != sampleRate) {
@@ -30,6 +30,7 @@ public class OpusManager {
         }
         byte[] result = new byte[audio.length];
         var length = encoder.encoder.encode(audio, 0, audio.length / 2, result, 0, result.length);
+        SEND_SPEED.put(length);
         return Arrays.copyOf(result, length);
     }
 

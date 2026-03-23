@@ -1,6 +1,7 @@
 package cn.ussshenzhou.channel.audio;
 
 import cn.ussshenzhou.channel.util.AudioHelper;
+import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.gui.util.ITranslatable;
 
 /**
@@ -33,10 +34,10 @@ public enum Unit implements ITranslatable {
     }
 
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
-    public String getFS90(double value) {
+    public String getFSCorrected(double value) {
         return switch (this) {
-            case DB -> value == 0 ? "-∞ dBFS" : String.format("%.1f dBFS", value - 90);
-            case PERCENT -> String.format("%.2f", AudioHelper.db2factor((float) value - 90) * 100) + "%";
+            case DB -> value == 0 ? "-∞ dBFS" : String.format("%.1f dBFS", value - ModConstant.ABS_MIN_DBFS);
+            case PERCENT -> String.format("%.2f", AudioHelper.db2factor((float) value - ModConstant.ABS_MIN_DBFS) * 100) + "%";
         };
     }
 

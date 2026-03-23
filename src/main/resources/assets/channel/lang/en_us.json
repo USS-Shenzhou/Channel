@@ -1,7 +1,7 @@
 {
   "channel.welcome": "Press [%1$s] to open the Channel config screen,\nand adjust your microphone and audio processing options.",
 
-  "key.categories.channel": "Channel",
+  "key.category.channel.channel": "Channel",
   "key.channel.config_screen": "Config Screen",
   "key.channel.ptt": "Push to Talk",
 
@@ -78,6 +78,8 @@
   "channel.config.net.length.tooltip": "Determines how often data is sent to the server.\nA shorter frame helps reduce latency, while a longer frame helps reduce network usage.",
   "channel.config.net.samplerate": "Transmission Sample Rate (Hz)",
   "channel.config.net.samplerate.tooltip": "Determines the quality of the transmitted sound.\nThe highest sound frequency that can be transmitted is half of the sample rate.\nA lower sample rate helps reduce network usage,\nwhile a higher sample rate helps improve audio quality.",
+  "channel.config.net.bitrate": "Bitrate (kbps)",
+  "channel.config.net.flow": "Compressed Upload Rate",
 
   "channel.config.tab.output": "Output",
   "channel.config.post": "  Post-processing",

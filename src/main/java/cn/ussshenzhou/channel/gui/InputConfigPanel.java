@@ -12,7 +12,6 @@ import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.gui.advanced.TOptionsPanel;
-import cn.ussshenzhou.t88.gui.notification.TSimpleNotification;
 import cn.ussshenzhou.t88.gui.util.ImageFit;
 import cn.ussshenzhou.t88.gui.widegt.TCycleButton;
 import cn.ussshenzhou.t88.gui.widegt.TImage;
@@ -25,7 +24,6 @@ import net.minecraft.util.Mth;
 import org.joml.Vector2i;
 
 import javax.sound.sampled.*;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -59,17 +57,17 @@ public class InputConfigPanel extends TOptionsPanel {
                 .getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.samplebits.tooltip")));
         addOption(
                 Component.translatable("channel.config.level"),
-                new TProgressBar(90) {
+                new TProgressBar(ModConstant.ABS_MIN_DBFS) {
                     {
                         //this.setProgressBarColorGradient(0xff44ff00, 0xffff5900);
                         this.setProgressBarColorGradient(0x003c91ff, 0xff3c91ff);
-                        this.setTextMode(new TextMode((_, _, value) -> cfg.unit.getFS90(value)));
+                        this.setTextMode(new TextMode((_, _, value) -> cfg.unit.getFSCorrected(value)));
                         this.setTooltip(Tooltip.create(Component.translatable("channel.config.level.raw.tooltip")));
                     }
 
                     @Override
                     public void tickT() {
-                        this.setValue(Mth.clamp(90 + AudioHelper.s2dbfs(LevelGatherer.getRaw()), 0, 90));
+                        this.setValue(Mth.clamp(ModConstant.ABS_MIN_DBFS + AudioHelper.s2dbfs(LevelGatherer.getRaw()), 0, ModConstant.ABS_MIN_DBFS));
                         super.tickT();
                     }
                 }
@@ -119,7 +117,7 @@ public class InputConfigPanel extends TOptionsPanel {
         ).getB().setTooltip(Tooltip.create(Component.translatable(cfg.trigger.directTranslateKey() + ".tooltip")));
         thresholdLevel = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.threshold"),
-                -90, -1,
+                -ModConstant.ABS_MIN_DBFS, -1,
                 (_, v) -> Component.literal(cfg.unit.getFS(v)),
                 Component.translatable("channel.config.pre.threshold.tooltip"),
                 (slider, _) -> ChannelClientConfig.write(c -> c.triggerThresholdDBFS = (float) slider.getAbsValue()),
@@ -218,17 +216,17 @@ public class InputConfigPanel extends TOptionsPanel {
         maxGain.setVisibleT(cfg.autoGainControl);
         addOption(
                 Component.translatable("channel.config.level"),
-                new TProgressBar(90) {
+                new TProgressBar(ModConstant.ABS_MIN_DBFS) {
                     {
                         //this.setProgressBarColorGradient(0xff44ff00, 0xffff5900);
                         this.setProgressBarColorGradient(0x003c91ff, 0xff3c91ff);
-                        this.setTextMode(new TextMode((_, _, value) -> cfg.unit.getFS90(value)));
+                        this.setTextMode(new TextMode((_, _, value) -> cfg.unit.getFSCorrected(value)));
                         this.setTooltip(Tooltip.create(Component.translatable("channel.config.level.pro.tooltip")));
                     }
 
                     @Override
                     public void tickT() {
-                        this.setValue(Mth.clamp(90 + AudioHelper.s2dbfs(LevelGatherer.getProcessed()), 0, 90));
+                        this.setValue(Mth.clamp(ModConstant.ABS_MIN_DBFS + AudioHelper.s2dbfs(LevelGatherer.getProcessed()), 0, ModConstant.ABS_MIN_DBFS));
                         super.tickT();
                     }
                 }

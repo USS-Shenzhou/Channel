@@ -1,7 +1,7 @@
 {
   "channel.welcome": "按下[%1$s]打开沉浸语音配置界面，\n调整您的麦克风和音频处理选项。",
 
-  "key.categories.channel": "沉浸语音",
+  "key.category.channel.channel": "沉浸语音",
   "key.channel.config_screen": "配置界面",
   "key.channel.ptt": "按住讲话",
 
@@ -78,6 +78,8 @@
   "channel.config.net.length.tooltip": "决定每隔多久向服务器发送一次数据。\n较短的帧有助于减小延迟，较长的帧有助于减小网络占用。",
   "channel.config.net.samplerate": "传输采样率(Hz)",
   "channel.config.net.samplerate.tooltip": "决定传输声音的质量。\n能传输的最高声音频率是采样率的一半。\n较低的采样率有助于减小网络占用，\n较高的采样率有助于提高音频质量。",
+  "channel.config.net.bitrate": "比特率(kbps)",
+  "channel.config.net.flow": "压缩后上传速率",
 
   "channel.config.tab.output": "输出",
   "channel.config.post": "  后处理",

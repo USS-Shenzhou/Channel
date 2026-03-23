@@ -20,7 +20,7 @@ import org.lwjgl.glfw.GLFW;
  */
 @EventBusSubscriber(Dist.CLIENT)
 public class ModKeyMappingRegistry {
-    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(Identifier.fromNamespaceAndPath(Channel.MODID, "key.categories.channel"));
+    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(Identifier.fromNamespaceAndPath(Channel.MODID, "channel"));
     public static final KeyMapping CONFIG = new KeyMapping(
             "key.channel.config_screen", KeyConflictContext.UNIVERSAL, KeyModifier.ALT,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C,CATEGORY

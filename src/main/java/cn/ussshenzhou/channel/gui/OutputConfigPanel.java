@@ -63,11 +63,14 @@ public class OutputConfigPanel extends TOptionsPanel {
         public PlayerVolumePanel() {
             // FIXME remove
             update(Minecraft.getInstance().player.getUUID(), 0);
+            dirty = true;
         }
 
         public static void update(UUID id, float db) {
+            if (!PLAYER_VOLUME.containsKey(id) || Math.abs(PLAYER_VOLUME.get(id) - db) > 0.001) {
+                dirty = true;
+            }
             PLAYER_VOLUME.put(id, db);
-            dirty = true;
         }
 
         @SubscribeEvent
