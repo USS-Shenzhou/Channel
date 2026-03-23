@@ -94,6 +94,9 @@
   "channel.config.post.player_control_clear.tooltip": "重置以下全部单独调整响度。",
 
   "channel.config.tab.general": "通用",
+  "channel.config.dispay": "  显示",
+  "channel.config.dispay.hud": "显示麦克风图标",
+  "channel.config.dispay.hud_text": "显示麦克风文字",
   "Channel.config.unit": "显示单位",
   "Channel.config.unit.db": "分贝 dB / 满刻度分贝 dBFS",
   "Channel.config.unit.per": "振幅百分比 %",

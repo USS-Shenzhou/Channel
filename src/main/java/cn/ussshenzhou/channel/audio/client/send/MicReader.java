@@ -3,6 +3,7 @@ package cn.ussshenzhou.channel.audio.client.send;
 import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.audio.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
+import cn.ussshenzhou.channel.gui.hud.MicrophoneHud;
 import cn.ussshenzhou.channel.network.TalkPacket2S;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
@@ -51,6 +52,7 @@ public class MicReader {
             var line = MicManager.getLine();
             if (line == null) {
                 LevelGatherer.updateRaw(null);
+                MicrophoneHud.setStatus(MicrophoneHud.Status.ERROR);
                 braek();
                 return;
             }
@@ -59,6 +61,7 @@ public class MicReader {
             var bytesRead = line.read(audio, 0, audio.length);
             if (bytesRead == 0) {
                 LevelGatherer.updateRaw(null);
+                MicrophoneHud.setStatus(MicrophoneHud.Status.ERROR);
                 braek();
                 return;
             }
@@ -67,6 +70,7 @@ public class MicReader {
             int networkSampleRate = (int) ChannelClientConfig.get().networkSampleRate;
             audio = WebRTCHelper.process(NvidiaHelper.process(audio), MicManager.getSampleRate(), networkSampleRate);
             if (audio == null) {
+                MicrophoneHud.setStatus(MicrophoneHud.Status.VAD_FAIL);
                 braek();
                 return;
             }
@@ -82,6 +86,7 @@ public class MicReader {
             //-----encode-----
             var opus = OpusManager.encode(audio, networkSampleRate);
             NetworkHelper.sendToServer(new TalkPacket2S(networkSampleRate, opus));
+            MicrophoneHud.setStatus(MicrophoneHud.Status.TALKING);
         } catch (Throwable t) {
             LogUtils.getLogger().error("{}", t.toString());
         }
@@ -90,12 +95,17 @@ public class MicReader {
     private static boolean checkThreshold(byte[] audio) {
         var level = LevelGatherer.updateProcessed(audio);
         if (level == 0) {
+            MicrophoneHud.setStatus(MicrophoneHud.Status.STANDBY);
             return false;
         }
         var cfg = ChannelClientConfig.get();
         if (cfg.trigger == Trigger.THRESHOLD) {
             slidingWindow.update(AudioHelper.s2dbfs(level) >= cfg.triggerThresholdDBFS);
-            return slidingWindow.getSmoothedValue();
+            var r = slidingWindow.getSmoothedValue();
+            if (!r) {
+                MicrophoneHud.setStatus(MicrophoneHud.Status.VOLUME_FAIL);
+            }
+            return r;
         }
         return true;
     }

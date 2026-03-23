@@ -35,6 +35,8 @@ public class ChannelClientConfig implements TConfig {
     public Unit unit = Unit.DB;
     public boolean rayTraceAudio = true;
     public float outputAdjust = 0;
+    public boolean showHudIcon = true;
+    public boolean showHudText = true;
 
     public static ChannelClientConfig get() {
         return ConfigHelper.getConfigRead(ChannelClientConfig.class);

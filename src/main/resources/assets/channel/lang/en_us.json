@@ -94,6 +94,9 @@
   "channel.config.post.player_control_clear.tooltip": "Reset all individual loudness adjustments below.",
 
   "channel.config.tab.general": "General",
+  "channel.config.dispay": "  Display",
+  "channel.config.dispay.hud": "Show Microphone Icon",
+  "channel.config.dispay.hud_text": "Show Microphone Text",
   "Channel.config.unit": "Display Unit",
   "Channel.config.unit.db": "Decibel dB / Decibels relative to full scale dBFS",
   "Channel.config.unit.per": "Amplitude Percentage %",
