@@ -5,6 +5,7 @@ import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.t88.gui.HudManager;
 import cn.ussshenzhou.t88.gui.advanced.TOptionsPanel;
 import cn.ussshenzhou.t88.gui.event.ResizeHudEvent;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.common.NeoForge;
 
@@ -27,7 +28,7 @@ public class GeneralConfigPanel extends TOptionsPanel {
                     NeoForge.EVENT_BUS.post(new ResizeHudEvent());
                 },
                 entry -> entry.getContent() == cfg.showHudIcon
-        );
+        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.dispay.hud.tooltip")));
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.dispay.hud_text"),
                 List.of(false, true),
@@ -35,7 +36,7 @@ public class GeneralConfigPanel extends TOptionsPanel {
                     ChannelClientConfig.write(c -> c.showHudText = bool);
                 },
                 entry -> entry.getContent() == cfg.showHudText
-        );
+        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.dispay.hud.tooltip")));
         addOptionCycleButtonInit(
                 Component.translatable("Channel.config.unit"),
                 List.of(Unit.values()),

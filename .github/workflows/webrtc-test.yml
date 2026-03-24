@@ -24,21 +24,18 @@ jobs:
           echo "$pwd\depot_tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Fetch WebRTC Source
+      - name: Fetch WebRTC Source (Optimized)
         shell: cmd
         run: |
           mkdir webrtc_build
           cd webrtc_build
-          fetch --nohooks webrtc
-          cd src
-          gclient sync
+          call gclient config --name=src https://webrtc.googlesource.com/src.git
+          echo target_os = ['win'] >> .gclient
+          echo custom_vars = { 'checkout_configuration': 'small' } >> .gclient
+          call gclient sync --no-history --nohooks
 
       - name: Inject C Wrapper and GN Targets
         run: |
-          # 假设你的 ipynb 脚本保存在仓库根目录下的 scripts 文件夹中
-          # 如果你更倾向于直接将 ipynb 转换为 py 运行，可以在此处使用 jupyter-nbconvert
-          pip install nbconvert
-          jupyter nbconvert --to script scripts/generate_webrtc_wrapper.ipynb
           python scripts/generate_webrtc_wrapper.py
         working-directory: ${{ github.workspace }}
 
