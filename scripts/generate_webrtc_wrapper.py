@@ -73,7 +73,6 @@ def generate_wrapper():
         extern "C" {
 
         FFM_AudioProcessing FFM_CreateAudioProcessing() {
-            // 使用最新的 BuiltinAudioProcessingBuilder 和 CreateEnvironment
             webrtc::scoped_refptr<webrtc::AudioProcessing> apm = 
                 webrtc::BuiltinAudioProcessingBuilder().Build(webrtc::CreateEnvironment());
             
@@ -190,11 +189,18 @@ def generate_wrapper():
             "//api/audio:audio_frame_api",
           ]
           
-          cflags = [ "-w" ]
-          cflags_cc = [ "-w" ]
+          # 直接移除触发该报错的 Clang 检查插件
+          if (is_clang) {
+            configs -= [ "//build/config/clang:find_bad_constructs" ]
+          }
           
+          # 降低对代码风格的严格程度
           configs -= [ "//build/config/compiler:chromium_code" ]
           configs += [ "//build/config/compiler:no_chromium_code" ]
+          
+          # 确保其他可能出现的 warning 不会被升级为 error
+          cflags = [ "-Wno-error" ]
+          cflags_cc = [ "-Wno-error" ]
         }
         """)
 
