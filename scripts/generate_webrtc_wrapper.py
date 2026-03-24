@@ -61,12 +61,9 @@ def generate_wrapper():
         
         #include "api/scoped_refptr.h"
         #include "api/audio/audio_processing.h"
-        #if __has_include("modules/audio_processing/include/audio_processing_builder.h")
-        #include "modules/audio_processing/include/audio_processing_builder.h"
-        #endif
-        
+        #include "api/audio/builtin_audio_processing_builder.h"
+        #include "api/environment/environment_factory.h"
         #include "api/audio/audio_view.h"
-        #include "modules/audio_processing/include/audio_processing.h"
         #include "common_audio/vad/include/webrtc_vad.h"
         #include "common_audio/resampler/include/push_resampler.h"
         #include "api/audio/audio_frame.h"
@@ -76,7 +73,10 @@ def generate_wrapper():
         extern "C" {
 
         FFM_AudioProcessing FFM_CreateAudioProcessing() {
-            rtc::scoped_refptr<AudioProcessing> apm = AudioProcessingBuilder().Create();
+            // 使用最新的 BuiltinAudioProcessingBuilder 和 CreateEnvironment
+            webrtc::scoped_refptr<webrtc::AudioProcessing> apm = 
+                webrtc::BuiltinAudioProcessingBuilder().Build(webrtc::CreateEnvironment());
+            
             if (apm) {
                 apm->AddRef();
                 return apm.get();
@@ -184,9 +184,14 @@ def generate_wrapper():
           ]
           deps = [
             "//modules/audio_processing:audio_processing",
+            "//api/audio:builtin_audio_processing_builder",
+            "//api/environment:environment_factory",
             "//common_audio:common_audio",
             "//api/audio:audio_frame_api",
           ]
+          
+          cflags = [ "-w" ]
+          cflags_cc = [ "-w" ]
           
           configs -= [ "//build/config/compiler:chromium_code" ]
           configs += [ "//build/config/compiler:no_chromium_code" ]
