@@ -49,7 +49,7 @@ jobs:
           echo 1700000000 > build\util\LASTCHANGE.committime
           echo LASTCHANGE=0000000000000000000000000000000000000000 > build\util\LASTCHANGE
           
-          call gn gen out/Release "--args=target_os=\"win\" is_debug=false is_component_build=false rtc_include_tests=false rtc_build_examples=false rtc_build_tools=false rtc_enable_video=false rtc_enable_protobuf=false rtc_use_x11=false rtc_include_ilbc=false rtc_include_opus=false rtc_include_internal_audio_device=false"
+          call gn gen out/Release "--args=target_os=\"win\" is_debug=false is_component_build=false rtc_include_tests=false rtc_build_examples=false rtc_build_tools=false rtc_enable_video=false rtc_enable_protobuf=false rtc_use_x11=false rtc_include_ilbc=false rtc_include_opus=false rtc_include_internal_audio_device=false clang_use_chrome_plugins=false"
           call ninja -C out/Release webrtc_ffm
 
       - name: Upload Output Artifacts

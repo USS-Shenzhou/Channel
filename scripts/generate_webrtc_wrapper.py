@@ -175,12 +175,8 @@ def generate_wrapper():
 
     build_gn_content = textwrap.dedent("""\
         import("//webrtc.gni")
-
         shared_library("webrtc_ffm") {
-          sources = [
-            "webrtc_ffm.cc",
-            "webrtc_ffm.h",
-          ]
+          sources = [ "webrtc_ffm.cc", "webrtc_ffm.h" ]
           deps = [
             "//modules/audio_processing:audio_processing",
             "//api/audio:builtin_audio_processing_builder",
@@ -188,19 +184,8 @@ def generate_wrapper():
             "//common_audio:common_audio",
             "//api/audio:audio_frame_api",
           ]
-          
-          # 直接移除触发该报错的 Clang 检查插件
-          if (is_clang) {
-            configs -= [ "//build/config/clang:find_bad_constructs" ]
-          }
-          
-          # 降低对代码风格的严格程度
           configs -= [ "//build/config/compiler:chromium_code" ]
           configs += [ "//build/config/compiler:no_chromium_code" ]
-          
-          # 确保其他可能出现的 warning 不会被升级为 error
-          cflags = [ "-Wno-error" ]
-          cflags_cc = [ "-Wno-error" ]
         }
         """)
 
