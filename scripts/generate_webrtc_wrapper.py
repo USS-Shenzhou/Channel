@@ -53,13 +53,12 @@ def generate_wrapper():
         #endif
         """)
 
-    with open(os.path.join(wrapper_dir, "webrtc_ffm.h"), "w") as f:
+    with open(os.path.join(wrapper_dir, "webrtc_ffm.h"), "w", encoding="utf-8") as f:
         f.write(header_content)
 
     cpp_content = textwrap.dedent("""\
         #include "webrtc_ffm.h"
         
-        // 补齐之前缺失的智能指针和构建器引用
         #include "api/scoped_refptr.h"
         #include "api/audio/audio_processing.h"
         #if __has_include("modules/audio_processing/include/audio_processing_builder.h")
@@ -162,7 +161,6 @@ def generate_wrapper():
         int FFM_Resample(FFM_Resampler resampler, const int16_t* src, size_t src_length, int src_rate, int16_t* dest, size_t dest_capacity, int dest_rate, int channels) {
             PushResampler<int16_t>* r = static_cast<PushResampler<int16_t>*>(resampler);
             
-            // 构建带维度信息的视图，PushResampler 会根据视图的 samples_per_channel 自动内部初始化
             InterleavedView<const int16_t> src_view(src, src_length / channels, channels);
             InterleavedView<int16_t> dest_view(dest, dest_capacity / channels, channels);
             
@@ -173,7 +171,7 @@ def generate_wrapper():
         }
         """)
 
-    with open(os.path.join(wrapper_dir, "webrtc_ffm.cc"), "w") as f:
+    with open(os.path.join(wrapper_dir, "webrtc_ffm.cc"), "w", encoding="utf-8") as f:
         f.write(cpp_content)
 
     build_gn_content = textwrap.dedent("""\
@@ -190,17 +188,16 @@ def generate_wrapper():
             "//api/audio:audio_frame_api",
           ]
           
-          # 核心修复：移除严格的 Chromium 检查，防止由于 WebRTC 自身的头文件不规范导致编译被中途掐断
           configs -= [ "//build/config/compiler:chromium_code" ]
           configs += [ "//build/config/compiler:no_chromium_code" ]
         }
         """)
 
-    with open(os.path.join(wrapper_dir, "BUILD.gn"), "w") as f:
+    with open(os.path.join(wrapper_dir, "BUILD.gn"), "w", encoding="utf-8") as f:
         f.write(build_gn_content)
 
     root_build_gn = os.path.join(webrtc_src_dir, "BUILD.gn")
-    with open(root_build_gn, "a") as f:
+    with open(root_build_gn, "a", encoding="utf-8") as f:
         f.write("\n")
         f.write('group("ffm_build") {\n')
         f.write('  deps = [ "//ffm_wrapper:webrtc_ffm" ]\n')
