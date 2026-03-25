@@ -9,9 +9,10 @@ import cn.ussshenzhou.t88.gui.HudManager;
 import cn.ussshenzhou.t88.gui.widegt.TImage;
 import cn.ussshenzhou.t88.gui.widegt.TPanel;
 import cn.ussshenzhou.t88.gui.widegt.TProgressBar;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
@@ -19,7 +20,7 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 /**
  * @author USS_Shenzhou
  */
-@EventBusSubscriber
+@EventBusSubscriber(Dist.CLIENT)
 public class MicrophoneHud extends TPanel {
 
     @SubscribeEvent
@@ -97,7 +98,7 @@ public class MicrophoneHud extends TPanel {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float pPartialTick) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float pPartialTick) {
         var word = Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/" + status.name().toLowerCase() + ".png");
         this.word.setImageLocation(word);
         this.shadow.setImageLocation(word);
@@ -115,7 +116,7 @@ public class MicrophoneHud extends TPanel {
         });
         var cfg = ChannelClientConfig.get();
         this.slash.setVisibleT(cfg.showHudIcon && (status == Status.MUTE || status == Status.ERROR));
-        super.render(graphics, mouseX, mouseY, pPartialTick);
+        super.extractRenderState(graphics, mouseX, mouseY, pPartialTick);
     }
 
     public static void setStatus(Status status) {

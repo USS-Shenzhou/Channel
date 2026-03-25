@@ -26,8 +26,8 @@ public class RelayHandler {
 
     public static void normalTalking(ServerPlayer from, byte[] opusAudio, int sampleRate) {
         from.level().players().stream().filter(to ->
-                        //to.getId() != from.getId() &&
-                        to.position().distanceTo(from.position()) < 64 &&
+                        to.getId() != from.getId() &&
+                                to.position().distanceTo(from.position()) < 64 &&
                                 (!from.isSpectator() || to.isSpectator())
                 )
                 .forEach(to -> NetworkHelper.sendToPlayer(to, new TalkPacket2C(sampleRate, from.getUUID(), opusAudio)));

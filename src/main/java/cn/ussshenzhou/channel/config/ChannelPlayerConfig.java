@@ -1,6 +1,5 @@
 package cn.ussshenzhou.channel.config;
 
-import cn.ussshenzhou.channel.gui.OutputConfigPanel;
 import cn.ussshenzhou.t88.config.ConfigHelper;
 import cn.ussshenzhou.t88.config.TConfig;
 import com.google.gson.TypeAdapter;

@@ -6,8 +6,8 @@ import cn.ussshenzhou.channel.config.ChannelPlayerConfig;
 import cn.ussshenzhou.t88.gui.advanced.TOptionsPanel;
 import cn.ussshenzhou.t88.gui.widegt.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.PlayerFaceRenderer;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.PlayerFaceExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
@@ -61,8 +61,7 @@ public class OutputConfigPanel extends TOptionsPanel {
         private static boolean dirty = true;
 
         public PlayerVolumePanel() {
-            // FIXME remove
-            update(Minecraft.getInstance().player.getUUID(), 0);
+            //update(Minecraft.getInstance().player.getUUID(), 0);
             dirty = true;
         }
 
@@ -150,11 +149,11 @@ public class OutputConfigPanel extends TOptionsPanel {
         }
 
         @Override
-        public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-            super.render(graphics, pMouseX, pMouseY, pPartialTick);
+        public void extractRenderState(GuiGraphicsExtractor graphics, int pMouseX, int pMouseY, float pPartialTick) {
+            super.extractRenderState(graphics, pMouseX, pMouseY, pPartialTick);
             var playerInfo = Minecraft.getInstance().getConnection().getPlayerInfo(uuid);
             if (playerInfo != null) {
-                PlayerFaceRenderer.draw(graphics, playerInfo.getSkin(), width / 2 - 16, this.getYT() + 2, 16, -1);
+                PlayerFaceExtractor.extractRenderState(graphics, playerInfo.getSkin(), width / 2 - 16, this.getYT() + 2, 16, -1);
             }
         }
 
