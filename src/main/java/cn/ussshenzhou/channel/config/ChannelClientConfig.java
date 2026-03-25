@@ -22,8 +22,8 @@ public class ChannelClientConfig implements TConfig {
     public boolean listen = false;
     public Trigger trigger = Trigger.THRESHOLD;
     public Vad voiceDetectThreshold = Vad.LOW;
-    public float triggerThresholdDBFS = -40;
-    public NC noiseCanceling = NC.HIGH;
+    public float triggerThresholdDBFS = -48;
+    public NC noiseCanceling = NC.MID;
     public float aiNoiseCancelingRatio = 0.5f;
     public boolean highPassFilter = true;
     public boolean echoCanceling = false;

@@ -1,9 +1,11 @@
 package cn.ussshenzhou.channel.audio.server;
 
 import cn.ussshenzhou.channel.network.TalkPacket2C;
+import cn.ussshenzhou.t88.T88;
 import cn.ussshenzhou.t88.network.NetworkHelper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.gametest.GameTestHooks;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,7 +28,7 @@ public class RelayHandler {
 
     public static void normalTalking(ServerPlayer from, byte[] opusAudio, int sampleRate) {
         from.level().players().stream().filter(to ->
-                        to.getId() != from.getId() &&
+                        (GameTestHooks.isGametestEnabled() || to.getId() != from.getId()) &&
                                 to.position().distanceTo(from.position()) < 64 &&
                                 (!from.isSpectator() || to.isSpectator())
                 )

@@ -14,6 +14,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.gametest.GameTestHooks;
 import org.joml.Vector2i;
 
 import java.util.*;
@@ -61,7 +62,9 @@ public class OutputConfigPanel extends TOptionsPanel {
         private static boolean dirty = true;
 
         public PlayerVolumePanel() {
-            //update(Minecraft.getInstance().player.getUUID(), 0);
+            if (GameTestHooks.isGametestEnabled()) {
+                update(Minecraft.getInstance().player.getUUID(), 0);
+            }
             dirty = true;
         }
 

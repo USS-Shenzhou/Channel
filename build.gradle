@@ -252,3 +252,138 @@ tasks.register('stripPreviewMinor', StripPreviewMinorTask) {
 tasks.named('classes') {
     finalizedBy tasks.named('stripPreviewMinor')
 }
+
+
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
+
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.Path
+
+abstract class RemoveWebRTCLibJarjarMetadata extends DefaultTask {
+
+    @InputFile
+    abstract RegularFileProperty getTargetJar()
+
+    @TaskAction
+    void processMetadata() {
+        def jarFile = getTargetJar().get().asFile
+        if (!jarFile.exists()) {
+            return
+        }
+
+        URI uri = URI.create("jar:" + jarFile.toPath().toUri().toString())
+
+        try {
+            FileSystems.newFileSystem(uri, Collections.emptyMap()).withCloseable { fs ->
+                Path metadataPath = fs.getPath("/META-INF/jarjar/metadata.json")
+
+                if (Files.exists(metadataPath)) {
+                    def reader = Files.newBufferedReader(metadataPath)
+                    def json = new JsonSlurper().parse(reader)
+                    reader.close()
+
+                    if (json.jars instanceof List) {
+                        boolean removed = json.jars.removeIf { jarObj ->
+                            String pathStr = jarObj.path?.toString()
+                            return pathStr != null && pathStr.matches(".*webrtc-java-[0-9.]+-.*\\.jar")
+                        }
+
+                        if (removed) {
+                            def writer = Files.newBufferedWriter(metadataPath)
+                            writer.write(new JsonBuilder(json).toPrettyString())
+                            writer.close()
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            project.logger.error("Failed to process jarjar metadata in: " + jarFile.name, e)
+        }
+    }
+}
+
+tasks.register("removeWebRTCLibJarjarMetadata", RemoveWebRTCLibJarjarMetadata) {
+    targetJar.set(tasks.named("jar").flatMap { it.archiveFile })
+}
+
+tasks.named("build") {
+    finalizedBy tasks.named("removeWebRTCLibJarjarMetadata")
+}
+
+import java.nio.file.StandardCopyOption
+import java.util.jar.Manifest
+
+abstract class MakeLibMixinableTask extends DefaultTask {
+
+    @InputFile
+    abstract RegularFileProperty getTargetJar()
+
+    @TaskAction
+    void processJar() {
+        def mainJarFile = getTargetJar().get().asFile
+        if (!mainJarFile.exists()) {
+            return
+        }
+
+        URI mainUri = URI.create("jar:" + mainJarFile.toPath().toUri().toString())
+
+        try {
+            FileSystems.newFileSystem(mainUri, Collections.emptyMap()).withCloseable { mainFs ->
+                Path jarJarDir = mainFs.getPath("/META-INF/jarjar")
+                if (!Files.exists(jarJarDir)) {
+                    return
+                }
+
+                Files.list(jarJarDir).forEach { innerJarPath ->
+                    String fileName = innerJarPath.getFileName().toString()
+
+                    if (fileName.matches("webrtc-java-[0-9.]+\\.jar")) {
+                        Path tempJar = Files.createTempFile("temp-webrtc", ".jar")
+                        Files.copy(innerJarPath, tempJar, StandardCopyOption.REPLACE_EXISTING)
+
+                        boolean needsUpdate = false
+                        URI tempUri = URI.create("jar:" + tempJar.toUri().toString())
+
+                        FileSystems.newFileSystem(tempUri, Collections.emptyMap()).withCloseable { tempFs ->
+                            Path manifestPath = tempFs.getPath("/META-INF/MANIFEST.MF")
+
+                            if (Files.exists(manifestPath)) {
+                                Manifest manifest
+                                Files.newInputStream(manifestPath).withCloseable { is ->
+                                    manifest = new Manifest(is)
+                                }
+
+                                String fmlModType = manifest.getMainAttributes().getValue("FMLModType")
+                                if (fmlModType != "GAMELIBRARY") {
+                                    manifest.getMainAttributes().putValue("FMLModType", "GAMELIBRARY")
+                                    Files.newOutputStream(manifestPath).withCloseable { os ->
+                                        manifest.write(os)
+                                    }
+                                    needsUpdate = true
+                                }
+                            }
+                        }
+
+                        if (needsUpdate) {
+                            Files.copy(tempJar, innerJarPath, StandardCopyOption.REPLACE_EXISTING)
+                        }
+                        Files.deleteIfExists(tempJar)
+                    }
+                }
+            }
+        } catch (Exception e) {
+            project.logger.error("Failed to inject manifest entry in: " + mainJarFile.name, e)
+        }
+    }
+}
+
+tasks.register("makeLibMixinableTask", MakeLibMixinableTask) {
+    targetJar.set(tasks.named("jar").flatMap { it.archiveFile })
+    mustRunAfter tasks.named("removeWebRTCLibJarjarMetadata")
+}
+
+tasks.named("build") {
+    finalizedBy tasks.named("makeLibMixinableTask")
+}
