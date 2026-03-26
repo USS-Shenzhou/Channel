@@ -5,6 +5,7 @@ import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.config.ChannelPlayerConfig;
 import cn.ussshenzhou.t88.gui.advanced.TOptionsPanel;
 import cn.ussshenzhou.t88.gui.widegt.*;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerFaceExtractor;
@@ -35,6 +36,16 @@ public class OutputConfigPanel extends TOptionsPanel {
                 },
                 entry -> entry.getContent() == cfg.rayTraceAudio
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.rt.tooltip")));
+        addOptionSliderDoubleInit(Component.translatable("channel.config.post.delay"),
+                20, 3000,
+                (_, v) -> Component.literal(v.intValue() + "ms"),
+                Component.translatable("channel.config.post.delay.tooltip"),
+                (slider, _) -> {
+                    ChannelClientConfig.write(c -> c.networkTolerance = (int) slider.getAbsValue());
+                },
+                cfg.networkTolerance, false
+
+        );
 
         addOptionSplitter(Component.translatable("channel.config.post.control"));
         addOptionSliderDoubleInit(Component.translatable("channel.config.post.control_adjust"),
@@ -62,7 +73,7 @@ public class OutputConfigPanel extends TOptionsPanel {
         private static boolean dirty = true;
 
         public PlayerVolumePanel() {
-            if (GameTestHooks.isGametestEnabled()) {
+            if (SharedConstants.IS_RUNNING_WITH_JDWP) {
                 update(Minecraft.getInstance().player.getUUID(), 0);
             }
             dirty = true;

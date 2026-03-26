@@ -45,7 +45,7 @@
   "channel.config.pre.trigger.always.tooltip": "All captured sound will be sent to the server.",
   "channel.config.pre.trigger.vad.tooltip": "§6Experimental Feature§r\nOnly sends to the server when voice is detected in the captured sound.",
   "channel.config.pre.trigger.threshold.tooltip": "Only sound exceeding the specified loudness will be sent to the server.",
-  "channel.config.pre.trigger.ptt.tooltip": "The captured sound will only be sent to the server while the key is held down.",
+  "channel.config.pre.trigger.ptt.tooltip": "The captured sound will only be sent to the server while the key is held down.\n§6WIP",
   "channel.config.pre.vad": "VAD Threshold",
   "channel.config.pre.vad.tooltip": "Set the trigger threshold for voice activity detection.\nA lower option makes it easier for the same audio segment to be considered as containing voice.",
   "channel.config.pre.threshold": "Trigger Loudness Threshold",
@@ -101,6 +101,8 @@
   "Channel.config.unit": "Display Unit",
   "Channel.config.unit.db": "Decibel dB / Decibels relative to full scale dBFS",
   "Channel.config.unit.per": "Amplitude Percentage %",
+  "channel.config.post.delay": "Network Quality Tolerance",
+  "channel.config.post.delay.tooltip": "Copes with different network qualities by adjusting the buffer size.\nA smaller value helps reduce audio latency.\nA larger value helps cope with unstable network environments, reducing popping and stuttering.",
 
   "channel.notify.failed_find": "Device %1$s not found.\nThe default input device is used.",
   "channel.notify.no_valid": "No input device available.",

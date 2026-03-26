@@ -22,8 +22,7 @@ import static org.lwjgl.openal.EXTEfx.*;
  * @author USS_Shenzhou
  */
 public class PlayerAudio {
-    private static final int MAX_BUFFER_10MS = 2 * 100;
-    private static final int MIN_PLAY_THRESHOLD_MS = 49;
+    private static final int MAX_BUFFER_10MS = 3 * 100;
     private final MpscArrayQueue<short[]> audioBuffer = new MpscArrayQueue<>((int) (1.1 * MAX_BUFFER_10MS));
     private int readyBufferMs = 0;
     public final int alSource, sampleRate, alDirectFilter, alReverbFilter;
@@ -83,7 +82,7 @@ public class PlayerAudio {
 
     public void checkTooMuchDelay() {
         if (audioBuffer.size() >= MAX_BUFFER_10MS) {
-            int targetBufferSize = (int) (MIN_PLAY_THRESHOLD_MS * 1.5 / 10);
+            int targetBufferSize = (int) (ChannelClientConfig.get().networkTolerance * 1.5 / 10);
             int drop = audioBuffer.size() - targetBufferSize;
             for (int i = 0; i < drop; i++) {
                 audioBuffer.poll();
@@ -111,7 +110,7 @@ public class PlayerAudio {
                 readyBufferMs += 10;
             }
         }
-        if (alGetSourcei(alSource, AL_SOURCE_STATE) != AL_PLAYING && readyBufferMs > MIN_PLAY_THRESHOLD_MS) {
+        if (alGetSourcei(alSource, AL_SOURCE_STATE) != AL_PLAYING && readyBufferMs > ChannelClientConfig.get().networkTolerance) {
             alSourcePlay(alSource);
         }
     }

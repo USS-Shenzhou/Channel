@@ -4,6 +4,7 @@ import cn.ussshenzhou.channel.network.TalkPacket2C;
 import cn.ussshenzhou.t88.T88;
 import cn.ussshenzhou.t88.network.NetworkHelper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.minecraft.SharedConstants;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.gametest.GameTestHooks;
 
@@ -28,7 +29,7 @@ public class RelayHandler {
 
     public static void normalTalking(ServerPlayer from, byte[] opusAudio, int sampleRate) {
         from.level().players().stream().filter(to ->
-                        (GameTestHooks.isGametestEnabled() || to.getId() != from.getId()) &&
+                        (SharedConstants.IS_RUNNING_WITH_JDWP || to.getId() != from.getId()) &&
                                 to.position().distanceTo(from.position()) < 64 &&
                                 (!from.isSpectator() || to.isSpectator())
                 )

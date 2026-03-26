@@ -40,11 +40,13 @@ public class MicManager {
                 .findFirst()
                 .map(AudioSystem::getMixer)
                 .orElse(null);
-        TSimpleNotification.fire(
-                Component.translatable("channel.notify.failed_find", name),
-                5,
-                TSimpleNotification.Severity.WARN
-        );
+        if (name != null) {
+            TSimpleNotification.fire(
+                    Component.translatable("channel.notify.failed_find", name),
+                    5,
+                    TSimpleNotification.Severity.WARN
+            );
+        }
         if (mixer != null) {
             return mixer;
         }

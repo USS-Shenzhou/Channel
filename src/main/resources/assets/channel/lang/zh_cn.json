@@ -45,7 +45,7 @@
   "channel.config.pre.trigger.always.tooltip": "采集到的所有声音都会发送至服务器。",
   "channel.config.pre.trigger.vad.tooltip": "§6实验性功能§r\n只有采集到的声音中含有话音时才会发送至服务器。",
   "channel.config.pre.trigger.threshold.tooltip": "只有超过指定响度的声音才会发送至服务器。",
-  "channel.config.pre.trigger.ptt.tooltip": "只有按住按键时才会把采集到的声音发送至服务器。",
+  "channel.config.pre.trigger.ptt.tooltip": "只有按住按键时才会把采集到的声音发送至服务器。\n§6开发中",
   "channel.config.pre.vad": "语音检测阈值",
   "channel.config.pre.vad.tooltip": "设定语音检测的触发阈值。\n更低的选项使同一段音频更容易被认为含有语音。",
   "channel.config.pre.threshold": "触发响度阈值",
@@ -92,6 +92,8 @@
   "channel.config.post.control_adjust.tooltip": "调整所有输出的声音响度。\n更大的值使你听到的的声音更响。\n§6不受限幅器控制。",
   "channel.config.post.player_control_clear": "§6重置全部",
   "channel.config.post.player_control_clear.tooltip": "重置以下全部单独调整响度。",
+  "channel.config.post.delay": "网络质量容忍",
+  "channel.config.post.delay.tooltip": "通过调整缓冲区大小来应对不同的网络质量。\n更小的值有助于减少声音延迟。\n更大的值有助于应对不稳定的网络环境，减少爆音和跳变。",
 
   "channel.config.tab.general": "通用",
   "channel.config.dispay": "  显示",

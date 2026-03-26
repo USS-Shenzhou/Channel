@@ -37,6 +37,7 @@ public class ChannelClientConfig implements TConfig {
     public float outputAdjust = 0;
     public boolean showHudIcon = true;
     public boolean showHudText = true;
+    public int networkTolerance = 60;
 
     public static ChannelClientConfig get() {
         return ConfigHelper.getConfigRead(ChannelClientConfig.class);
