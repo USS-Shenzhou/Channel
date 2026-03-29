@@ -37,7 +37,7 @@ public class OutputConfigPanel extends TOptionsPanel {
                 entry -> entry.getContent() == cfg.rayTraceAudio
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.rt.tooltip")));
         addOptionSliderDoubleInit(Component.translatable("channel.config.post.delay"),
-                20, 3000,
+                20, 2000,
                 (_, v) -> Component.literal(v.intValue() + "ms"),
                 Component.translatable("channel.config.post.delay.tooltip"),
                 (slider, _) -> {

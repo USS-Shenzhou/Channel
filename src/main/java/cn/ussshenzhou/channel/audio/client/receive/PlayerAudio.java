@@ -81,8 +81,8 @@ public class PlayerAudio {
     }
 
     public void checkTooMuchDelay() {
-        if (audioBuffer.size() >= MAX_BUFFER_10MS) {
-            int targetBufferSize = (int) (ChannelClientConfig.get().networkTolerance * 1.5 / 10);
+        if (audioBuffer.size() >= ChannelClientConfig.get().networkTolerance * 1.5 || audioBuffer.size() >= MAX_BUFFER_10MS) {
+            int targetBufferSize = (int) (ChannelClientConfig.get().networkTolerance * 1.1 / 10);
             int drop = audioBuffer.size() - targetBufferSize;
             for (int i = 0; i < drop; i++) {
                 audioBuffer.poll();

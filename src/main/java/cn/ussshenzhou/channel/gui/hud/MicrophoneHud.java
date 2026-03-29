@@ -9,7 +9,9 @@ import cn.ussshenzhou.t88.gui.HudManager;
 import cn.ussshenzhou.t88.gui.widegt.TImage;
 import cn.ussshenzhou.t88.gui.widegt.TPanel;
 import cn.ussshenzhou.t88.gui.widegt.TProgressBar;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
@@ -41,6 +43,7 @@ public class MicrophoneHud extends TPanel {
     private final TImage word = new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/standby.png"));
     private final TImage shadow = new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/standby.png"));
     private final TImage slash = new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/slash.png"));
+    private boolean render = true;
 
     public MicrophoneHud() {
         this.add(microphone);
@@ -74,6 +77,8 @@ public class MicrophoneHud extends TPanel {
 
         word.setVisibleT(cfg.showHudText);
         shadow.setVisibleT(cfg.showHudText);
+
+        render = !(Minecraft.getInstance().screen instanceof ChatScreen);
         super.tickT();
     }
 
@@ -99,6 +104,9 @@ public class MicrophoneHud extends TPanel {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float pPartialTick) {
+        if (!render) {
+            return;
+        }
         var word = Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/" + status.name().toLowerCase() + ".png");
         this.word.setImageLocation(word);
         this.shadow.setImageLocation(word);
