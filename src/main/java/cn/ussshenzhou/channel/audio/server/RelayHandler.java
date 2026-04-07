@@ -29,7 +29,7 @@ public class RelayHandler {
 
     public static void normalTalking(ServerPlayer from, byte[] opusAudio, int sampleRate) {
         from.level().players().stream().filter(to ->
-                        (SharedConstants.IS_RUNNING_WITH_JDWP || to.getId() != from.getId()) &&
+                        (SharedConstants.IS_RUNNING_IN_IDE || to.getId() != from.getId()) &&
                                 to.position().distanceTo(from.position()) < 64 &&
                                 (!from.isSpectator() || to.isSpectator())
                 )

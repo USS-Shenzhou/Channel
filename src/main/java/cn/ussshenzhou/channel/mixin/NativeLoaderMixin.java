@@ -25,7 +25,7 @@ public class NativeLoaderMixin {
 
     @Inject(method = "loadLibrary", at = @At(value = "HEAD"), cancellable = true)
     private static void channelCancelLoad(String libName, CallbackInfo ci) {
-        if (SharedConstants.IS_RUNNING_WITH_JDWP) {
+        if (SharedConstants.IS_RUNNING_IN_IDE) {
             LogUtils.getLogger().warn("We are in a dev env now. Native things may work differently.");
             return;
         }

@@ -73,7 +73,7 @@ public class OutputConfigPanel extends TOptionsPanel {
         private static boolean dirty = true;
 
         public PlayerVolumePanel() {
-            if (SharedConstants.IS_RUNNING_WITH_JDWP) {
+            if (SharedConstants.IS_RUNNING_IN_IDE) {
                 update(Minecraft.getInstance().player.getUUID(), 0);
             }
             dirty = true;
