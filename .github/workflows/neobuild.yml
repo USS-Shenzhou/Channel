@@ -14,29 +14,11 @@ jobs:
           - { platform: windows-x86_64,  runner: windows-2022,      target_os: win,   target_cpu: x64,   lib_in: webrtc_ffm.dll,      lib_out: webrtc.dll }
           - { platform: windows-aarch64, runner: windows-2022,      target_os: win,   target_cpu: arm64, lib_in: webrtc_ffm.dll,      lib_out: webrtc.dll }
           - { platform: linux-x86_64,    runner: ubuntu-22.04,      target_os: linux, target_cpu: x64,   lib_in: libwebrtc_ffm.so,    lib_out: webrtc.so }
-          - { platform: linux-aarch64,   runner: ubuntu-24.04-arm,  target_os: linux, target_cpu: arm64, lib_in: libwebrtc_ffm.so,    lib_out: webrtc.so }
+          - { platform: linux-aarch64,   runner: ubuntu-22.04,      target_os: linux, target_cpu: arm64, lib_in: libwebrtc_ffm.so,    lib_out: webrtc.so }
           - { platform: macos-x86_64,    runner: macos-13,          target_os: mac,   target_cpu: x64,   lib_in: libwebrtc_ffm.dylib, lib_out: webrtc.dylib }
           - { platform: macos-aarch64,   runner: macos-14,          target_os: mac,   target_cpu: arm64, lib_in: libwebrtc_ffm.dylib, lib_out: webrtc.dylib }
 
     runs-on: ${{ matrix.runner }}
-
-    env:
-      GN_ARGS: >-
-        target_os="${{ matrix.target_os }}"
-        target_cpu="${{ matrix.target_cpu }}"
-        is_debug=false
-        is_component_build=false
-        rtc_include_tests=false
-        rtc_build_examples=false
-        rtc_build_tools=false
-        rtc_enable_protobuf=false
-        rtc_use_x11=false
-        rtc_include_ilbc=false
-        rtc_include_opus=false
-        rtc_include_internal_audio_device=false
-        clang_use_chrome_plugins=false
-        symbol_level=0
-        use_thin_lto=true
 
     steps:
       - uses: actions/checkout@v4
@@ -93,6 +75,34 @@ jobs:
       - name: Inject wrapper into source tree
         run: python webrtc/inject_wrapper.py
 
+      # ── Platform-specific fixups ──
+
+      # Linux ARM64 cross-compile: the hooks only install the host sysroot,
+      # we need to manually install the ARM64 sysroot
+      - name: Install ARM64 sysroot (Linux cross-compile)
+        if: matrix.platform == 'linux-aarch64'
+        run: |
+          cd _build/src
+          python build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
+
+      # macOS: select the latest available Xcode to avoid SDK version mismatches
+      - name: Select Xcode (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          echo "Available Xcodes:"
+          ls -d /Applications/Xcode*.app || true
+          LATEST_XCODE=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$LATEST_XCODE" ]; then
+            sudo xcode-select -s "$LATEST_XCODE/Contents/Developer"
+          fi
+          echo "Selected: $(xcode-select -p)"
+          echo "SDK path: $(xcrun --show-sdk-path)"
+
+      # ── Write GN args via Python (avoids shell quoting issues) ──
+
+      - name: Write GN args
+        run: python webrtc/write_gn_args.py ${{ matrix.target_os }} ${{ matrix.target_cpu }}
+
       # ── Compile ──
 
       - name: Compile (Windows)
@@ -100,14 +110,14 @@ jobs:
         shell: cmd
         run: |
           cd _build\src
-          call gn gen out/Release --args="%GN_ARGS%"
+          call gn gen out/Release
           call ninja -C out/Release webrtc_ffm
 
       - name: Compile (Unix)
         if: runner.os != 'Windows'
         run: |
           cd _build/src
-          gn gen out/Release --args="$GN_ARGS"
+          gn gen out/Release
           ninja -C out/Release webrtc_ffm
 
       # ── Upload native library ──
