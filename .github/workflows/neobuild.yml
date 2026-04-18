@@ -15,8 +15,8 @@ jobs:
           - { platform: windows-aarch64, runner: windows-2022,      target_os: win,   target_cpu: arm64, lib_in: webrtc_ffm.dll,      lib_out: webrtc.dll }
           - { platform: linux-x86_64,    runner: ubuntu-22.04,      target_os: linux, target_cpu: x64,   lib_in: libwebrtc_ffm.so,    lib_out: webrtc.so }
           - { platform: linux-aarch64,   runner: ubuntu-22.04,      target_os: linux, target_cpu: arm64, lib_in: libwebrtc_ffm.so,    lib_out: webrtc.so }
-          - { platform: macos-x86_64,    runner: macos-13,          target_os: mac,   target_cpu: x64,   lib_in: libwebrtc_ffm.dylib, lib_out: webrtc.dylib }
-          - { platform: macos-aarch64,   runner: macos-14,          target_os: mac,   target_cpu: arm64, lib_in: libwebrtc_ffm.dylib, lib_out: webrtc.dylib }
+          - { platform: macos-x86_64,    runner: macos-26,          target_os: mac,   target_cpu: x64,   lib_in: libwebrtc_ffm.dylib, lib_out: webrtc.dylib }
+          - { platform: macos-aarch64,   runner: macos-26,          target_os: mac,   target_cpu: arm64, lib_in: libwebrtc_ffm.dylib, lib_out: webrtc.dylib }
 
     runs-on: ${{ matrix.runner }}
 
@@ -85,16 +85,11 @@ jobs:
           cd _build/src
           python build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
 
-      # macOS: select the latest available Xcode to avoid SDK version mismatches
-      - name: Select Xcode (macOS)
+      # macOS: WebRTC main branch requires Xcode 26 SDK
+      - name: Select Xcode 26 (macOS)
         if: runner.os == 'macOS'
         run: |
-          echo "Available Xcodes:"
-          ls -d /Applications/Xcode*.app || true
-          LATEST_XCODE=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
-          if [ -n "$LATEST_XCODE" ]; then
-            sudo xcode-select -s "$LATEST_XCODE/Contents/Developer"
-          fi
+          sudo xcode-select --switch /Applications/Xcode_26.0.app/Contents/Developer
           echo "Selected: $(xcode-select -p)"
           echo "SDK path: $(xcrun --show-sdk-path)"
 
