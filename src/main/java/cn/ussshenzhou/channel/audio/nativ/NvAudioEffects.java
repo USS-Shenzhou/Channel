@@ -6,7 +6,7 @@ import java.lang.foreign.*;
 
 import static java.lang.foreign.ValueLayout.*;
 
-public class NvAudioEffects extends NvAudioEffects$shared {
+public class NvAudioEffects extends CShared {
 
     NvAudioEffects() {
         // Should not be called directly

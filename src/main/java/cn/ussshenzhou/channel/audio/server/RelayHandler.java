@@ -1,12 +1,10 @@
 package cn.ussshenzhou.channel.audio.server;
 
-import cn.ussshenzhou.channel.network.TalkPacket2C;
-import cn.ussshenzhou.t88.T88;
+import cn.ussshenzhou.channel.network.AudioPacket2C;
 import cn.ussshenzhou.t88.network.NetworkHelper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.gametest.GameTestHooks;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,6 +31,6 @@ public class RelayHandler {
                                 to.position().distanceTo(from.position()) < 64 &&
                                 (!from.isSpectator() || to.isSpectator())
                 )
-                .forEach(to -> NetworkHelper.sendToPlayer(to, new TalkPacket2C(sampleRate, from.getUUID(), opusAudio)));
+                .forEach(to -> NetworkHelper.sendToPlayer(to, new AudioPacket2C(sampleRate, from.getUUID(), opusAudio)));
     }
 }

@@ -7,9 +7,9 @@ import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 
-public class NvAudioEffects$shared {
+public class CShared {
 
-    NvAudioEffects$shared() {
+    CShared() {
         // Should not be called directly
     }
 

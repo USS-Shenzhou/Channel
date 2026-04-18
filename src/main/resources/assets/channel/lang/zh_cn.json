@@ -98,7 +98,7 @@
   "channel.config.tab.general": "通用",
   "channel.config.dispay": "  显示",
   "channel.config.dispay.hud": "显示麦克风图标",
-  "channel.config.dispay.hud.tooltip": "麦克风尾部的颜色和文字代表了不同的状态。\n§7■§bStand By§r无声音输入\n§7■§cMute§r静音\n§a■Talking§r发话中\n§6■VAD§r人声检测不通过\n§6■Volume§r音量检测不通过\n§c■Error§r程序故障或输入设备不可用",
+  "channel.config.dispay.hud.tooltip": "麦克风尾部的颜色和文字代表了不同的状态。\n§7■§bStand By§r无声音输入\n§7■§cMute§r静音\n§a■Talking§r发话中\n§7■§dSubspace§r正在连接子空间中继\n§6■VAD§r人声检测不通过\n§6■Volume§r音量检测不通过\n§c■Error§r程序故障或输入设备不可用",
   "channel.config.dispay.hud_text": "显示麦克风文字",
   "Channel.config.unit": "显示单位",
   "Channel.config.unit.db": "分贝 dB / 满刻度分贝 dBFS",

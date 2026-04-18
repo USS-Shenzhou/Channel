@@ -96,8 +96,8 @@ public class MicrophoneHud extends TPanel {
         this.outline.setBounds(0, 0, width, height);
         this.color.setBounds(0, 0, width, height);
         this.volume.setBounds(3, 2, 3, 11);
-        this.word.setBounds(9, 15, 28, 4);
-        this.shadow.setBounds(10, 16, 28, 4);
+        this.word.setBounds(9, 15, 31, 4);
+        this.shadow.setBounds(10, 16, 31, 4);
         this.slash.setBounds(-3, 2, 15, 19);
         super.layout();
     }
@@ -115,20 +115,25 @@ public class MicrophoneHud extends TPanel {
             case TALKING -> 0x00ff00;
             case ERROR, MUTE -> 0xff0000;
             case VAD_FAIL, VOLUME_FAIL -> 0xff9933;
+            case SUBSPACE -> 0x9966ff;
         });
         this.color.setColor(switch (status) {
-            case STANDBY, MUTE -> 0x404040;
+            case STANDBY, MUTE, SUBSPACE -> 0x404040;
             case TALKING -> 0x00ff00;
             case ERROR -> 0xff0000;
             case VAD_FAIL, VOLUME_FAIL -> 0xff9933;
         });
         var cfg = ChannelClientConfig.get();
-        this.slash.setVisibleT(cfg.showHudIcon && (status == Status.MUTE || status == Status.ERROR));
+        this.slash.setVisibleT(cfg.showHudIcon && (status == Status.MUTE || status == Status.ERROR || status == Status.SUBSPACE));
         super.extractRenderState(graphics, mouseX, mouseY, pPartialTick);
     }
 
     public static void setStatus(Status status) {
         MicrophoneHud.status = status;
+    }
+
+    public static Status getStatus() {
+        return status;
     }
 
     public enum Status {
@@ -137,7 +142,8 @@ public class MicrophoneHud extends TPanel {
         TALKING,
         ERROR,
         VAD_FAIL,
-        VOLUME_FAIL
+        VOLUME_FAIL,
+        SUBSPACE
     }
 
 }

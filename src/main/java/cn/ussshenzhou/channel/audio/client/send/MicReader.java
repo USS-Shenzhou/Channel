@@ -45,7 +45,7 @@ public class MicReader {
     }
 
     private static synchronized void read() {
-        if (Minecraft.getInstance().getConnection() == null) {
+        if (Minecraft.getInstance().getConnection() == null || MicrophoneHud.getStatus() == MicrophoneHud.Status.SUBSPACE) {
             return;
         }
         try {

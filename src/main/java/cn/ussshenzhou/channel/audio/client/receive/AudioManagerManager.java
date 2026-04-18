@@ -1,7 +1,6 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
-import cn.ussshenzhou.channel.network.BaseAudioPacket2C;
-import cn.ussshenzhou.channel.network.TalkPacket2C;
+import cn.ussshenzhou.channel.network.AudioPacket2C;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.concurrent.ExecutorService;
@@ -26,14 +25,8 @@ public class AudioManagerManager {
         TALK.reset();
     }
 
-    public static void handlePacket(BaseAudioPacket2C packet) {
-        HANDLER_THREAD.execute(() -> {
-            switch (packet) {
-                case TalkPacket2C talk -> TALK.handle(packet);
-                //TODO case SpeakerPacket2C speaker -> SPEAKER.handle(packet.from, packet.sampleRate, packet.opus);
-                default -> {
-                }
-            }
-        });
+    public static void handlePacket(AudioPacket2C packet) {
+        TALK.handle(packet);
+        //TODO case SpeakerPacket2C speaker -> SPEAKER.handle(packet.from, packet.sampleRate, packet.opus);
     }
 }

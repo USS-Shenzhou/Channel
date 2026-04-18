@@ -1,6 +1,6 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
-import cn.ussshenzhou.channel.network.BaseAudioPacket2C;
+import cn.ussshenzhou.channel.network.AudioPacket2C;
 import cn.ussshenzhou.channel.audio.OpusManager;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -55,7 +55,7 @@ public abstract class BaseAudioManager {
         AL.createCapabilities(ALC.createCapabilities(alDevice));
     }
 
-    public void handle(BaseAudioPacket2C packet) {
+    public void handle(AudioPacket2C packet) {
         var opus = packet.opus;
         var sampleRate = packet.sampleRate;
         var from = packet.from;

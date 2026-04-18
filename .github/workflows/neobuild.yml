@@ -1,0 +1,168 @@
+name: Neo Build
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  # ── Phase 1: Compile native WebRTC libraries for each platform ──
+  build-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: windows-x86_64,  runner: windows-2022,      target_os: win,   target_cpu: x64,   lib_in: webrtc_ffm.dll,      lib_out: webrtc.dll }
+          - { platform: windows-aarch64, runner: windows-2022,      target_os: win,   target_cpu: arm64, lib_in: webrtc_ffm.dll,      lib_out: webrtc.dll }
+          - { platform: linux-x86_64,    runner: ubuntu-22.04,      target_os: linux, target_cpu: x64,   lib_in: libwebrtc_ffm.so,    lib_out: webrtc.so }
+          - { platform: linux-aarch64,   runner: ubuntu-24.04-arm,  target_os: linux, target_cpu: arm64, lib_in: libwebrtc_ffm.so,    lib_out: webrtc.so }
+          - { platform: macos-x86_64,    runner: macos-13,          target_os: mac,   target_cpu: x64,   lib_in: libwebrtc_ffm.dylib, lib_out: webrtc.dylib }
+          - { platform: macos-aarch64,   runner: macos-14,          target_os: mac,   target_cpu: arm64, lib_in: libwebrtc_ffm.dylib, lib_out: webrtc.dylib }
+
+    runs-on: ${{ matrix.runner }}
+
+    env:
+      GN_ARGS: >-
+        target_os="${{ matrix.target_os }}"
+        target_cpu="${{ matrix.target_cpu }}"
+        is_debug=false
+        is_component_build=false
+        rtc_include_tests=false
+        rtc_build_examples=false
+        rtc_build_tools=false
+        rtc_enable_protobuf=false
+        rtc_use_x11=false
+        rtc_include_ilbc=false
+        rtc_include_opus=false
+        rtc_include_internal_audio_device=false
+        clang_use_chrome_plugins=false
+        symbol_level=0
+        use_thin_lto=true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # ── depot_tools ──
+
+      - name: Install depot_tools (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Uri "https://storage.googleapis.com/chrome-infra/depot_tools.zip" -OutFile depot_tools.zip
+          Expand-Archive depot_tools.zip -DestinationPath _depot_tools
+          echo "$pwd\_depot_tools" >> $env:GITHUB_PATH
+          echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" >> $env:GITHUB_ENV
+
+      - name: Install depot_tools (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git _depot_tools
+          echo "$PWD/_depot_tools" >> $GITHUB_PATH
+
+      # ── Fetch WebRTC source (shallow, no hooks) ──
+
+      - name: Fetch WebRTC (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          mkdir _build
+          cd _build
+          call gclient config --name=src https://webrtc.googlesource.com/src.git
+          echo target_os = ['${{ matrix.target_os }}'] >> .gclient
+          call gclient sync --no-history --nohooks
+
+      - name: Fetch WebRTC (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir _build
+          cd _build
+          gclient config --name=src https://webrtc.googlesource.com/src.git
+          echo "target_os = ['${{ matrix.target_os }}']" >> .gclient
+          gclient sync --no-history --nohooks
+
+      # ── Prepare source tree ──
+
+      - name: Patch LASTCHANGE
+        run: python webrtc/patch_lastchange.py
+
+      - name: Inject wrapper into source tree
+        run: python webrtc/inject_wrapper.py
+
+      # ── Compile ──
+
+      - name: Compile (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          cd _build\src
+          call gn gen out/Release --args="%GN_ARGS%"
+          call ninja -C out/Release webrtc_ffm
+
+      - name: Compile (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cd _build/src
+          gn gen out/Release --args="$GN_ARGS"
+          ninja -C out/Release webrtc_ffm
+
+      # ── Upload native library ──
+
+      - name: Rename output
+        shell: bash
+        run: cp "_build/src/out/Release/${{ matrix.lib_in }}" "${{ matrix.lib_out }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.platform }}
+          path: ${{ matrix.lib_out }}
+
+  # ── Phase 2: Assemble all natives into a single JAR ──
+  build-jar:
+    needs: build-native
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: USS-Shenzhou/t88
+          path: t88
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Publish t88 to Maven Local
+        working-directory: ./t88
+        run: chmod +x gradlew && ./gradlew publishToMavenLocal
+
+      - name: Download all native libraries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: native-*
+          path: _natives
+
+      - name: Organize into resources/natives
+        run: |
+          for platform in windows-x86_64 windows-aarch64 linux-x86_64 linux-aarch64 macos-x86_64 macos-aarch64; do
+            mkdir -p src/main/resources/natives/$platform
+            cp _natives/native-$platform/* src/main/resources/natives/$platform/
+          done
+          echo "=== Native libraries ==="
+          find src/main/resources/natives -type f
+
+      - name: Build with Gradle
+        run: chmod +x gradlew && ./gradlew build
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: channel
+          path: build/libs/*.jar

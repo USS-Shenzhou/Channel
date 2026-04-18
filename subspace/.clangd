@@ -1,0 +1,3 @@
+Diagnostics:
+  Suppress:
+    - "constexpr_var_requires_const_init"

@@ -1,89 +1,148 @@
 package cn.ussshenzhou.channel.audio.client.send;
 
-import cn.ussshenzhou.channel.audio.Vad;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.audio.NC;
 import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.util.ModConstant;
-import dev.onvoid.webrtc.media.audio.*;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+
+import static cn.ussshenzhou.channel.audio.nativ.WebRTC.*;
 
 /**
  * @author USS_Shenzhou
  */
 public class WebRTCHelper {
-    private volatile static AudioProcessing processor = null;
-    private volatile static VoiceActivityDetector detector = null;
+    private volatile static MemorySegment processor = null;
+    private volatile static MemorySegment vad = null;
     private static SimpleSlidingBooleanWindow slidingWindow = null;
-    private volatile static AudioResampler resampler = null;
+    private volatile static MemorySegment resampler = null;
     private volatile static int inSampleRate, outSampleRate;
+
+    static {
+        loadWebRTC();
+    }
 
     public static void init() {
         refresh();
-        detector = new VoiceActivityDetector();
+        if (vad != null) {
+            FreeVad(vad);
+        }
+        vad = CreateVad();
+        InitVad(vad);
+        SetVadMode(vad, ChannelClientConfig.get().voiceDetectThreshold.ordinal());
         slidingWindow = new SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / MicReader.getFrameLength());
     }
 
+    private static void loadWebRTC() {
+        if (!FMLEnvironment.isProduction()) {
+            System.load(Path.of("").toAbsolutePath().resolve("webrtc.dll").toString());
+            return;
+        }
+        String os;
+        String arch;
+        String libName;
+        String osName = System.getProperty("os.name").toLowerCase();
+        String osArch = System.getProperty("os.arch").toLowerCase();
+        if (osName.contains("win")) {
+            os = "windows";
+            libName = "webrtc.dll";
+        } else if (osName.contains("linux")) {
+            os = "linux";
+            libName = "webrtc.so";
+        } else if (osName.contains("mac")) {
+            os = "macos";
+            libName = "webrtc.dylib";
+        } else {
+            throw new RuntimeException("Unsupported OS: " + osName);
+        }
+        if (osArch.contains("amd64") || osArch.contains("x86_64")) {
+            arch = "x86_64";
+        } else if (osArch.contains("aarch64") || osArch.contains("arm64")) {
+            arch = "aarch64";
+        } else {
+            throw new RuntimeException("Unsupported architecture: " + osArch);
+        }
+        var resourcePath = "/natives/" + os + "-" + arch + "/" + libName;
+        try (var is = WebRTCHelper.class.getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                throw new RuntimeException("This should not happen. Native library not found in jar: " + resourcePath);
+            }
+            var tempDir = Files.createTempDirectory("channel-natives");
+            var tempFile = tempDir.resolve(libName);
+            Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            System.load(tempFile.toAbsolutePath().toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load WebRTC. This should not happen.", e);
+        }
+    }
+
     public static synchronized void refresh() {
+        if (slidingWindow != null) {
+            slidingWindow = new SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / MicReader.getFrameLength(), slidingWindow);
+        }
         if (processor != null) {
-            processor.dispose();
+            FreeAudioProcessing(processor);
         }
         var cfg = ChannelClientConfig.get();
-        processor = new AudioProcessing();
-        var config = new AudioProcessingConfig();
+        processor = CreateAudioProcessing();
+
         if (cfg.noiseCanceling != NC.AI) {
             if (cfg.noiseCanceling != NC.OFF) {
-                config.noiseSuppression.enabled = true;
-                config.noiseSuppression.level = AudioProcessingConfig.NoiseSuppression.Level.values()[cfg.noiseCanceling.ordinal()];
+                SetNoiseSuppression(processor, true, cfg.noiseCanceling.ordinal());
             } else {
-                config.noiseSuppression.enabled = false;
+                SetNoiseSuppression(processor, false, 0);
             }
             if (cfg.echoCanceling) {
-                config.echoCanceller.enabled = true;
-                config.echoCanceller.enforceHighPassFiltering = true;
-                processor.setStreamDelayMs(80);
+                SetEchoCanceller(processor, true, true);
+                SetStreamDelayMs(processor, 80);
             } else {
-                config.echoCanceller.enabled = false;
-                processor.setStreamDelayMs(0);
+                SetEchoCanceller(processor, false, false);
+                SetStreamDelayMs(processor, 0);
             }
         }
-        config.highPassFilter.enabled = cfg.highPassFilter;
-        config.gainControl.enabled = true;
-        config.gainControl.fixedDigital.gainDb = cfg.forceGainControl;
-        if (cfg.autoGainControl) {
-            config.gainControl.adaptiveDigital.enabled = true;
-            config.gainControl.adaptiveDigital.headroomDb = -cfg.targetLevel;
-            config.gainControl.adaptiveDigital.maxGainDb = cfg.maxGain;
-            config.gainControl.adaptiveDigital.initialGainDb = 0;
-            config.gainControl.adaptiveDigital.maxOutputNoiseLevelDbfs = -40;
-            config.gainControl.adaptiveDigital.maxGainChangeDbPerSecond = 15;
-        } else {
-            config.gainControl.adaptiveDigital.enabled = false;
-        }
-        processor.applyConfig(config);
+        SetHighPassFilter(processor, cfg.highPassFilter);
+        SetGainController(processor,
+                true,
+                cfg.forceGainControl,
+                cfg.autoGainControl,
+                -cfg.targetLevel,
+                cfg.maxGain,
+                0,
+                -40,
+                15);
     }
 
     @Nullable
     public static synchronized byte[] process(byte[] raw, int sampleRateIn, int sampleRateOut) {
         boolean vadPass = false;
         var segAmount = MicReader.getFrameLength() / 10;
-        var inStepLength = raw.length / segAmount;
-        byte[] processed = new byte[raw.length];
-        for (int i = 0; i < segAmount; i++) {
-            var subRaw = Arrays.copyOfRange(raw, inStepLength * i, inStepLength * (i + 1));
-            var subResult = new byte[inStepLength];
-            processor.processStream(
-                    subRaw,
-                    new AudioProcessingStreamConfig(sampleRateIn, ModConstant.MIC_CHANNEL),
-                    new AudioProcessingStreamConfig(sampleRateIn, ModConstant.MIC_CHANNEL),
-                    subResult
-            );
-            System.arraycopy(subResult, 0, processed, inStepLength * i, inStepLength);
-            vadPass |= vad(subResult, sampleRateIn);
+
+        var inStepBytes = raw.length / segAmount;
+        var samplesPerChannel = sampleRateIn / 100;
+
+        try (var arena = Arena.ofConfined()) {
+            var src = arena.allocate(raw.length);
+            var dst = arena.allocate(raw.length);
+            MemorySegment.copy(raw, 0, src, ValueLayout.JAVA_BYTE, 0, raw.length);
+            for (int i = 0; i < segAmount; i++) {
+                long offset = (long) i * inStepBytes;
+                var subSrc = src.asSlice(offset, inStepBytes);
+                var subDest = dst.asSlice(offset, inStepBytes);
+                ProcessStream(processor, subSrc, sampleRateIn, ModConstant.MIC_CHANNEL, subDest);
+                vadPass |= vad(subDest, sampleRateIn, samplesPerChannel);
+            }
+            byte[] processed = new byte[raw.length];
+            MemorySegment.copy(dst, ValueLayout.JAVA_BYTE, 0, processed, 0, raw.length);
+            return vadPass ? resample(processed, sampleRateIn, sampleRateOut) : null;
         }
-        return vadPass ? resample(processed, sampleRateIn, sampleRateOut) : null;
     }
 
     private static byte[] resample(byte[] raw, int sampleRateIn, int sampleRateOut) {
@@ -91,42 +150,46 @@ public class WebRTCHelper {
             return raw;
         }
         if (resampler == null || inSampleRate != sampleRateIn || outSampleRate != sampleRateOut) {
-            resampler = new AudioResampler(sampleRateIn, sampleRateOut, ModConstant.MIC_CHANNEL);
+            if (resampler != null) {
+                FreeResampler(resampler);
+            }
+            resampler = CreateResampler(sampleRateIn, sampleRateOut, ModConstant.MIC_CHANNEL);
             inSampleRate = sampleRateIn;
             outSampleRate = sampleRateOut;
         }
-        var seg = MicReader.getFrameLength() / 10;
-        var inStepLength = raw.length / seg;
-        var outStepLength = (int) ((float) raw.length / sampleRateIn * sampleRateOut / seg);
-        byte[] result = new byte[(int) ((float) raw.length / sampleRateIn * sampleRateOut)];
-        for (int i = 0; i < seg; i++) {
-            var subRaw = Arrays.copyOfRange(raw, inStepLength * i, inStepLength * (i + 1));
-            var subResult = new byte[outStepLength];
-            resampler.resample(subRaw, sampleRateIn / 100, subResult, sampleRateOut / 100, ModConstant.MIC_CHANNEL);
-            System.arraycopy(subResult, 0, result, outStepLength * i, outStepLength);
+        var segAmount = MicReader.getFrameLength() / 10;
+        var inStepBytes = raw.length / segAmount;
+        var outStepBytes = (int) ((float) raw.length / sampleRateIn * sampleRateOut / segAmount);
+        int totalOutBytes = (int) ((float) raw.length / sampleRateIn * sampleRateOut);
+        try (var arena = Arena.ofConfined()) {
+            var src = arena.allocate(raw.length);
+            var dst = arena.allocate(totalOutBytes);
+            MemorySegment.copy(raw, 0, src, ValueLayout.JAVA_BYTE, 0, raw.length);
+            for (int i = 0; i < segAmount; i++) {
+                long srcOffset = (long) i * inStepBytes;
+                long destOffset = (long) i * outStepBytes;
+                var subSrc = src.asSlice(srcOffset, inStepBytes);
+                var subDest = dst.asSlice(destOffset, outStepBytes);
+                Resample(resampler,
+                        subSrc, sampleRateIn / 100,
+                        subDest, sampleRateOut / 100);
+            }
+            byte[] result = new byte[totalOutBytes];
+            MemorySegment.copy(dst, ValueLayout.JAVA_BYTE, 0, result, 0, totalOutBytes);
+            return result;
         }
-        return result;
     }
 
-    private static boolean vad(byte[] audio, int sampleRate) {
+    private static boolean vad(MemorySegment audio, int sampleRate, int samplesPerChannel) {
         if (ChannelClientConfig.get().trigger != Trigger.VAD) {
             return true;
         }
-        var vadLevel = ChannelClientConfig.get().voiceDetectThreshold;
-        if (vadLevel == Vad.LOW) {
-            return vadInternal(audio, sampleRate) >= 0.005;
+        int result = ProcessVad(vad, sampleRate, audio, (long) samplesPerChannel);
+        if (result < 0) {
+            return true;
         }
-        slidingWindow.update(vadInternal(audio, sampleRate) >= ChannelClientConfig.get().voiceDetectThreshold.ordinal() * 0.1f);
+        slidingWindow.update((result == 1));
         return slidingWindow.getSmoothedValue();
-    }
-
-    private static float vadInternal(byte[] audio, int sampleRate) {
-        detector.process(audio, audio.length / 2, sampleRate);
-        return detector.getLastVoiceProbability();
-    }
-
-    public static void updateSlideWindow() {
-        slidingWindow = new SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / MicReader.getFrameLength(), slidingWindow);
     }
 
     public static class SimpleSlidingBooleanWindow {

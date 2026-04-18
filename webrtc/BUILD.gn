@@ -1,0 +1,20 @@
+import("//webrtc.gni")
+
+shared_library("webrtc_ffm") {
+  sources = [
+    "webrtc_ffm.cc",
+    "webrtc_ffm.h",  
+    ]
+
+  deps = [
+    "//api/audio:audio_frame_api",
+    "//api/audio:builtin_audio_processing_builder",
+    "//api/environment:environment_factory",
+    "//common_audio:common_audio",
+    "//common_audio:common_audio_c",
+    "//modules/audio_processing:audio_processing",
+  ]
+
+  configs -= [ "//build/config/compiler:chromium_code" ]
+  configs += [ "//build/config/compiler:no_chromium_code" ]
+  }
