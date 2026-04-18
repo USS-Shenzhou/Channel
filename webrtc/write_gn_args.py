@@ -26,6 +26,10 @@ symbol_level = 0
 use_thin_lto = true
 """
 
+# macOS: disable C++ modules to avoid missing .modulemap files in SDK
+if target_os == "mac":
+    args += "use_libcxx_modules = false\n"
+
 args_path = os.path.join(args_dir, "args.gn")
 with open(args_path, "w", encoding="utf-8") as f:
     f.write(args)
