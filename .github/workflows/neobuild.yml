@@ -5,8 +5,49 @@ on:
   push:
 
 jobs:
-  # ── Phase 1: Compile native WebRTC libraries for each platform ──
+  # ── Check which native libraries need building ──
+  check-natives:
+    runs-on: ubuntu-latest
+    outputs:
+      needs_build: ${{ steps.check.outputs.needs_build }}
+      missing: ${{ steps.check.outputs.missing }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for pre-built natives
+        id: check
+        run: |
+          MISSING=""
+          for spec in \
+            "windows-x86_64:webrtc.dll" \
+            "windows-aarch64:webrtc.dll" \
+            "linux-x86_64:webrtc.so" \
+            "linux-aarch64:webrtc.so" \
+            "macos-x86_64:webrtc.dylib" \
+            "macos-aarch64:webrtc.dylib"; do
+            platform="${spec%%:*}"
+            lib="${spec##*:}"
+            path="src/main/resources/natives/$platform/$lib"
+            if [ ! -f "$path" ]; then
+              echo "MISSING: $path"
+              MISSING="$MISSING $platform"
+            else
+              echo "OK: $path"
+            fi
+          done
+          if [ -z "$MISSING" ]; then
+            echo "All native libraries present, skipping build."
+            echo "needs_build=false" >> $GITHUB_OUTPUT
+          else
+            echo "Missing:$MISSING"
+            echo "needs_build=true" >> $GITHUB_OUTPUT
+          fi
+          echo "missing=$MISSING" >> $GITHUB_OUTPUT
+
+  # ── Phase 1: Compile native WebRTC libraries (only if needed) ──
   build-native:
+    needs: check-natives
+    if: needs.check-natives.outputs.needs_build == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -21,16 +62,31 @@ jobs:
     runs-on: ${{ matrix.runner }}
 
     steps:
+      # Skip this platform if its library already exists in the repo
+      - name: Check if build needed for this platform
+        id: skip
+        shell: bash
+        run: |
+          echo "missing_list=${{ needs.check-natives.outputs.missing }}"
+          if echo "${{ needs.check-natives.outputs.missing }}" | grep -q "${{ matrix.platform }}"; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+          else
+            echo "Library for ${{ matrix.platform }} already exists, skipping."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.skip.outputs.skip != 'true'
 
       - uses: actions/setup-python@v5
+        if: steps.skip.outputs.skip != 'true'
         with:
           python-version: '3.11'
 
       # ── depot_tools ──
 
       - name: Install depot_tools (Windows)
-        if: runner.os == 'Windows'
+        if: steps.skip.outputs.skip != 'true' && runner.os == 'Windows'
         shell: powershell
         run: |
           Invoke-WebRequest -Uri "https://storage.googleapis.com/chrome-infra/depot_tools.zip" -OutFile depot_tools.zip
@@ -39,17 +95,15 @@ jobs:
           echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" >> $env:GITHUB_ENV
 
       - name: Install depot_tools (Unix)
-        if: runner.os != 'Windows'
+        if: steps.skip.outputs.skip != 'true' && runner.os != 'Windows'
         run: |
           git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git _depot_tools
           echo "$PWD/_depot_tools" >> $GITHUB_PATH
 
       # ── Fetch WebRTC source ──
-      # Windows: --nohooks is safe (toolchain comes via CIPD, DEPOT_TOOLS_WIN_TOOLCHAIN=0 is set)
-      # Linux/macOS: hooks must run to install sysroots and configure SDK paths
 
       - name: Fetch WebRTC (Windows)
-        if: runner.os == 'Windows'
+        if: steps.skip.outputs.skip != 'true' && runner.os == 'Windows'
         shell: cmd
         run: |
           mkdir _build
@@ -59,7 +113,7 @@ jobs:
           call gclient sync --no-history --nohooks
 
       - name: Fetch WebRTC (Unix)
-        if: runner.os != 'Windows'
+        if: steps.skip.outputs.skip != 'true' && runner.os != 'Windows'
         run: |
           mkdir _build
           cd _build
@@ -70,38 +124,36 @@ jobs:
       # ── Prepare source tree ──
 
       - name: Patch LASTCHANGE
+        if: steps.skip.outputs.skip != 'true'
         run: python webrtc/patch_lastchange.py
 
       - name: Inject wrapper into source tree
+        if: steps.skip.outputs.skip != 'true'
         run: python webrtc/inject_wrapper.py
 
       # ── Platform-specific fixups ──
 
-      # Linux ARM64 cross-compile: the hooks only install the host sysroot,
-      # we need to manually install the ARM64 sysroot
       - name: Install ARM64 sysroot (Linux cross-compile)
-        if: matrix.platform == 'linux-aarch64'
+        if: steps.skip.outputs.skip != 'true' && matrix.platform == 'linux-aarch64'
         run: |
           cd _build/src
           python build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
 
-      # macOS: WebRTC main branch requires Xcode 26 SDK
       - name: Select Xcode 26 (macOS)
-        if: runner.os == 'macOS'
+        if: steps.skip.outputs.skip != 'true' && runner.os == 'macOS'
         run: |
           sudo xcode-select --switch /Applications/Xcode_26.0.app/Contents/Developer
           echo "Selected: $(xcode-select -p)"
           echo "SDK path: $(xcrun --show-sdk-path)"
 
-      # ── Write GN args via Python (avoids shell quoting issues) ──
+      # ── Write GN args & Compile ──
 
       - name: Write GN args
+        if: steps.skip.outputs.skip != 'true'
         run: python webrtc/write_gn_args.py ${{ matrix.target_os }} ${{ matrix.target_cpu }}
 
-      # ── Compile ──
-
       - name: Compile (Windows)
-        if: runner.os == 'Windows'
+        if: steps.skip.outputs.skip != 'true' && runner.os == 'Windows'
         shell: cmd
         run: |
           cd _build\src
@@ -109,7 +161,7 @@ jobs:
           call ninja -C out/Release webrtc_ffm
 
       - name: Compile (Unix)
-        if: runner.os != 'Windows'
+        if: steps.skip.outputs.skip != 'true' && runner.os != 'Windows'
         run: |
           cd _build/src
           gn gen out/Release
@@ -118,17 +170,20 @@ jobs:
       # ── Upload native library ──
 
       - name: Rename output
+        if: steps.skip.outputs.skip != 'true'
         shell: bash
         run: cp "_build/src/out/Release/${{ matrix.lib_in }}" "${{ matrix.lib_out }}"
 
       - uses: actions/upload-artifact@v4
+        if: steps.skip.outputs.skip != 'true'
         with:
           name: native-${{ matrix.platform }}
           path: ${{ matrix.lib_out }}
 
   # ── Phase 2: Assemble all natives into a single JAR ──
   build-jar:
-    needs: build-native
+    needs: [check-natives, build-native]
+    if: always() && !failure() && !cancelled()
     runs-on: ubuntu-latest
 
     steps:
@@ -150,20 +205,40 @@ jobs:
         working-directory: ./t88
         run: chmod +x gradlew && ./gradlew publishToMavenLocal
 
-      - name: Download all native libraries
+      # Download freshly built natives (if any were built)
+      - name: Download built native libraries
+        if: needs.check-natives.outputs.needs_build == 'true'
         uses: actions/download-artifact@v4
         with:
           pattern: native-*
           path: _natives
 
-      - name: Organize into resources/natives
+      # Overlay freshly built natives on top of repo's pre-existing ones
+      - name: Organize native libraries
         run: |
-          for platform in windows-x86_64 windows-aarch64 linux-x86_64 linux-aarch64 macos-x86_64 macos-aarch64; do
-            mkdir -p src/main/resources/natives/$platform
-            cp _natives/native-$platform/* src/main/resources/natives/$platform/
+          for spec in \
+            "windows-x86_64:webrtc.dll" \
+            "windows-aarch64:webrtc.dll" \
+            "linux-x86_64:webrtc.so" \
+            "linux-aarch64:webrtc.so" \
+            "macos-x86_64:webrtc.dylib" \
+            "macos-aarch64:webrtc.dylib"; do
+            platform="${spec%%:*}"
+            lib="${spec##*:}"
+            dest="src/main/resources/natives/$platform"
+            mkdir -p "$dest"
+            # Prefer freshly built over repo version
+            if [ -f "_natives/native-$platform/$lib" ]; then
+              cp "_natives/native-$platform/$lib" "$dest/$lib"
+              echo "Using freshly built: $platform/$lib"
+            elif [ -f "$dest/$lib" ]; then
+              echo "Using pre-existing:  $platform/$lib"
+            else
+              echo "WARNING: Missing $platform/$lib!"
+            fi
           done
-          echo "=== Native libraries ==="
-          find src/main/resources/natives -type f
+          echo "=== Final native libraries ==="
+          find src/main/resources/natives -type f -exec ls -lh {} \;
 
       - name: Build with Gradle
         run: chmod +x gradlew && ./gradlew build
