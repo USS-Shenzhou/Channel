@@ -62,7 +62,9 @@ jobs:
           git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git _depot_tools
           echo "$PWD/_depot_tools" >> $GITHUB_PATH
 
-      # ── Fetch WebRTC source (shallow, no hooks) ──
+      # ── Fetch WebRTC source ──
+      # Windows: --nohooks is safe (toolchain comes via CIPD, DEPOT_TOOLS_WIN_TOOLCHAIN=0 is set)
+      # Linux/macOS: hooks must run to install sysroots and configure SDK paths
 
       - name: Fetch WebRTC (Windows)
         if: runner.os == 'Windows'
@@ -81,7 +83,7 @@ jobs:
           cd _build
           gclient config --name=src https://webrtc.googlesource.com/src.git
           echo "target_os = ['${{ matrix.target_os }}']" >> .gclient
-          gclient sync --no-history --nohooks
+          gclient sync --no-history
 
       # ── Prepare source tree ──
 
