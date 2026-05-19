@@ -3,26 +3,14 @@ name: Subspace Build
 on:
   workflow_dispatch:
   push:
+    paths:
+      - 'subspace/**'
+      - '.github/workflows/subspace-build.yml'
 
 env:
   VCPKG_BINARY_SOURCES: 'clear;x-gha,readwrite'
 
 jobs:
-  changes:
-    name: Detect changes
-    runs-on: ubuntu-latest
-    outputs:
-      subspace: ${{ steps.filter.outputs.subspace }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            subspace:
-              - 'subspace/**'
-              - '.github/workflows/subspace-build.yml'
-
   build:
     name: ${{ matrix.platform }}
     strategy:
@@ -166,10 +154,7 @@ jobs:
 
   docker:
     name: Docker build & push (Aliyun ACR)
-    needs: [build, changes]
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'push' && needs.changes.outputs.subspace == 'true')
+    needs: [build]
     runs-on: ubuntu-latest
 
     steps:
