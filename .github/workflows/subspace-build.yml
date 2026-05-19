@@ -40,11 +40,11 @@ jobs:
             msvc_arch: amd64_arm64
             bin: subspace.exe
           - platform: linux-x86_64
-            runner: ubuntu-22.04
+            runner: ubuntu-24.04
             triplet: x64-linux
             bin: subspace
           - platform: linux-aarch64
-            runner: ubuntu-22.04
+            runner: ubuntu-24.04
             triplet: arm64-linux
             cross_linux_aarch64: true
             bin: subspace
