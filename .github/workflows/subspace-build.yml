@@ -1,0 +1,229 @@
+name: Subspace Build
+
+on:
+  workflow_dispatch:
+  push:
+
+env:
+  VCPKG_BINARY_SOURCES: 'clear;x-gha,readwrite'
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      subspace: ${{ steps.filter.outputs.subspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            subspace:
+              - 'subspace/**'
+              - '.github/workflows/subspace-build.yml'
+
+  build:
+    name: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-x86_64
+            runner: windows-2022
+            triplet: x64-windows
+            msvc_arch: amd64
+            bin: subspace.exe
+          - platform: windows-aarch64
+            runner: windows-2022
+            triplet: arm64-windows
+            msvc_arch: amd64_arm64
+            bin: subspace.exe
+          - platform: linux-x86_64
+            runner: ubuntu-22.04
+            triplet: x64-linux
+            bin: subspace
+          - platform: linux-aarch64
+            runner: ubuntu-22.04
+            triplet: arm64-linux
+            cross_linux_aarch64: true
+            bin: subspace
+          - platform: macos-x86_64
+            runner: macos-26
+            triplet: x64-osx
+            osx_arch: x86_64
+            bin: subspace
+          - platform: macos-aarch64
+            runner: macos-26
+            triplet: arm64-osx
+            osx_arch: arm64
+            bin: subspace
+
+    runs-on: ${{ matrix.runner }}
+
+    defaults:
+      run:
+        working-directory: subspace
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Expose ACTIONS_CACHE_URL / ACTIONS_RUNTIME_TOKEN to subsequent steps so
+      # vcpkg's x-gha binary cache backend can authenticate against the runner's
+      # cache service. Without this step, vcpkg silently falls back to rebuilding
+      # every dependency from source on every run.
+      - name: Export GitHub Actions cache env for vcpkg
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Install CMake 4.2.x
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: '~4.2.0'
+
+      - name: Install Linux build deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build pkg-config
+
+      - name: Setup aarch64-linux cross toolchain
+        if: matrix.cross_linux_aarch64
+        run: |
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          mkdir -p "$RUNNER_TEMP/cmake"
+          cat > "$RUNNER_TEMP/cmake/aarch64-linux-toolchain.cmake" <<'EOF'
+          set(CMAKE_SYSTEM_NAME Linux)
+          set(CMAKE_SYSTEM_PROCESSOR aarch64)
+          set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
+          set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
+          set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+          set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+          set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+          set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+          EOF
+          echo "VCPKG_CHAINLOAD_TOOLCHAIN_FILE=$RUNNER_TEMP/cmake/aarch64-linux-toolchain.cmake" >> "$GITHUB_ENV"
+
+      - name: Install macOS build deps
+        if: runner.os == 'macOS'
+        run: |
+          brew install ninja pkg-config || true
+
+      - name: Select Xcode 26 (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_26.0.app/Contents/Developer
+          echo "Selected: $(xcode-select -p)"
+          echo "SDK path: $(xcrun --show-sdk-path)"
+
+      - name: Setup MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc_arch }}
+
+      - name: Configure
+        shell: bash
+        run: |
+          if [ -n "$VCPKG_INSTALLATION_ROOT" ]; then
+            export VCPKG_ROOT="$VCPKG_INSTALLATION_ROOT"
+          fi
+          echo "Using VCPKG_ROOT=$VCPKG_ROOT"
+
+          extra_args=()
+          if [ -n "${{ matrix.osx_arch }}" ]; then
+            extra_args+=("-DCMAKE_OSX_ARCHITECTURES=${{ matrix.osx_arch }}")
+          fi
+          if [ -n "$VCPKG_CHAINLOAD_TOOLCHAIN_FILE" ]; then
+            extra_args+=("-DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$VCPKG_CHAINLOAD_TOOLCHAIN_FILE")
+          fi
+
+          cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} \
+            "${extra_args[@]}"
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Stage binary
+        shell: bash
+        run: |
+          mkdir -p _stage
+          cp "build/${{ matrix.bin }}" "_stage/${{ matrix.bin }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: subspace-${{ matrix.platform }}
+          path: subspace/_stage/${{ matrix.bin }}
+          if-no-files-found: error
+
+  docker:
+    name: Docker build & push (Aliyun ACR)
+    needs: [build, changes]
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && needs.changes.outputs.subspace == 'true')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: subspace-linux-*
+          path: _artifacts
+
+      - name: Stage binaries for docker build
+        run: |
+          mkdir -p subspace/bin/amd64 subspace/bin/arm64
+          cp _artifacts/subspace-linux-x86_64/subspace  subspace/bin/amd64/subspace
+          cp _artifacts/subspace-linux-aarch64/subspace subspace/bin/arm64/subspace
+          chmod +x subspace/bin/amd64/subspace subspace/bin/arm64/subspace
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Aliyun ACR
+        run: |
+          echo "${{ secrets.ACR_PASSWORD }}" \
+            | docker login -u "${{ secrets.ACR_USERNAME }}" --password-stdin "${{ secrets.ACR_REGISTRY }}"
+
+      - name: Compute image tags
+        id: meta
+        run: |
+          IMAGE="${{ secrets.ACR_REGISTRY }}/${{ secrets.ACR_NAMESPACE }}/${{ secrets.ACR_REPOSITORY }}"
+          MOD_VERSION="$(grep -E '^mod_version=' gradle.properties | cut -d'=' -f2-)"
+          if [ -z "$MOD_VERSION" ]; then
+            echo "mod_version not found in gradle.properties" >&2
+            exit 1
+          fi
+          SAFE_MOD_VERSION="$(echo "$MOD_VERSION" | tr '+' '_')"
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+          VERSION_TAG="${SAFE_MOD_VERSION}_${SHORT_SHA}"
+          TAGS="${IMAGE}:${VERSION_TAG},${IMAGE}:latest"
+          {
+            echo "tags=${TAGS}"
+            echo "primary=${VERSION_TAG}"
+          } >> "$GITHUB_OUTPUT"
+          echo "Will push: ${TAGS}"
+
+      - name: Build & push multi-arch image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./subspace
+          file: ./subspace/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          provenance: false
