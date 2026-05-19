@@ -20,7 +20,7 @@ namespace subspace {
 
         static void put(const UUID& uuid, const ByteArray& token);
         static void remove(const UUID& uuid);
-        static ByteArray get(const UUID& uuid);
+        static ByteArray& get(const UUID& uuid);
         static bool contains(const UUID& uuid);
 
     private:

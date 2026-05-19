@@ -1,9 +1,12 @@
 package cn.ussshenzhou.channel.subspace.server;
 
 import cn.ussshenzhou.channel.config.ChannelServerConfig;
+import cn.ussshenzhou.channel.network.SubspaceInitPacket;
 import cn.ussshenzhou.channel.subspace.AesGcmEncoder;
 import cn.ussshenzhou.channel.subspace.SubspacePacket;
 import cn.ussshenzhou.channel.subspace.server.send.InitPacket;
+import cn.ussshenzhou.channel.subspace.server.send.PlayerLoginPacket;
+import cn.ussshenzhou.t88.network.NetworkHelper;
 import com.mojang.logging.LogUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -14,8 +17,15 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.Varint21FrameDecoder;
 import net.minecraft.network.Varint21LengthFieldPrepender;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
+import java.security.SecureRandom;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author USS_Shenzhou
@@ -68,6 +78,13 @@ public class SubspaceConnection {
                             }
                         });
                         send(new InitPacket());
+                        LogUtils.getLogger().info("Subspace server connected.");
+                        group.schedule(() -> {
+                            LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1000));
+                            if (channel.isActive() && ServerLifecycleHooks.getCurrentServer() != null) {
+                                ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(SubspaceConnection::newPlayer);
+                            }
+                        }, 1, TimeUnit.SECONDS);
                     } else {
                         LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
                         group.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
@@ -102,5 +119,16 @@ public class SubspaceConnection {
             group.shutdownGracefully();
         }
         activelyDisconnect = false;
+    }
+
+    public static void newPlayer(Player player) {
+        byte[] token = new SecureRandom().generateSeed(32);
+        SubspaceConnection.send(new PlayerLoginPacket(token, player.getUUID(), player.getId()));
+        var cfg = ChannelServerConfig.get();
+        NetworkHelper.sendToPlayer((ServerPlayer) player, new SubspaceInitPacket(token, cfg.subspaceProtocol, cfg.subspaceAddress, cfg.subspaceClientPort, cfg.subspaceSecurityLevel));
+    }
+
+    public static boolean using(){
+        return channel != null && channel.isActive();
     }
 }

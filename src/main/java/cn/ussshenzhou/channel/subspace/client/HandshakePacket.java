@@ -20,6 +20,6 @@ public class HandshakePacket extends SubspacePacket {
 
     @Override
     public int getId() {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 }

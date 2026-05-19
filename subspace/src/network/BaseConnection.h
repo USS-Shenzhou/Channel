@@ -34,12 +34,15 @@ namespace subspace {
         virtual void send(const ByteArray& data) {
         }
 
-        void setOnDisconnect(const std::function<void()> &runnable) {
+        void setOnDisconnect(const std::function<void()>& runnable) {
             onDisconnect = runnable;
         }
 
     protected:
         CryptFunc encryptor;
+        /**
+         * @throw DecryptException
+         */
         CryptFunc decryptor;
         std::function<void()> onDisconnect;
 
@@ -49,6 +52,7 @@ namespace subspace {
         void handleRaw(const ByteArray& encrypted);
         virtual const ByteArray& getToken() = 0;
         virtual void handle(FriendlyByteBuf& decrypted) = 0;
+        virtual std::string getRemoteAddress() = 0;
     };
 } // subspace
 

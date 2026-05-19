@@ -6,10 +6,13 @@
 
 namespace subspace {
     ServerConnection::ServerConnection(asio::ip::tcp::socket socket) :
-        BaseConnection(CryptHelper::NULL_ENCODE_DECODE, CryptHelper::AES_GCM_DECODE), socket(std::move(socket)), handshakeTimer(this->socket.get_executor()) {
+        BaseConnection(CryptHelper::NULL_ENCODE_DECODE, CryptHelper::AES_GCM_DECODE),
+        socket(std::move(socket)),
+        handshakeTimer(this->socket.get_executor()) {
     }
 
     void ServerConnection::start() {
+        remoteAddress = socket.remote_endpoint().address().to_string() + ":" + std::to_string(socket.remote_endpoint().port());
         spdlog::info("Minecraft Server connecting, from {}", getRemoteAddress());
         handshakeTimer.expires_from_now(std::chrono::seconds(3));
         handshakeTimer.async_wait([thiz = std::dynamic_pointer_cast<ServerConnection>(shared_from_this())](const std::error_code& ec) {
@@ -17,7 +20,7 @@ namespace subspace {
                 return;
             }
             if (thiz->waitingHandshake) {
-                spdlog::warn("Handshake timeout from {}", thiz->getRemoteAddress());
+                spdlog::warn("Server handshake timeout from {}", thiz->getRemoteAddress());
                 thiz->disconnect();
             }
         });
@@ -57,7 +60,7 @@ namespace subspace {
         if (!socket.is_open()) {
             return;
         }
-        spdlog::info("Disconnecting from {}", getRemoteAddress());
+        spdlog::info("Disconnecting from server {}", getRemoteAddress());
         socket.close();
         BaseConnection::disconnect();
     }
@@ -94,6 +97,8 @@ namespace subspace {
         }
     }
 
+    void initClientListening();
+
     void ServerConnection::serverInit(FriendlyByteBuf& buf) {
         waitingHandshake = false;
         handshakeTimer.cancel();
@@ -109,7 +114,9 @@ namespace subspace {
         cfg.protocol = protocol;
         cfg.securityLevel = securityLevel;
         spdlog::info("Connection from {} accepted.", getRemoteAddress());
-        spdlog::info("Now using protocol {} and security level {}.", static_cast<int>(protocol), static_cast<int>(securityLevel));
+        spdlog::info("Now using protocol <{}> and security level <{}>.", static_cast<int>(protocol), static_cast<int>(securityLevel));
+
+        initClientListening();
     }
 
     void ServerConnection::playerLogIn(FriendlyByteBuf& buf) {
@@ -128,6 +135,16 @@ namespace subspace {
     }
 
     void ServerConnection::routeUpdate(FriendlyByteBuf& buf) {
-        //TODO
+        const int count = buf.readVarInt();
+        for (int i = 0; i < count; ++i) {
+            const UUID uuid = buf.readUUID();
+            PlayerData route;
+            route.x = buf.readDouble();
+            route.y = buf.readDouble();
+            route.z = buf.readDouble();
+            route.dimensionHash = buf.readInt();
+            route.spectator = buf.readBool();
+            RelayManager::updateData(uuid, route);
+        }
     }
 } // subspace

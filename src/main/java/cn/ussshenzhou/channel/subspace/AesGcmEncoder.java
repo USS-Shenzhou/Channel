@@ -30,6 +30,16 @@ public class AesGcmEncoder extends MessageToByteEncoder<ByteBuf> {
         this.token = new SecretKeySpec(token, "AES");
     }
 
+    public AesGcmEncoder(String token, int initNumber) {
+        this(token);
+        this.counter = initNumber;
+    }
+
+    public AesGcmEncoder(byte[] token, int initNumber) {
+        this(token);
+        this.counter = initNumber;
+    }
+
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
         initCipher();
@@ -37,7 +47,7 @@ public class AesGcmEncoder extends MessageToByteEncoder<ByteBuf> {
         VarInt.write(out, counter);
         out.ensureWritable(outputSize);
         out.writerIndex(out.writerIndex() + cipher.doFinal(msg.nioBuffer(), out.nioBuffer(out.writerIndex(), outputSize)));
-        counter++;
+        counter+=2;
     }
 
     protected void initCipher() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {

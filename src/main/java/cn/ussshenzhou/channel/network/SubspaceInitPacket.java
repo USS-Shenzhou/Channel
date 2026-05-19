@@ -1,5 +1,6 @@
-package cn.ussshenzhou.channel.network.standalone;
+package cn.ussshenzhou.channel.network;
 
+import cn.ussshenzhou.channel.subspace.client.SubspaceConnection;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.channel.util.Protocol;
 import cn.ussshenzhou.channel.util.SecurityLevel;
@@ -46,6 +47,6 @@ public class SubspaceInitPacket {
 
     @ClientHandler
     public void clientHandler(IPayloadContext context) {
-        //TODO
+        SubspaceConnection.connect(this);
     }
 }

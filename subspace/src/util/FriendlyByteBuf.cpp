@@ -63,14 +63,9 @@ namespace subspace {
     }
 
     void FriendlyByteBuf::writeVarInt(int value) {
-        auto v = static_cast<unsigned int>(value);
-        while ((v & ~0x7F) != 0) {
-            byte b = (v & 0x7F) | 0x80;
-            writeRaw(&b, 1);
-            v >>= 7;
-        }
-        byte b = v & 0x7F;
-        writeRaw(&b, 1);
+        byte buf[5];
+        int len = subspace::writeVarInt(value, buf);
+        writeRaw(buf, len);
     }
 
     void FriendlyByteBuf::writeFloat(float value) {

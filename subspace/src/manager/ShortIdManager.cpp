@@ -5,9 +5,9 @@
 #include "ShortIdManager.h"
 
 namespace subspace {
-    void ShortIdManager::put(const UUID& uuid, int token) {
+    void ShortIdManager::put(const UUID& uuid, int id) {
         std::unique_lock lock(shortIdsLock);
-        shortIds.emplace(uuid, token);
+        shortIds[uuid] = id;
     }
 
     void ShortIdManager::remove(const UUID& uuid) {

@@ -1,22 +1,23 @@
 package cn.ussshenzhou.channel.subspace.client;
 
+import cn.ussshenzhou.channel.gui.hud.MicrophoneHud;
 import cn.ussshenzhou.channel.network.TalkPacket2S;
-import cn.ussshenzhou.channel.network.standalone.SubspaceInitPacket;
+import cn.ussshenzhou.channel.network.SubspaceInitPacket;
 import cn.ussshenzhou.channel.subspace.*;
 import cn.ussshenzhou.channel.util.Protocol;
+import cn.ussshenzhou.channel.util.SecurityLevel;
 import com.mojang.logging.LogUtils;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
+import io.netty.util.concurrent.ScheduledFuture;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.Varint21FrameDecoder;
 import net.minecraft.network.Varint21LengthFieldPrepender;
 
-import java.security.Security;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,9 +25,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class SubspaceConnection {
     private static Protocol protocol;
+    private static SecurityLevel securityLevel;
     private static EventLoopGroup group;
     private static volatile Channel channel;
     private static volatile boolean activelyDisconnect;
+    private static ScheduledFuture<?> reconnectFuture;
 
     /**
      * <h3>TCP</h3>
@@ -157,18 +160,28 @@ public class SubspaceConnection {
      */
 
     public static void connect(SubspaceInitPacket packet) {
+        MicrophoneHud.setStatus(MicrophoneHud.Status.SUBSPACE);
+        if (channel != null && channel.isActive()) {
+            channel.close();
+        }
+        if (reconnectFuture != null) {
+            reconnectFuture.cancel(false);
+            reconnectFuture = null;
+        }
         protocol = packet.protocol;
+        securityLevel = packet.securityLevel;
         switch (packet.protocol) {
             case TCP -> connectTcp(packet);
-            case UDP -> {
-
-            }
+            case UDP -> throw new UnsupportedOperationException();
             //TODO
             case GRPC -> throw new UnsupportedOperationException();
         }
     }
 
     private static void connectTcp(SubspaceInitPacket packet) {
+        if (group != null) {
+            group.shutdownGracefully();
+        }
         group = new MultiThreadIoEventLoopGroup(1, new DefaultThreadFactory("Channel-Client-Subspace", true), NioIoHandler.newFactory());
         new Bootstrap()
                 .group(group)
@@ -184,16 +197,12 @@ public class SubspaceConnection {
                             case NONE -> {
                             }
                             case LOW -> ch.pipeline().addLast(new OnceAesGcmEncoder(packet.subspaceToken));
-                            case MID -> ch.pipeline().addLast(new OnceAesGcmEncoder(packet.subspaceToken) {
-                                @Override
-                                protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
-                                    super.encode(ctx, msg, out);
-                                    ctx.pipeline().addLast(new AesCtrEncoder(packet.subspaceToken));
-                                }
-                            }, new AesCtrDecoder(packet.subspaceToken));
-                            case HIGH -> ch.pipeline().addLast(new AesGcmEncoder(packet.subspaceToken), new AesGcmDecoder(packet.subspaceToken));
+                            case MID -> ch.pipeline().addLast(new OnceAesGcmEncoder(packet.subspaceToken, new AesCtrEncoder(packet.subspaceToken, 1)),
+                                    new AesCtrDecoder(packet.subspaceToken));
+                            case HIGH -> ch.pipeline().addLast(new OnceAesGcmEncoder(packet.subspaceToken, new AesGcmEncoder(packet.subspaceToken, 1)),
+                                    new AesGcmDecoder(packet.subspaceToken));
                         }
-                        ch.pipeline().addLast();
+                        ch.pipeline().addLast(new SubspacePacketHandler());
                     }
                 })
                 .connect(packet.subspaceAddress, packet.subspacePort)
@@ -203,13 +212,14 @@ public class SubspaceConnection {
                         channel.closeFuture().addListener((ChannelFutureListener) f -> {
                             if (!activelyDisconnect) {
                                 LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 10s...");
-                                group.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
+                                reconnectFuture = group.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
                             }
                         });
                         send(new HandshakePacket());
+                        MicrophoneHud.setStatus(MicrophoneHud.Status.STANDBY);
                     } else {
                         LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
-                        group.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
+                        reconnectFuture = group.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
                     }
                 });
     }
@@ -217,20 +227,40 @@ public class SubspaceConnection {
     public static void send(SubspacePacket packet) {
         if (channel != null && channel.isActive()) {
             var buf = new FriendlyByteBuf(channel.alloc().buffer());
-            buf.writeVarInt(packet.getId());
             packet.encode(buf);
             channel.writeAndFlush(buf);
         }
     }
 
-    public static void shutdown() {
+    public static void terminate() {
         activelyDisconnect = true;
         if (channel != null) {
             channel.close();
+            channel = null;
         }
         if (group != null) {
             group.shutdownGracefully();
+            group = null;
         }
+        protocol = null;
+        securityLevel = null;
+        reconnectFuture = null;
         activelyDisconnect = false;
+    }
+
+    public static Protocol getProtocol() {
+        return protocol;
+    }
+
+    public static SecurityLevel getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public static Channel getChannel() {
+        return channel;
+    }
+
+    public static boolean using(){
+        return channel != null && channel.isActive();
     }
 }

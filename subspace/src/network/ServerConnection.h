@@ -7,6 +7,8 @@
 
 #include "BaseConnection.h"
 
+#include "../manager/RelayManager.h"
+
 
 namespace subspace {
     class ServerConnection : public BaseConnection {
@@ -23,6 +25,10 @@ namespace subspace {
         const ByteArray& getToken() override;
         void handle(FriendlyByteBuf& decrypted) override;
 
+        std::string getRemoteAddress() override {
+            return remoteAddress;
+        }
+
         asio::ip::tcp::socket socket;
         byte headerBuf = 0;
         int headerBufValue = 0;
@@ -32,10 +38,7 @@ namespace subspace {
     private:
         asio::steady_timer handshakeTimer;
         bool waitingHandshake = true;
-
-        std::string getRemoteAddress() {
-            return socket.remote_endpoint().address().to_string() + ":" + std::to_string(socket.remote_endpoint().port());
-        }
+        std::string remoteAddress;
 
         void serverInit(FriendlyByteBuf& buf);
         void playerLogIn(FriendlyByteBuf& buf);

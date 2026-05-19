@@ -11,6 +11,7 @@
 #include <memory>
 #include <bit>
 #include <stdexcept>
+#include <format>
 
 #include "../Config.h"
 
@@ -24,6 +25,19 @@ namespace subspace {
         int64_t least;
 
         bool operator==(const UUID&) const = default;
+
+        std::string toString() const {
+            const auto m = static_cast<uint64_t>(most);
+            const auto l = static_cast<uint64_t>(least);
+            return std::format(
+                "{:08x}-{:04x}-{:04x}-{:04x}-{:012x}",
+                (m >> 32) & 0xFFFFFFFFu,
+                (m >> 16) & 0xFFFFu,
+                m & 0xFFFFu,
+                (l >> 48) & 0xFFFFu,
+                l & 0xFFFFFFFFFFFFull
+            );
+        }
     };
 
     inline std::pair<int, int> readVarInt(const byte* data, int maxLen) {
@@ -43,6 +57,17 @@ namespace subspace {
             }
         } while ((b & 0x80) != 0);
         return {value, i};
+    }
+
+    inline int writeVarInt(int value, byte* out) {
+        auto v = static_cast<unsigned int>(value);
+        int i = 0;
+        while ((v & ~0x7Fu) != 0) {
+            out[i++] = static_cast<byte>((v & 0x7F) | 0x80);
+            v >>= 7;
+        }
+        out[i++] = static_cast<byte>(v);
+        return i;
     }
 } // subspace
 

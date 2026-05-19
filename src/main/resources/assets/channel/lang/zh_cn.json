@@ -78,8 +78,16 @@
   "channel.config.net.length.tooltip": "决定每隔多久向服务器发送一次数据。\n较短的帧有助于减小延迟，较长的帧有助于减小网络占用。",
   "channel.config.net.samplerate": "传输采样率(Hz)",
   "channel.config.net.samplerate.tooltip": "决定传输声音的质量。\n能传输的最高声音频率是采样率的一半。\n较低的采样率有助于减小网络占用，\n较高的采样率有助于提高音频质量。",
-  "channel.config.net.bitrate": "比特率(kbps)",
+  "channel.config.net.bitrate": "原始比特率(kbps)",
+  "channel.config.net.opus_bitrate": "压缩后比特率(kbps)",
   "channel.config.net.flow": "压缩后上传速率",
+
+  "channel.config.subsapce": "  §o子空间§r中继",
+  "channel.config.subspace.off": "此服务器未启用子空间中继。",
+  "channel.config.subspace.address": "远程服务器地址",
+  "channel.config.subspace.port": "远程服务器端口",
+  "channel.config.subspace.protocol": "协议",
+  "channel.config.subspace.security": "安全性",
 
   "channel.config.tab.output": "输出",
   "channel.config.post": "  后处理",

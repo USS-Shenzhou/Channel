@@ -23,11 +23,19 @@ public class AesCtrEncoder extends AesGcmEncoder {
         super(token);
     }
 
+    public AesCtrEncoder(String token, int initNumber) {
+        super(token, initNumber);
+    }
+
+    public AesCtrEncoder(byte[] token, int initNumber) {
+        super(token, initNumber);
+    }
+
     @Override
     protected void initCipher() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        byte[] nonce = Util.getNonce(0);
+        byte[] nonce = Util.getNonce(counter);
         if (cipher == null) {
-            cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher = Cipher.getInstance("AES/CTR/NoPadding");
         }
         cipher.init(Cipher.ENCRYPT_MODE, token, new IvParameterSpec(nonce));
     }

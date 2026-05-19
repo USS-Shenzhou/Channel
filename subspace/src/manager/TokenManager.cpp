@@ -26,7 +26,7 @@ namespace subspace {
 
     void TokenManager::put(const UUID& uuid, const ByteArray& token) {
         std::unique_lock lock(clientTokensLock);
-        clientTokens.emplace(uuid, token);
+        clientTokens[uuid] = token;
     }
 
     void TokenManager::remove(const UUID& uuid) {
@@ -37,8 +37,12 @@ namespace subspace {
     /**
      * @warning Contains before Get.
      */
-    ByteArray TokenManager::get(const UUID& uuid) {
+    ByteArray& TokenManager::get(const UUID& uuid) {
         std::shared_lock lock(clientTokensLock);
+        auto r = clientTokens.find(uuid);
+        if (r == clientTokens.end()) {
+            throw std::out_of_range("contains before get");
+        }
         return clientTokens[uuid];
     }
 

@@ -7,7 +7,7 @@
 namespace subspace {
     ServerListener::ServerListener(asio::io_context& context) :
         listener(context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), getConfig().serverPort)) {
-        spdlog::info("Listening on {}", getConfig().serverPort);
+        spdlog::info("Listening on {} for server", getConfig().serverPort);
         wait();
     }
 
@@ -32,5 +32,10 @@ namespace subspace {
         std::erase_if(connections, [connection](const auto& c) {
             return c.get() == connection;
         });
+        if (connections.empty()) {
+            spdlog::info("Last Minecraft server disconnected. Resetting.");
+            getConfig().protocol = std::nullopt;
+            getConfig().securityLevel = std::nullopt;
+        }
     }
 } // subspace

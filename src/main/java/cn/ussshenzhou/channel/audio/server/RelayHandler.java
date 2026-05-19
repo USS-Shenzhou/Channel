@@ -26,11 +26,14 @@ public class RelayHandler {
     }
 
     public static void normalTalking(ServerPlayer from, byte[] opusAudio, int sampleRate) {
-        from.level().players().stream().filter(to ->
-                        (SharedConstants.IS_RUNNING_IN_IDE || to.getId() != from.getId()) &&
-                                to.position().distanceTo(from.position()) < 64 &&
-                                (!from.isSpectator() || to.isSpectator())
-                )
+        from.level().players().stream().filter(to -> shouldRelay(from, to))
                 .forEach(to -> NetworkHelper.sendToPlayer(to, new AudioPacket2C(sampleRate, from.getUUID(), opusAudio)));
+    }
+
+    public static boolean shouldRelay(ServerPlayer from, ServerPlayer to) {
+        return (SharedConstants.IS_RUNNING_IN_IDE || to.getId() != from.getId())
+                && to.position().distanceTo(from.position()) < 64
+                && from.level().dimension().equals(to.level().dimension())
+                && (!from.isSpectator() || to.isSpectator());
     }
 }

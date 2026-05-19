@@ -48,4 +48,8 @@ public class OpusManager {
         return outArray;
     }
 
+    public static int getOpusBitRate() {
+        return encoder == null ? 0 : encoder.encoder.getBitrate();
+    }
+
 }

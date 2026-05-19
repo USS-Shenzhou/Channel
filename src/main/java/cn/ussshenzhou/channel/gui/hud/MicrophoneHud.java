@@ -58,7 +58,7 @@ public class MicrophoneHud extends TPanel {
         volume.setProgressBarColorGradient(0x103c91ff, 0xff3c91ff);
         this.add(volume);
 
-        shadow.setAlpha(0.5f);
+        shadow.setAlpha(0.75f);
         shadow.setColor(0x000000);
         this.add(shadow);
         this.add(word);

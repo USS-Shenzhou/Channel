@@ -1,6 +1,7 @@
 package cn.ussshenzhou.channel.network;
 
 import cn.ussshenzhou.channel.audio.server.RelayHandler;
+import cn.ussshenzhou.channel.subspace.SubspacePacket;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.network.annotation.Decoder;
 import cn.ussshenzhou.t88.network.annotation.Encoder;
@@ -14,7 +15,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
  * @author USS_Shenzhou
  */
 @NetPacket(modid = ModConstant.SHORT_ID, handleOnNetwork = true, id = "tsp")
-public class TalkPacket2S {
+public class TalkPacket2S extends SubspacePacket {
     private final int sampleRate;
     private final byte[] opus;
 
@@ -29,10 +30,16 @@ public class TalkPacket2S {
         this.opus = buf.readByteArray();
     }
 
+    @Override
     @Encoder
     public void encode(FriendlyByteBuf buf) {
         buf.writeVarInt(this.sampleRate);
         buf.writeByteArray(this.opus);
+    }
+
+    @Override
+    public int getId() {
+        throw new UnsupportedOperationException();
     }
 
     @ServerHandler

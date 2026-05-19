@@ -5,6 +5,7 @@ import cn.ussshenzhou.channel.audio.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.gui.hud.MicrophoneHud;
 import cn.ussshenzhou.channel.network.TalkPacket2S;
+import cn.ussshenzhou.channel.subspace.client.SubspaceConnection;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.channel.audio.OpusManager;
@@ -85,7 +86,12 @@ public class MicReader {
             }
             //-----encode-----
             var opus = OpusManager.encode(audio, networkSampleRate);
-            NetworkHelper.sendToServer(new TalkPacket2S(networkSampleRate, opus));
+            var packet = new TalkPacket2S(networkSampleRate, opus);
+            if (SubspaceConnection.using()) {
+                SubspaceConnection.send(packet);
+            } else {
+                NetworkHelper.sendToServer(packet);
+            }
             MicrophoneHud.setStatus(MicrophoneHud.Status.TALKING);
         } catch (Throwable t) {
             LogUtils.getLogger().error("{}", t.toString());
