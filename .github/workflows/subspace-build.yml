@@ -181,8 +181,7 @@ jobs:
 
       - name: Login to Aliyun ACR
         run: |
-          echo "${{ secrets.ACR_PASSWORD }}" \
-            | docker login -u "${{ secrets.ACR_USERNAME }}" --password-stdin "${{ secrets.ACR_REGISTRY }}"
+          docker login -u ${{ secrets.ACR_USERNAME }} -p ${{ secrets.ACR_PASSWORD }} ${{ secrets.ACR_REGISTRY }}
 
       - name: Compute image tags
         id: meta
