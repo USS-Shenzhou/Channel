@@ -74,7 +74,7 @@ namespace subspace {
         const std::string path = "SubspaceConfig.json";
         std::ifstream ifs(path);
         if (!ifs.is_open()) {
-            createDefaultConfig(path, hasArg(argc, argv, "--no-json-config"));
+            createDefaultConfig(path, !hasArg(argc, argv, "--no-json-config"));
         }
         auto json = nlohmann::json::parse(ifs);
         auto& config = getConfig();
