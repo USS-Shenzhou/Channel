@@ -29,28 +29,34 @@ namespace subspace {
     }
 
     void RelayManager::relay(const UUID& from, int sampleRate, const ByteArray& opus) {
-        auto to = findTargets(from);
+        PlayerData fr;
+        {
+            std::shared_lock lock1(dataLock);
+            auto f = playerDatas.find(from);
+            if (f == playerDatas.end()) {
+                spdlog::warn("Received voice data from unknown player {}", from.toString());
+                return;
+            }
+            fr = f->second;
+        }
+        auto to = findTargets(from, fr);
         FriendlyByteBuf buf;
         buf.writeVarInt(sampleRate);
         buf.writeUUID(from);
         buf.writeByteArray(opus);
+        buf.writeDouble(fr.x);
+        buf.writeDouble(fr.y);
+        buf.writeDouble(fr.z);
         const auto& bytes = *buf.bytes();
         for (const auto& t : to) {
             t->send(bytes);
         }
     }
 
-    std::vector<std::shared_ptr<ClientTcpConnection>> RelayManager::findTargets(const UUID& from) {
+    std::vector<std::shared_ptr<ClientTcpConnection>> RelayManager::findTargets(const UUID& from, const PlayerData& fr) {
         std::vector<std::shared_ptr<ClientTcpConnection>> targets;
         std::shared_lock lock0(connectionLock);
         std::shared_lock lock1(dataLock);
-
-        auto f = playerDatas.find(from);
-        if (f == playerDatas.end()) {
-            spdlog::warn("Received voice data from unknown player {}", from.toString());
-            return {};
-        }
-        const auto& fr = f->second;
         for (const auto& [uuid, to] : playerDatas) {
 #ifdef NDEBUG
             if (uuid == from) {

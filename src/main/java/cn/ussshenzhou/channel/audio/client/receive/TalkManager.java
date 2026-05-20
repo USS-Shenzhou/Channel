@@ -22,22 +22,16 @@ import static org.lwjgl.openal.AL10.*;
 public class TalkManager extends BaseAudioManager {
     @Override
     protected boolean play(Level level, UUID playerId, PlayerAudio audio) {
-        var player = level.getEntity(playerId);
-        if (player == null) {
-            audio.close();
-            return true;
-        }
-        var partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        var pos = player.getEyePosition(partialTick);
+        var pos = audio.getPos(level);
         if (ChannelClientConfig.get().rayTraceAudio) {
             RayTraceManager.play(pos.x, pos.y, pos.z, audio);
         } else {
-            simplePlay(audio, pos, player);
+            simplePlay(audio, pos);
         }
         return false;
     }
 
-    private void simplePlay(PlayerAudio audio, Vec3 pos, Entity player) {
+    private void simplePlay(PlayerAudio audio, Vec3 pos) {
         alSource3f(audio.alSource, AL_POSITION, (float) pos.x, (float) pos.y, (float) pos.z);
         audio.play();
     }

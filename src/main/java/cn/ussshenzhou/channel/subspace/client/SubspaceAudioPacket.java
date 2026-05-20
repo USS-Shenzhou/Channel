@@ -11,18 +11,17 @@ import java.util.UUID;
  * @author USS_Shenzhou
  */
 public class SubspaceAudioPacket extends AudioPacket2C {
+    public final double x, y, z;
 
     public SubspaceAudioPacket(FriendlyByteBuf buf) {
         super(buf);
+        this.x = buf.readDouble();
+        this.y = buf.readDouble();
+        this.z = buf.readDouble();
     }
 
     @Override
     public void encode(FriendlyByteBuf buf) {
-        super.encode(buf);
-    }
-
-    @Override
-    public void clientHandler(@Nullable IPayloadContext context) {
-        super.clientHandler(context);
+        throw new UnsupportedOperationException();
     }
 }

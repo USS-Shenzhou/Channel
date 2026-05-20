@@ -2,10 +2,13 @@ package cn.ussshenzhou.channel.audio.client.receive;
 
 import cn.ussshenzhou.channel.network.AudioPacket2C;
 import cn.ussshenzhou.channel.audio.OpusManager;
+import cn.ussshenzhou.channel.subspace.client.SubspaceAudioPacket;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.common.EventBusSubscriber;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 
@@ -65,18 +68,19 @@ public abstract class BaseAudioManager {
             if (level == null) {
                 return;
             }
-            var fromEntity = level.getEntity(from);
-            if (fromEntity instanceof Player player) {
-                playerAudios.compute(player.getUUID(), (id, old) -> {
-                    if (old == null) {
-                        return new PlayerAudio(id, sampleRate);
-                    } else if (old.sampleRate != sampleRate) {
-                        old.close();
-                        return new PlayerAudio(id, sampleRate);
-                    } else {
-                        return old;
-                    }
-                }).push(decoded);
+            var audio = playerAudios.compute(from, (id, old) -> {
+                if (old == null) {
+                    return new PlayerAudio(id, sampleRate);
+                } else if (old.sampleRate != sampleRate) {
+                    old.close();
+                    return new PlayerAudio(id, sampleRate);
+                } else {
+                    return old;
+                }
+            });
+            audio.push(decoded);
+            if (packet instanceof SubspaceAudioPacket subspace) {
+                audio.setPos(subspace.x, subspace.y, subspace.z);
             }
         } catch (Exception e) {
             LogUtils.getLogger().error(e.toString());

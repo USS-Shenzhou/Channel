@@ -35,7 +35,7 @@ namespace subspace {
         inline static std::shared_mutex connectionLock;
         inline static std::unordered_map<UUID, std::shared_ptr<ClientTcpConnection>> connections;
 
-        static std::vector<std::shared_ptr<ClientTcpConnection>> findTargets(const UUID& from);
+        static std::vector<std::shared_ptr<ClientTcpConnection>> findTargets(const UUID& from, const PlayerData& fr);
     };
 } // subspace
 

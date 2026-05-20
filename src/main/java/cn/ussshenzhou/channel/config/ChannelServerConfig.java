@@ -28,4 +28,10 @@ public class ChannelServerConfig implements TConfig {
         ConfigHelper.getConfigWrite(ChannelServerConfig.class, writer);
     }
 
+    public String getSubspaceFrequency() {
+        if (System.getenv().containsKey("CHANNEL_SUBSPACE_FREQUENCY")) {
+            return System.getenv("CHANNEL_SUBSPACE_FREQUENCY");
+        }
+        return subspaceFrequency;
+    }
 }

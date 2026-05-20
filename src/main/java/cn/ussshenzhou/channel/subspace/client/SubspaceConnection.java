@@ -246,6 +246,7 @@ public class SubspaceConnection {
         securityLevel = null;
         reconnectFuture = null;
         activelyDisconnect = false;
+        MicrophoneHud.setStatus(MicrophoneHud.Status.STANDBY);
     }
 
     public static Protocol getProtocol() {

@@ -9,6 +9,8 @@ import com.mojang.logging.LogUtils;
 import io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
@@ -27,6 +29,7 @@ public class PlayerAudio {
     private int readyBufferMs = 0;
     public final int alSource, sampleRate, alDirectFilter, alReverbFilter;
     public final UUID playerId;
+    private double x, y, z;
 
     public PlayerAudio(UUID playerId, int sampleRate) {
         this.playerId = playerId;
@@ -81,7 +84,7 @@ public class PlayerAudio {
     }
 
     public void checkTooMuchDelay() {
-        if (audioBuffer.size() >= ChannelClientConfig.get().networkTolerance * 1.5 || audioBuffer.size() >= MAX_BUFFER_10MS) {
+        if (audioBuffer.size() >= ChannelClientConfig.get().networkTolerance * 1.5 / 10 || audioBuffer.size() >= MAX_BUFFER_10MS) {
             int targetBufferSize = (int) (ChannelClientConfig.get().networkTolerance * 1.1 / 10);
             int drop = audioBuffer.size() - targetBufferSize;
             for (int i = 0; i < drop; i++) {
@@ -91,6 +94,7 @@ public class PlayerAudio {
     }
 
     public void play() {
+        //TODO close self by last active time
         var vol = ChannelPlayerConfig.getOrDefault(playerId);
         alSourcef(alSource, AL_GAIN, AudioHelper.db2factor(vol));
         OutputConfigPanel.PlayerVolumePanel.update(playerId, vol);
@@ -110,8 +114,13 @@ public class PlayerAudio {
                 readyBufferMs += 10;
             }
         }
-        if (alGetSourcei(alSource, AL_SOURCE_STATE) != AL_PLAYING && readyBufferMs > ChannelClientConfig.get().networkTolerance) {
-            alSourcePlay(alSource);
+
+        int state = alGetSourcei(alSource, AL_SOURCE_STATE);
+        if (state != AL_PLAYING) {
+            int threshold = (state == AL_INITIAL) ? ChannelClientConfig.get().networkTolerance : ChannelClientConfig.get().networkTolerance / 5;
+            if (readyBufferMs > threshold) {
+                alSourcePlay(alSource);
+            }
         }
     }
 
@@ -119,9 +128,25 @@ public class PlayerAudio {
         alSourceStop(this.alSource);
         int alBuf = alGetSourcei(this.alSource, AL_BUFFERS_QUEUED);
         while (alBuf-- > 0) {
-            alDeleteBuffers(alSourceUnqueueBuffers(alBuf));
+            alDeleteBuffers(alSourceUnqueueBuffers(this.alSource));
         }
         alDeleteSources(this.alSource);
+        alDeleteFilters(this.alDirectFilter);
+        alDeleteFilters(this.alReverbFilter);
+    }
+
+    public Vec3 getPos(Level level) {
+        var player = level.getPlayerByUUID(this.playerId);
+        if (player == null) {
+            return new Vec3(x, y, z);
+        }
+        return player.getEyePosition();
+    }
+
+    public void setPos(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     @Override

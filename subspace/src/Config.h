@@ -71,7 +71,9 @@ namespace subspace {
     inline void loadFromJson() {
         const std::string path = "SubspaceConfig.json";
         std::ifstream ifs(path);
-        createDefaultConfig(path);
+        if (!ifs.is_open()) {
+            createDefaultConfig(path);
+        }
         auto json = nlohmann::json::parse(ifs);
         auto& config = getConfig();
         config.serverPort = json["serverPort"];
