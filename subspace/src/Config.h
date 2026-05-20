@@ -53,7 +53,7 @@ namespace subspace {
         return false;
     }
 
-    inline void createDefaultConfig(const std::string& path, bool exit) {
+    inline void createDefaultConfig(const std::string& path) {
         auto defaultCfg = Config();
         nlohmann::json json = {
             {"serverPort", defaultCfg.serverPort},
@@ -64,18 +64,14 @@ namespace subspace {
         std::ofstream out(path);
         out << json.dump(4);
         spdlog::error("SubspaceConfig.json not found. Created default config file.");
-        if (exit) {
-            spdlog::warn("Subspace will exit. You can edit the config and restart.");
-            std::exit(943);
-        }
+        spdlog::warn("Subspace will exit. You can edit the config and restart.");
+        std::exit(943);
     }
 
-    inline void loadFromJson(int argc, char* argv[]) {
+    inline void loadFromJson() {
         const std::string path = "SubspaceConfig.json";
         std::ifstream ifs(path);
-        if (!ifs.is_open()) {
-            createDefaultConfig(path, !hasArg(argc, argv, "--no-json-config"));
-        }
+        createDefaultConfig(path);
         auto json = nlohmann::json::parse(ifs);
         auto& config = getConfig();
         config.serverPort = json["serverPort"];
@@ -118,7 +114,9 @@ namespace subspace {
 
     inline void loadConfig(int argc, char* argv[]) {
         loadFromSysEnv();
-        loadFromJson(argc, argv);
+        if (!hasArg(argc, argv, "--no-json-config")) {
+            loadFromJson();
+        }
         loadFromArg(argc, argv);
         auto& config = getConfig();
         if (config.subspaceFrequency.empty()) {

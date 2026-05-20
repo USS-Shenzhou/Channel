@@ -133,6 +133,11 @@ The security level used between Subspace and the Minecraft **server** is always 
 
 Pre-built executables can be downloaded directly from [CI](https://github.com/USS-Shenzhou/Channel/actions/workflows/subspace-build.yml). There are three ways to configure them:
 
+> [!NOTE]
+> 这三种方式的配置优先级为 环境变量<JSON文件<程序参数。后者覆盖前者。
+> 
+> The priority of these three configuration methods is: environment variables < JSON config file < command-line arguments. The latter overrides the former.
+
 #### JSON配置文件 | JSON config file
 
 在你第一次运行Subspace时，会自动生成一个`SubspaceConfig.json`：
