@@ -2,6 +2,7 @@ package cn.ussshenzhou.channel.gui;
 
 import cn.ussshenzhou.channel.audio.Unit;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
+import cn.ussshenzhou.channel.gui.hud.DebugHud;
 import cn.ussshenzhou.t88.gui.HudManager;
 import cn.ussshenzhou.t88.gui.advanced.TOptionsPanel;
 import cn.ussshenzhou.t88.gui.event.ResizeHudEvent;
@@ -38,7 +39,7 @@ public class GeneralConfigPanel extends TOptionsPanel {
                 entry -> entry.getContent() == cfg.showHudText
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.dispay.hud.tooltip")));
         addOptionCycleButtonInit(
-                Component.translatable("Channel.config.unit"),
+                Component.translatable("channel.config.unit"),
                 List.of(Unit.values()),
                 u -> _ -> {
                     ChannelClientConfig.write(c -> c.unit = u);
@@ -48,6 +49,27 @@ public class GeneralConfigPanel extends TOptionsPanel {
                     }
                 },
                 entry -> entry.getContent() == cfg.unit
+        );
+
+        addOptionSplitter(Component.translatable("channel.config.debug"));
+        addOptionCycleButtonInit(
+                Component.translatable("channel.config.debug.raytrace"),
+                List.of(false, true),
+                bool -> _ -> ChannelClientConfig.write(c -> c.showRaytrace = bool),
+                entry -> entry.getContent() == cfg.showRaytrace
+        );
+        addOptionCycleButtonInit(
+                Component.translatable("channel.config.debug.info"),
+                List.of(false, true),
+                bool -> _ -> {
+                    ChannelClientConfig.write(c -> c.showRaytraceInfo = bool);
+                    if (bool){
+                        HudManager.addIfSameClassNotExist(new DebugHud());
+                    } else {
+                        HudManager.removeInstanceOf(DebugHud.class);
+                    }
+                },
+                entry -> entry.getContent() == cfg.showRaytraceInfo
         );
     }
 }

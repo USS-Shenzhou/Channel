@@ -1,10 +1,15 @@
 package cn.ussshenzhou.channel.audio.client.rt;
 
+import cn.ussshenzhou.channel.config.ChannelClientConfig;
+import net.minecraft.client.Minecraft;
+import net.minecraft.gizmos.Gizmos;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import org.joml.Vector3f;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
 
 /**
@@ -12,22 +17,23 @@ import java.util.IdentityHashMap;
  */
 @EventBusSubscriber(Dist.CLIENT)
 public class DebugRayTrace {
-    public static final IdentityHashMap<Vector3f, Vec3> whiteRays = new IdentityHashMap<>();
+    public static final ArrayList<Ray> rays = new ArrayList<>();
 
-    /*@SubscribeEvent
-    public static void render(RenderLevelStageEvent.AfterEntities event) {
-        if (Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON) {
+    @SubscribeEvent
+    public static void render(RenderLevelStageEvent.AfterTranslucentParticles event) {
+        if (!ChannelClientConfig.get().showRaytrace) {
             return;
         }
-        var buffer = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(RenderType.lines());
         var posestack = event.getPoseStack();
         posestack.pushPose();
-        posestack.translate(event.getCamera().getPosition().scale(-1));
-        for (var entry : whiteRays.entrySet()) {
-            var from = entry.getKey();
-            var ray = entry.getValue();
-            ShapeRenderer.renderVector(posestack, buffer, from, ray, 0x80ffffff);
+        posestack.translate(Minecraft.getInstance().gameRenderer.getMainCamera().position().scale(-1));
+        for (var ray : rays) {
+            Gizmos.line(ray.from, ray.to, ray.color, 1f);
         }
         posestack.popPose();
-    }*/
+    }
+
+    public record Ray(Vec3 from, Vec3 to, int color) {
+
+    }
 }

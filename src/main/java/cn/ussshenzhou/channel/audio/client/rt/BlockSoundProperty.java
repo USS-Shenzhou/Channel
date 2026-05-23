@@ -16,7 +16,7 @@ public record BlockSoundProperty(
 ) {
     private static final BlockSoundProperty DEFAULT = new BlockSoundProperty(0.05f, 0.5f, 0.8f);
     private static final IdentityHashMap<SoundType, BlockSoundProperty> PROPERTIES = new IdentityHashMap<>() {{
-        put(EMPTY, new BlockSoundProperty(0.01f, 0, 1));
+        put(EMPTY, DEFAULT);
         put(WOOD, new BlockSoundProperty(0.2f, 0.5f, 0.4f));
         put(GRAVEL, new BlockSoundProperty(0.6f, 0.85f, 0.2f));
         put(GRASS, new BlockSoundProperty(0.5f, 0.8f, 0.1f));

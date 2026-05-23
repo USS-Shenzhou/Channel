@@ -9,8 +9,8 @@ import cn.ussshenzhou.t88.gui.util.ITranslatable;
  */
 
 public enum Unit implements ITranslatable {
-    DB("Channel.config.unit.db"),
-    PERCENT("Channel.config.unit.per");
+    DB("channel.config.unit.db"),
+    PERCENT("channel.config.unit.per");
 
     private final String translateKey;
 

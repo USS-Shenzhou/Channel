@@ -85,7 +85,7 @@ Subspace is a standalone program that runs independently of the Minecraft server
 >
 > Connecting players that share the same UUID from multiple Minecraft servers to a single Subspace process at the same time is **undefined behavior**.
 
-要将语音数据导向Channel，你需要编辑`<Minecraft服务器运行目录>/Config/ChannelServerConfig.json`:
+要将语音数据导向Subspace，你需要编辑`<Minecraft服务器运行目录>/Config/ChannelServerConfig.json`:
 
 To route voice data through Subspace, edit `<Minecraft server working directory>/Config/ChannelServerConfig.json`:
 

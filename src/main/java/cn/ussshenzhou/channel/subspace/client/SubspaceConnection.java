@@ -240,7 +240,6 @@ public class SubspaceConnection {
         }
         if (group != null) {
             group.shutdownGracefully();
-            group = null;
         }
         protocol = null;
         securityLevel = null;
