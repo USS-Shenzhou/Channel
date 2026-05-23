@@ -82,7 +82,7 @@
   "channel.config.net.opus_bitrate": "Compressed Bitrate(kbps)",
   "channel.config.net.flow": "Compressed Upload Rate",
 
-  "channel.config.subsapce": "  §oSubspace§r Relay",
+  "channel.config.subspace": "  §oSubspace§r Relay",
   "channel.config.subspace.off": "Subspace relay is not enabled on this server.",
   "channel.config.subspace.address": "Subspace Server Address",
   "channel.config.subspace.port": "Subspace Server Port",

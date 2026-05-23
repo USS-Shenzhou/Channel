@@ -82,7 +82,7 @@
   "channel.config.net.opus_bitrate": "压缩后比特率(kbps)",
   "channel.config.net.flow": "压缩后上传速率",
 
-  "channel.config.subsapce": "  §o子空间§r中继",
+  "channel.config.subspace": "  §o子空间§r中继",
   "channel.config.subspace.off": "此服务器未启用子空间中继。",
   "channel.config.subspace.address": "远程服务器地址",
   "channel.config.subspace.port": "远程服务器端口",

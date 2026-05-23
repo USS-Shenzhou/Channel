@@ -53,7 +53,7 @@ public class TransmitConfigPanel extends TOptionsPanel {
         speed = addOption(Component.translatable("channel.config.net.flow"), new TLabel(Component.empty())).getB();
         netSampleRate.setTooltip(Tooltip.create(Component.translatable("channel.config.net.samplerate.tooltip")));
 
-        addOptionSplitter(Component.translatable("channel.config.subsapce"));
+        addOptionSplitter(Component.translatable("channel.config.subspace"));
         off = (HorizontalTitledOption<TLabel>) addOption(Component.empty(), new TLabel(Component.translatable("channel.config.subspace.off"))).getB().getParent();
         address = (HorizontalTitledOption<TLabel>) addOption(Component.translatable("channel.config.subspace.address"), new TLabel(Component.empty())).getB().getParent();
         port = (HorizontalTitledOption<TLabel>) addOption(Component.translatable("channel.config.subspace.port"), new TLabel(Component.empty())).getB().getParent();

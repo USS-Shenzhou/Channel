@@ -63,7 +63,7 @@ public class SubspaceConnection {
                                 new Varint21FrameDecoder(null),
 
                                 new Varint21LengthFieldPrepender(),
-                                new AesGcmEncoder(cfg.subspaceFrequency)
+                                new AesGcmEncoder(cfg.getSubspaceFrequency())
                         );
                     }
                 })
