@@ -22,8 +22,8 @@ public class CShared {
     public static final OfDouble C_DOUBLE = (OfDouble) Linker.nativeLinker().canonicalLayouts().get("double");
     public static final AddressLayout C_POINTER = ((AddressLayout) Linker.nativeLinker().canonicalLayouts().get("void*"))
             .withTargetLayout(MemoryLayout.sequenceLayout(Long.MAX_VALUE, C_CHAR));
-    public static final OfInt C_LONG = (OfInt) Linker.nativeLinker().canonicalLayouts().get("long");
-    public static final OfDouble C_LONG_DOUBLE = (OfDouble) Linker.nativeLinker().canonicalLayouts().get("double");
+    //public static final OfInt C_LONG = (OfInt) Linker.nativeLinker().canonicalLayouts().get("long");
+    //public static final OfDouble C_LONG_DOUBLE = (OfDouble) Linker.nativeLinker().canonicalLayouts().get("double");
 
     static final boolean TRACE_DOWNCALLS = Boolean.getBoolean("jextract.trace.downcalls");
 
