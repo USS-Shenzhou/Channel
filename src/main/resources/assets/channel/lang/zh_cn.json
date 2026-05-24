@@ -41,11 +41,13 @@
   "channel.config.pre.trigger.always": "常开",
   "channel.config.pre.trigger.vad": "语音检测",
   "channel.config.pre.trigger.threshold": "响度阈值",
-  "channel.config.pre.trigger.ptt": "按住[%1$s]",
+  "channel.config.pre.trigger.ptt": "按住 [ %1$s ] 发话",
+  "channel.config.pre.trigger.switch": "按下 [ %1$s ] 切换静音与否",
   "channel.config.pre.trigger.always.tooltip": "采集到的所有声音都会发送至服务器。",
   "channel.config.pre.trigger.vad.tooltip": "§6实验性功能§r\n只有采集到的声音中含有话音时才会发送至服务器。",
   "channel.config.pre.trigger.threshold.tooltip": "只有超过指定响度的声音才会发送至服务器。",
-  "channel.config.pre.trigger.ptt.tooltip": "只有按住按键时才会把采集到的声音发送至服务器。\n§6开发中",
+  "channel.config.pre.trigger.ptt.tooltip": "只有按住按键时才会把采集到的声音发送至服务器。\n§b即使处于静音，您的安全软件也可能会提示您Minecraft正在使用麦克风；这是正常现象。",
+  "channel.config.pre.trigger.switch.tooltip": "按下按键切换静音与否。\n§b即使处于静音，您的安全软件也可能会提示您Minecraft正在使用麦克风；这是正常现象。",
   "channel.config.pre.vad": "语音检测阈值",
   "channel.config.pre.vad.tooltip": "设定语音检测的触发阈值。\n更低的选项使同一段音频更容易被认为含有语音。",
   "channel.config.pre.threshold": "触发响度阈值",
@@ -115,8 +117,6 @@
   "channel.config.debug.raytrace": "显示检测射线",
   "channel.config.debug.info": "显示混响参数",
 
-
-  "channel.notify.failed_find": "未找到设备 %1$s.\n已使用默认输入设备。",
   "channel.notify.no_valid": "无可用的输入设备。",
   "channel.notify.unsupported": "选择的参数不受此输入设备支持。",
   "channel.notify.failed_init": "初始化设备 %1$s 失败。"

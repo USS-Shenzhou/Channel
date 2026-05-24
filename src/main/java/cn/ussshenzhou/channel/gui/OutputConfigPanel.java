@@ -160,6 +160,7 @@ public class OutputConfigPanel extends TOptionsPanel {
                 name.setText(Component.literal(uuid.toString()));
             }
             //TODO click face to mute
+            //TODO show player volume under silder
         }
 
         @Override

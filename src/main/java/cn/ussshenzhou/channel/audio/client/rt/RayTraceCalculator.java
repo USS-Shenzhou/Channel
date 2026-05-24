@@ -141,7 +141,7 @@ public class RayTraceCalculator {
         });
         post(() -> {
             double collisionCount = -6 / Math.log10(1 - absorptionWeightedTotal / weightTotal);
-            openSpaceCorrection = inWater ? 1 : Mth.clamp(pointTotalAmount / ((float) getRayAmount() * MAX_BOUNCE_ROUND), 0, 1);
+            openSpaceCorrection = inWater ? 1 : Mth.clamp(pointTotalAmount / ((float) getRayAmount() * MAX_BOUNCE_ROUND * 2), 0, 1);
             double r = collisionCount * distanceMean / 340 * openSpaceCorrection;
             rt60 = (float) Mth.clamp((20 - 400 / (r + 20)) * (inWater ? 3.6f : 1), 0.1, 20);
         });

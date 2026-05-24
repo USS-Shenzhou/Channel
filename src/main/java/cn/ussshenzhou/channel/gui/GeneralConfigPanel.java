@@ -62,14 +62,13 @@ public class GeneralConfigPanel extends TOptionsPanel {
                 Component.translatable("channel.config.debug.info"),
                 List.of(false, true),
                 bool -> _ -> {
-                    ChannelClientConfig.write(c -> c.showRaytraceInfo = bool);
                     if (bool){
                         HudManager.addIfSameClassNotExist(new DebugHud());
                     } else {
                         HudManager.removeInstanceOf(DebugHud.class);
                     }
                 },
-                entry -> entry.getContent() == cfg.showRaytraceInfo
+                entry -> entry.getContent() == false
         );
     }
 }

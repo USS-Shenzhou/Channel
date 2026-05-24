@@ -41,11 +41,13 @@
   "channel.config.pre.trigger.always": "Always On",
   "channel.config.pre.trigger.vad": "Voice Activity Detection",
   "channel.config.pre.trigger.threshold": "Loudness Threshold",
-  "channel.config.pre.trigger.ptt": "Hold [%1$s]",
+  "channel.config.pre.trigger.ptt": "Hold [ %1$s ] to Talk",
+  "channel.config.pre.trigger.switch": "Press [ %1$s ] to Toggle Mute",
   "channel.config.pre.trigger.always.tooltip": "All captured sound will be sent to the server.",
   "channel.config.pre.trigger.vad.tooltip": "§6Experimental Feature§r\nOnly sends to the server when voice is detected in the captured sound.",
   "channel.config.pre.trigger.threshold.tooltip": "Only sound exceeding the specified loudness will be sent to the server.",
-  "channel.config.pre.trigger.ptt.tooltip": "The captured sound will only be sent to the server while the key is held down.\n§6WIP",
+  "channel.config.pre.trigger.ptt.tooltip": "The captured sound will only be sent to the server while the key is held down.\n§6Even while muted, your security software may indicate that Minecraft is using the microphone; this is normal.",
+  "channel.config.pre.trigger.switch.tooltip": "Press the key to toggle mute.\n§6Even while muted, your security software may indicate that Minecraft is using the microphone; this is normal.",
   "channel.config.pre.vad": "VAD Threshold",
   "channel.config.pre.vad.tooltip": "Set the trigger threshold for voice activity detection.\nA lower option makes it easier for the same audio segment to be considered as containing voice.",
   "channel.config.pre.threshold": "Trigger Loudness Threshold",
@@ -115,7 +117,6 @@
   "channel.config.debug.raytrace": "Show Trace Rays",
   "channel.config.debug.info": "Show Reverb Parameters",
 
-  "channel.notify.failed_find": "Device %1$s not found.\nThe default input device is used.",
   "channel.notify.no_valid": "No input device available.",
   "channel.notify.unsupported": "The selected parameters are not supported by this input device.",
   "channel.notify.failed_init": "Failed to initialize device %1$s."

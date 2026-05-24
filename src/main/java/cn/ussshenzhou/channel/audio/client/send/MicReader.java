@@ -49,6 +49,11 @@ public class MicReader {
         if (Minecraft.getInstance().getConnection() == null || MicrophoneHud.getStatus() == MicrophoneHud.Status.SUBSPACE) {
             return;
         }
+        var cfg = ChannelClientConfig.get();
+        if ((cfg.trigger == Trigger.PUSH_TO_TALK || cfg.trigger == Trigger.SWITCH) && !cfg.onAir) {
+            MicrophoneHud.setStatus(MicrophoneHud.Status.MUTE);
+            return;
+        }
         try {
             var line = MicManager.getLine();
             if (line == null) {

@@ -22,7 +22,7 @@
 ### 饼 | TODO
 
 - 路径追踪音频：
-  - [ ] 针对栅栏/玻璃板等半透过方块的处理
+  - [x] 针对栅栏/玻璃板等半透过方块的处理
   - [ ] 针对流体方块的处理
   - [ ] 模拟绝对响度
 - 转发：
@@ -36,7 +36,7 @@
 
 
 - Path-Traced Audio:
-    - [ ] Handling of semi-transparent blocks (e.g., fences, glass panes)
+    - [x] Handling of semi-transparent blocks (e.g., fences, glass panes)
     - [ ] Handling of fluid blocks
     - [ ] Absolute loudness simulation
 - Forwarding:

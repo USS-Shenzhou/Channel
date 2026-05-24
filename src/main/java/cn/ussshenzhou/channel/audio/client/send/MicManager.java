@@ -5,6 +5,7 @@ import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.gui.notification.TSimpleNotification;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nullable;
@@ -42,7 +43,19 @@ public class MicManager {
                 .orElse(null);
         if (name != null) {
             TSimpleNotification.fire(
-                    Component.translatable("channel.notify.failed_find", name),
+                    Component.literal(
+                            String.format(
+                                    Minecraft.getInstance().getLanguageManager().getSelected().startsWith("zh") ?
+                                            """
+                                                    Channel: Device %s not found.
+                                                    The default input device is used.
+                                                    """ :
+                                            """
+                                                    沉浸语音：未找到设备 %s.
+                                                    已使用默认输入设备。
+                                                    """,
+                                    name)
+                    ),
                     5,
                     TSimpleNotification.Severity.WARN
             );
