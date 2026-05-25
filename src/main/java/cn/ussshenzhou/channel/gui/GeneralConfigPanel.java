@@ -62,13 +62,13 @@ public class GeneralConfigPanel extends TOptionsPanel {
                 Component.translatable("channel.config.debug.info"),
                 List.of(false, true),
                 bool -> _ -> {
-                    if (bool){
+                    if (bool) {
                         HudManager.addIfSameClassNotExist(new DebugHud());
                     } else {
                         HudManager.removeInstanceOf(DebugHud.class);
                     }
                 },
-                entry -> entry.getContent() == false
+                entry -> entry.getContent() == HudManager.getChildren().stream().anyMatch(t -> t instanceof DebugHud)
         );
     }
 }

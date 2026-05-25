@@ -26,8 +26,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.ussshenzhou.channel.audio.client.rt.RayTraceCalculator.*;
-import static org.lwjgl.openal.AL11.AL_POSITION;
-import static org.lwjgl.openal.AL11.alSource3f;
+import static org.lwjgl.openal.AL11.*;
 import static org.lwjgl.openal.EXTEfx.*;
 
 /**
@@ -62,8 +61,12 @@ public class RayTraceManager {
         var data = SOURCE_AUDIO_DATA_CACHE.computeIfAbsent(sourcePos, RayTraceCalculator::calculateSourceAudioData);
         alFilterf(audio.alDirectFilter, AL_LOWPASS_GAIN, data.directGain());
         alFilterf(audio.alDirectFilter, AL_LOWPASS_GAINHF, data.directHF());
+        alSourcei(audio.alSource, AL_DIRECT_FILTER, audio.alDirectFilter);
+
         alFilterf(audio.alReverbFilter, AL_LOWPASS_GAIN, data.reverbGain());
         alFilterf(audio.alReverbFilter, AL_LOWPASS_GAINHF, 1);
+        alSource3i(audio.alSource, AL_AUXILIARY_SEND_FILTER, getSlot(), 0, audio.alReverbFilter);
+
         alSource3f(audio.alSource, AL_POSITION, (float) data.virtualPos().x, (float) data.virtualPos().y, (float) data.virtualPos().z);
         audio.play();
     }

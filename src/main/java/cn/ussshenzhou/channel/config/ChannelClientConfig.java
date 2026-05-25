@@ -37,7 +37,7 @@ public class ChannelClientConfig implements TConfig {
     public float outputAdjust = 0;
     public boolean showHudIcon = true;
     public boolean showHudText = true;
-    public int networkTolerance = 60;
+    public int networkTolerance = 200;
     public boolean showRaytrace = false;
     public boolean onAir = true;
 

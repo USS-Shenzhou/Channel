@@ -41,26 +41,26 @@ public class MicManager {
                 .findFirst()
                 .map(AudioSystem::getMixer)
                 .orElse(null);
-        if (name != null) {
-            TSimpleNotification.fire(
-                    Component.literal(
-                            String.format(
-                                    Minecraft.getInstance().getLanguageManager().getSelected().startsWith("zh") ?
-                                            """
-                                                    Channel: Device %s not found.
-                                                    The default input device is used.
-                                                    """ :
-                                            """
-                                                    沉浸语音：未找到设备 %s.
-                                                    已使用默认输入设备。
-                                                    """,
-                                    name)
-                    ),
-                    5,
-                    TSimpleNotification.Severity.WARN
-            );
-        }
         if (mixer != null) {
+            if (name != null) {
+                TSimpleNotification.fire(
+                        Component.literal(
+                                String.format(
+                                        Minecraft.getInstance().getLanguageManager().getSelected().startsWith("zh") ?
+                                                """
+                                                        沉浸语音：未找到设备 [%s].
+                                                        已使用默认输入设备 [%s]。
+                                                        """ :
+                                                """
+                                                        Channel: Device [%s] not found.
+                                                        The default input device [%s] is used.
+                                                        """,
+                                        name, mixer.getMixerInfo().getName())
+                        ),
+                        5,
+                        TSimpleNotification.Severity.WARN
+                );
+            }
             return mixer;
         }
         TSimpleNotification.fire(

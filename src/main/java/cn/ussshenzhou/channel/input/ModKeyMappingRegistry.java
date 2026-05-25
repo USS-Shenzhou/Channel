@@ -51,13 +51,13 @@ public class ModKeyMappingRegistry {
     @SubscribeEvent
     public static void mute(InputEvent.Key event) {
         var cfg = ChannelClientConfig.get();
-        if (event.getKey() == PTT.getKey().getValue() && modifierMatch(event.getModifiers(),PTT.getKeyModifier().codes())) {
+        if (event.getKey() == PTT.getKey().getValue() && modifierMatch(event.getModifiers(), PTT.getKeyModifier().codes())) {
             if (event.getAction() == InputConstants.PRESS || event.getAction() == InputConstants.REPEAT) {
                 switch (cfg.trigger) {
-                    case PUSH_TO_TALK -> cfg.onAir = true;
+                    case PUSH_TO_TALK -> ChannelClientConfig.write(c -> c.onAir = true);
                     case SWITCH -> {
                         if (Util.getMillis() - lastSwitch >= 100) {
-                            cfg.onAir = !cfg.onAir;
+                            ChannelClientConfig.write(c -> c.onAir = !c.onAir);
                             lastSwitch = Util.getMillis();
                         }
                     }
@@ -66,7 +66,7 @@ public class ModKeyMappingRegistry {
                 }
             } else {
                 if (cfg.trigger == Trigger.PUSH_TO_TALK) {
-                    cfg.onAir = false;
+                    ChannelClientConfig.write(c -> c.onAir = false);
                 }
             }
         }

@@ -324,11 +324,11 @@ public class RayTraceCalculator {
             wallThickness = (float) hitA.getLocation().distanceTo(hitB.getLocation());
         }
         double wallDecay = Math.pow(inWater ? 0.5 : 0.25, wallThickness);
-        double directWeight = wallDecay / Math.max(0.2, cameraPos.distanceTo(sourcePos));
+        double directWeight = wallDecay / Math.max(1, cameraPos.distanceTo(sourcePos));
         var virtualPos = tuple.getB();
         double directDirectionWeight = 10 * Math.pow(inWater ? 0.25 : 0.1, wallThickness);
         var finalPos = virtualPos.scale(meanReverbWeight).add(sourcePos.scale(directDirectionWeight)).scale(1 / (meanReverbWeight + directDirectionWeight));
-        float directGain = (float) (Math.sqrt(Math.min(directWeight, 1)));
+        float directGain = (float) (Math.min(directWeight, 1));
         float directHF = (float) wallDecay;
         float reverbGain = (float) (Math.sqrt(Math.min(1 - Math.pow(0.001, meanReverbWeight), 1)));
         if (inWater) {
