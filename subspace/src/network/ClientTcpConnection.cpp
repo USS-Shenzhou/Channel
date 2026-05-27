@@ -109,7 +109,8 @@ namespace subspace {
     void ClientTcpConnection::disconnect() {
         if (!socket.is_open()) { return; }
         spdlog::info("Disconnecting from client {}", getRemoteAddress());
-        socket.close();
+        std::error_code ec;
+        socket.close(ec);
         RelayManager::disconnect(playerUuid, this);
         BaseConnection::disconnect();
     }

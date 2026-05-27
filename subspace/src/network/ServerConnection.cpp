@@ -61,7 +61,8 @@ namespace subspace {
             return;
         }
         spdlog::info("Disconnecting from server {}", getRemoteAddress());
-        socket.close();
+        std::error_code ec;
+        socket.close(ec);
         BaseConnection::disconnect();
     }
 
