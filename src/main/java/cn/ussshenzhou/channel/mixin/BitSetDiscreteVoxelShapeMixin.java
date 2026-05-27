@@ -1,13 +1,17 @@
 package cn.ussshenzhou.channel.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.shapes.BitSetDiscreteVoxelShape;
 import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayDeque;
 import java.util.BitSet;
 
 /**
@@ -16,16 +20,19 @@ import java.util.BitSet;
 @Mixin(value = BitSetDiscreteVoxelShape.class, priority = 9999)
 public abstract class BitSetDiscreteVoxelShapeMixin extends DiscreteVoxelShape {
     @Unique
-    private static final ThreadLocal<BitSetDiscreteVoxelShape> LOCAL_THIS = ThreadLocal.withInitial(() -> new BitSetDiscreteVoxelShape(0, 0, 0));
+    private static final ThreadLocal<ArrayDeque<BitSetDiscreteVoxelShape>> LOCAL_THESE = ThreadLocal.withInitial(ArrayDeque::new);
 
     protected BitSetDiscreteVoxelShapeMixin(int xSize, int ySize, int zSize) {
         super(xSize, ySize, zSize);
     }
 
     @Redirect(method = "forAllBoxes", at = @At(value = "NEW", target = "net/minecraft/world/phys/shapes/BitSetDiscreteVoxelShape"), require = 0)
-    private static BitSetDiscreteVoxelShape channelUseThreadLocalInstead(DiscreteVoxelShape voxelShape) {
-        var instance = LOCAL_THIS.get();
-
+    private static BitSetDiscreteVoxelShape channelUseThreadLocalInstead0(DiscreteVoxelShape voxelShape) {
+        var pool = LOCAL_THESE.get();
+        var instance = pool.poll();
+        if (instance == null) {
+            return new BitSetDiscreteVoxelShape(voxelShape);
+        }
         if (voxelShape.xSize >= 0 && voxelShape.ySize >= 0 && voxelShape.zSize >= 0) {
             instance.xSize = voxelShape.xSize;
             instance.ySize = voxelShape.ySize;
@@ -57,6 +64,11 @@ public abstract class BitSetDiscreteVoxelShapeMixin extends DiscreteVoxelShape {
         instance.zMax = voxelShape.lastFull(Direction.Axis.Z);
 
         return instance;
+    }
+
+    @Inject(method = "forAllBoxes", at = @At("RETURN"))
+    private static void channelUseThreadLocalInstead1(DiscreteVoxelShape voxelShape, IntLineConsumer consumer, boolean mergeNeighbors, CallbackInfo ci, @Local BitSetDiscreteVoxelShape shape) {
+        LOCAL_THESE.get().offer(shape);
     }
 
 }
