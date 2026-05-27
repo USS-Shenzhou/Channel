@@ -39,6 +39,8 @@ public class DebugHud extends TPanel {
                         Early Ref. Delay: %.3f
                         Late Ref. Gain: %.3f
                         Late Ref. Delay: %.3f
+                        Echo Time: %.3f
+                        Echo Depth: %.3f
                         
                         Open Space Correction: %.3f""",
                 getDensity(),
@@ -49,6 +51,9 @@ public class DebugHud extends TPanel {
                 getEarlyRefDelay(),
                 getLateRefGain(),
                 getLateRefDelay(),
+                getEchoTime(),
+                getEchoDepth(),
+
                 getOpenSpaceCorrection()
         )));
         super.tickT();

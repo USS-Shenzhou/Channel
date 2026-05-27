@@ -147,7 +147,7 @@ public class RayTraceManager {
             var blockPos = hitResult.getBlockPos();
             var block = level.getBlockState(blockPos);
             var soundType = block.getSoundType(level, blockPos, null);
-            HIT_POINTS.add(new HitPoint(round, new Vec3(hitPos.x, hitPos.y, hitPos.z), journey, distance, BlockSoundProperty.get(soundType)));
+            HIT_POINTS.add(new HitPoint(round, new Vec3(hitPos.x, hitPos.y, hitPos.z), journey, distance, BlockSoundProperty.get(soundType), hitResult.getDirection()));
             if (debug) {
                 DebugRayTrace.rays.add(new DebugRayTrace.Ray(
                         new Vec3(startPos.x, startPos.y, startPos.z),
@@ -179,7 +179,6 @@ public class RayTraceManager {
         alEffectf(REVERB_EFFECT, AL_EAXREVERB_GAINLF, 1);
         //-----RT60 RT60LF/HF-----
         alEffectf(REVERB_EFFECT, AL_EAXREVERB_DECAY_TIME, rt60);
-        //TODO individual calculation
         alEffectf(REVERB_EFFECT, AL_EAXREVERB_DECAY_HFRATIO, inWater ? 0.25f : hfGain);
         alEffectf(REVERB_EFFECT, AL_EAXREVERB_DECAY_LFRATIO, 1);
         //-----early reflection-----
@@ -188,55 +187,12 @@ public class RayTraceManager {
         //-----late reflection-----
         alEffectf(REVERB_EFFECT, AL_EAXREVERB_LATE_REVERB_GAIN, lateRefGain);
         alEffectf(REVERB_EFFECT, AL_EAXREVERB_LATE_REVERB_DELAY, lateRefDelay);
-
-
-
-
-            /* TODO
-            // ==========================================
-            // 5. 回声与调制 (Echo & Modulation)
-            // ==========================================
-
-            // [回声时间] 0.075 ~ 0.25 (默认: 0.25秒)
-            // 循环回声的时间间隔
-            alEffectf(REVERB_EFFECT, AL_EAXREVERB_ECHO_TIME, 0.25f);
-
-            // [回声深度] 0.0 ~ 1.0 (默认: 0.0)
-            // 引入回声的量
-            alEffectf(REVERB_EFFECT, AL_EAXREVERB_ECHO_DEPTH, 0.0f);
-
-            // [调制时间] 0.04 ~ 4.0 (默认: 0.25秒)
-            // 音高调制的频率
-            alEffectf(REVERB_EFFECT, AL_EAXREVERB_MODULATION_TIME, 0.25f);
-
-            // [调制深度] 0.0 ~ 1.0 (默认: 0.0)
-            // 音高变化的幅度（颤音效果）
-            alEffectf(REVERB_EFFECT, AL_EAXREVERB_MODULATION_DEPTH, 0.0f);
-
-
-            // ==========================================
-            // 6. 物理微调 (Advanced Physical)
-            // ==========================================
-
-            // [空气吸收增益] 0.892 ~ 1.0 (默认: 0.994)
-            // 空气对高频的阻尼
-            alEffectf(REVERB_EFFECT, AL_EAXREVERB_AIR_ABSORPTION_GAINHF, 0.994f);
-
-            // [高频参考值] 1000.0 ~ 20000.0 (默认: 5000.0)
-            // 定义高频的频率阈值
-            alEffectf(REVERB_EFFECT, AL_EAXREVERB_HFREFERENCE, 5000.0f);
-
-            // [低频参考值] 20.0 ~ 1000.0 (默认: 250.0)
-            // 定义低频的频率阈值
-            alEffectf(REVERB_EFFECT, AL_EAXREVERB_LFREFERENCE, 250.0f);
-
-            // [房间滚降因子] 0.0 ~ 10.0 (默认: 0.0)
-            // 混响随距离衰减的效果（0为关闭）
-            alEffectf(REVERB_EFFECT, AL_EAXREVERB_ROOM_ROLLOFF_FACTOR, 0.0f);
-
-            // [高频衰减限制] 0 或 1 (默认: 1/True)
-            // *注：整数/布尔参数需使用 alEffecti
-            alEffecti(REVERB_EFFECT, AL_EAXREVERB_DECAY_HFLIMIT, 1);*/
+        //-----Echo-----
+        alEffectf(REVERB_EFFECT, AL_EAXREVERB_ECHO_TIME, echoTime);
+        alEffectf(REVERB_EFFECT, AL_EAXREVERB_ECHO_DEPTH, echoDepth);
+        //-----Modulation-----
+        alEffectf(REVERB_EFFECT, AL_EAXREVERB_MODULATION_TIME, 0.4f);
+        alEffectf(REVERB_EFFECT, AL_EAXREVERB_MODULATION_DEPTH, 0.025f);
 
         alAuxiliaryEffectSloti(AUX_SLOT, AL_EFFECTSLOT_EFFECT, REVERB_EFFECT);
     }

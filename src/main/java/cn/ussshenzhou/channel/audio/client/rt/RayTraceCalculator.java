@@ -258,25 +258,98 @@ public class RayTraceCalculator {
         });
     }
 
-    //----------A----------
+    //----------Echo----------
+    static double xEnergy, yEnergy, zEnergy;
+    static double xDistance, yDistance, zDistance;
+    static int xCount, yCount, zCount;
+    static double xDistanceSqSum, yDistanceSqSum, zDistanceSqSum;
+    static double xRoughnessSum, yRoughnessSum, zRoughnessSum;
+
+    static volatile float echoTime;
+    static volatile float echoDepth;
+
     static {
         def(() -> {
-
+            echoTime = 0.25f;
+            echoDepth = 0;
         });
         pre(() -> {
-
+            xEnergy = 0;
+            yEnergy = 0;
+            zEnergy = 0;
+            xDistance = 0;
+            yDistance = 0;
+            zDistance = 0;
+            xCount = 0;
+            yCount = 0;
+            zCount = 0;
+            xDistanceSqSum = 0;
+            yDistanceSqSum = 0;
+            zDistanceSqSum = 0;
+            xRoughnessSum = 0;
+            yRoughnessSum = 0;
+            zRoughnessSum = 0;
         });
         loop1(h -> {
-
+            switch (h.faceDirection().getAxis()) {
+                case X -> {
+                    xEnergy += h.weight() * (1 - h.soundProperty().absorption());
+                    if (h.round() > 0) {
+                        xDistance += h.distance();
+                        xCount++;
+                        xDistanceSqSum += h.distance() * h.distance();
+                        xRoughnessSum += h.soundProperty().roughness();
+                    }
+                }
+                case Y -> {
+                    yEnergy += h.weight() * (1 - h.soundProperty().absorption());
+                    if (h.round() > 0) {
+                        yDistance += h.distance();
+                        yCount++;
+                        yDistanceSqSum += h.distance() * h.distance();
+                        yRoughnessSum += h.soundProperty().roughness();
+                    }
+                }
+                case Z -> {
+                    zEnergy += h.weight() * (1 - h.soundProperty().absorption());
+                    if (h.round() > 0) {
+                        zDistance += h.distance();
+                        zCount++;
+                        zDistanceSqSum += h.distance() * h.distance();
+                        zRoughnessSum += h.soundProperty().roughness();
+                    }
+                }
+            }
         });
         mid(() -> {
-
+            double Energy = xEnergy + yEnergy + zEnergy;
+            xEnergy = xEnergy / Energy;
+            yEnergy = yEnergy / Energy;
+            zEnergy = zEnergy / Energy;
         });
         loop2(h -> {
 
         });
         post(() -> {
+            double avgXDistance = xDistance / xCount;
+            double avgYDistance = yDistance / yCount;
+            double avgZDistance = zDistance / zCount;
+            double avgDistance = avgXDistance * xEnergy + avgYDistance * yEnergy + avgZDistance * zEnergy;
+            echoTime = (float) Mth.clamp(4 * avgDistance / 340, 0.075, 0.25);
 
+            double xVar = xDistanceSqSum / xCount - avgXDistance * avgXDistance;
+            double xCv = Math.sqrt(xVar) / avgXDistance;
+            double xEchoDepth = (1.0 / (1.0 + xCv)) * (1.0 - xRoughnessSum / xCount);
+
+            double yVar = yDistanceSqSum / yCount - avgYDistance * avgYDistance;
+            double yCv = Math.sqrt(yVar) / avgYDistance;
+            double yEchoDepth = (1.0 / (1.0 + yCv)) * (1.0 - yRoughnessSum / yCount);
+
+            double zVar = zDistanceSqSum / zCount - avgZDistance * avgZDistance;
+            double zCv = Math.sqrt(zVar) / avgZDistance;
+            double zEchoDepth = (1.0 / (1.0 + zCv)) * (1.0 - zRoughnessSum / zCount);
+
+            echoDepth = (float) Mth.clamp(xEchoDepth * xEnergy + yEchoDepth * yEnergy + zEchoDepth * zEnergy, 0, 1);
         });
     }
 
@@ -424,5 +497,13 @@ public class RayTraceCalculator {
 
     public static float getOpenSpaceCorrection() {
         return openSpaceCorrection;
+    }
+
+    public static float getEchoTime() {
+        return echoTime;
+    }
+
+    public static float getEchoDepth() {
+        return echoDepth;
     }
 }
