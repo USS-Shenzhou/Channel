@@ -7,6 +7,9 @@ import cn.ussshenzhou.channel.gui.ConfigScreen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractTextAreaWidget;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.MultilineTextField;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.neoforged.api.distmarker.Dist;
@@ -50,6 +53,10 @@ public class ModKeyMappingRegistry {
 
     @SubscribeEvent
     public static void mute(InputEvent.Key event) {
+        var screen = Minecraft.getInstance().screen;
+        if (screen != null && (screen.getFocused() instanceof EditBox || screen.getFocused() instanceof MultilineTextField || screen.getFocused() instanceof AbstractTextAreaWidget)) {
+            return;
+        }
         var cfg = ChannelClientConfig.get();
         if (event.getKey() == PTT.getKey().getValue() && modifierMatch(event.getModifiers(), PTT.getKeyModifier().codes())) {
             if (event.getAction() == InputConstants.PRESS || event.getAction() == InputConstants.REPEAT) {

@@ -58,7 +58,7 @@ public class RayTraceManager {
             audio.read(BaseAudioManager.PLAY_RATE10);
             return;
         }
-        var data = SOURCE_AUDIO_DATA_CACHE.computeIfAbsent(sourcePos, RayTraceCalculator::calculateSourceAudioData);
+        var data = SOURCE_AUDIO_DATA_CACHE.compute(sourcePos, (p, _) -> RayTraceCalculator.calculateSourceAudioData(p));
         alFilterf(audio.alDirectFilter, AL_LOWPASS_GAIN, data.directGain());
         alFilterf(audio.alDirectFilter, AL_LOWPASS_GAINHF, data.directHF());
         alSourcei(audio.alSource, AL_DIRECT_FILTER, audio.alDirectFilter);

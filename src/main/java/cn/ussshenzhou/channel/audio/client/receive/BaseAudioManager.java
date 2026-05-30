@@ -51,6 +51,7 @@ public abstract class BaseAudioManager {
 
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
     protected void initAL() {
+        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(15));
         var library = Minecraft.getInstance().getSoundManager().soundEngine.library;
         alCtx = library.context;
         alDevice = library.currentDevice;
