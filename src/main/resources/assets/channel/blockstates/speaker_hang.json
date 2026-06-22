@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "channel:block/speaker_hang"
+    },
+    "facing=east": {
+      "model": "channel:block/speaker_hang",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "channel:block/speaker_hang",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "channel:block/speaker_hang",
+      "y": 270
+    }
+  }
+}

@@ -1,8 +1,10 @@
 package cn.ussshenzhou.channel.audio.client.rt;
 
-import cn.ussshenzhou.channel.audio.client.receive.BaseAudioManager;
-import cn.ussshenzhou.channel.audio.client.receive.PlayerAudio;
+import cn.ussshenzhou.channel.audio.client.receive.Audio;
+import cn.ussshenzhou.channel.audio.client.receive.AudioManager;
+import cn.ussshenzhou.channel.audio.client.receive.AudioReceiveHandler;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
+import cn.ussshenzhou.channel.util.AudioHelper;
 import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -26,7 +28,6 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.ussshenzhou.channel.audio.client.rt.RayTraceCalculator.*;
-import static org.lwjgl.openal.AL11.*;
 import static org.lwjgl.openal.EXTEfx.*;
 
 /**
@@ -52,31 +53,14 @@ public class RayTraceManager {
         return AUX_SLOT;
     }
 
-    public static void play(double x, double y, double z, PlayerAudio audio) {
-        var sourcePos = new Vec3(x, y, z);
-        if (sourcePos.distanceToSqr(getEarPos()) > MAX_DISTANCE * MAX_DISTANCE) {
-            audio.read(BaseAudioManager.PLAY_RATE10);
-            return;
+    public static boolean play(Audio audio, Vec3 sourcePos) {
+        if (sourcePos.distanceToSqr(AudioHelper.getEarPos()) > MAX_DISTANCE * MAX_DISTANCE) {
+            audio.read(AudioReceiveHandler.PLAY_RATE10);
+            return true;
         }
         var data = SOURCE_AUDIO_DATA_CACHE.compute(sourcePos, (p, _) -> RayTraceCalculator.calculateSourceAudioData(p));
-        alFilterf(audio.alDirectFilter, AL_LOWPASS_GAIN, data.directGain());
-        alFilterf(audio.alDirectFilter, AL_LOWPASS_GAINHF, data.directHF());
-        alSourcei(audio.alSource, AL_DIRECT_FILTER, audio.alDirectFilter);
-
-        alFilterf(audio.alReverbFilter, AL_LOWPASS_GAIN, data.reverbGain());
-        alFilterf(audio.alReverbFilter, AL_LOWPASS_GAINHF, 1);
-        alSource3i(audio.alSource, AL_AUXILIARY_SEND_FILTER, getSlot(), 0, audio.alReverbFilter);
-
-        alSource3f(audio.alSource, AL_POSITION, (float) data.virtualPos().x, (float) data.virtualPos().y, (float) data.virtualPos().z);
-        audio.play();
-    }
-
-    static Vec3 getEarPos() {
-        var mc = Minecraft.getInstance();
-        if (ChannelClientConfig.get().showRaytrace && mc.getCameraEntity() != null) {
-            return mc.getCameraEntity().getEyePosition();
-        }
-        return Minecraft.getInstance().gameRenderer.getMainCamera().position();
+        audio.updateSourceParameters(data, getSlot());
+        return audio.play();
     }
 
     private static long lastUpdate = 0;
@@ -86,9 +70,9 @@ public class RayTraceManager {
         if (Minecraft.getInstance().level == null || !ChannelClientConfig.get().rayTraceAudio) {
             return;
         }
-        var block = Minecraft.getInstance().level.getBlockState(BlockPos.containing(getEarPos()));
+        var block = Minecraft.getInstance().level.getBlockState(BlockPos.containing(AudioHelper.getEarPos()));
         inWater = !block.getFluidState().isEmpty();
-        BaseAudioManager.AUDIO_EXECUTOR.execute(RayTraceManager::updateReflectionPan);
+        AudioManager.AUDIO_EXECUTOR.execute(RayTraceManager::updateReflectionPan);
         if (Util.getMillis() - lastUpdate < 500) {
             return;
         }
@@ -108,14 +92,14 @@ public class RayTraceManager {
     private static void update() {
         generateHitPoints();
         RayTraceCalculator.run();
-        BaseAudioManager.AUDIO_EXECUTOR.execute(RayTraceManager::setEaxReverb);
+        AudioManager.AUDIO_EXECUTOR.execute(RayTraceManager::setEaxReverb);
     }
 
     private static void generateHitPoints() {
         synchronized (HIT_POINTS) {
             var level = Minecraft.getInstance().level;
             boolean debug = ChannelClientConfig.get().showRaytrace;
-            var earPos = getEarPos();
+            var earPos = AudioHelper.getEarPos();
             for (var ray : generateRays(getRayAmount(), 0)) {
                 //noinspection DataFlowIssue
                 generateOneRay(earPos, ray, level, debug, ClipContext.Block.OUTLINE, 0x80ffffff);
@@ -147,7 +131,9 @@ public class RayTraceManager {
             var blockPos = hitResult.getBlockPos();
             var block = level.getBlockState(blockPos);
             var soundType = block.getSoundType(level, blockPos, null);
-            HIT_POINTS.add(new HitPoint(round, new Vec3(hitPos.x, hitPos.y, hitPos.z), journey, distance, BlockSoundProperty.get(soundType), hitResult.getDirection()));
+            synchronized (HIT_POINTS) {
+                HIT_POINTS.add(new HitPoint(round, new Vec3(hitPos.x, hitPos.y, hitPos.z), journey, distance, BlockSoundProperty.get(soundType), hitResult.getDirection()));
+            }
             if (debug) {
                 DebugRayTrace.rays.add(new DebugRayTrace.Ray(
                         new Vec3(startPos.x, startPos.y, startPos.z),
@@ -198,7 +184,7 @@ public class RayTraceManager {
     }
 
     private static void updateReflectionPan() {
-        var earPos = getEarPos();
+        var earPos = AudioHelper.getEarPos();
         var inverseRotation = new Quaternionf(Minecraft.getInstance().gameRenderer.getMainCamera().rotation()).conjugate();
 
         var earlyPos = new Vector3f(

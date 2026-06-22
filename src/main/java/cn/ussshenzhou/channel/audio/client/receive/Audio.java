@@ -1,38 +1,37 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
 import cn.ussshenzhou.channel.audio.client.rt.RayTraceManager;
+import cn.ussshenzhou.channel.audio.client.rt.SourceAudioData;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
-import cn.ussshenzhou.channel.config.ChannelPlayerConfig;
-import cn.ussshenzhou.channel.gui.OutputConfigPanel;
 import cn.ussshenzhou.channel.util.AudioHelper;
-import com.mojang.logging.LogUtils;
 import io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueue;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.*;
+import java.util.List;
 
-import static org.lwjgl.openal.AL11.*;
+import static org.lwjgl.openal.AL10.*;
+import static org.lwjgl.openal.AL10.AL_FALSE;
+import static org.lwjgl.openal.AL10.AL_LOOPING;
+import static org.lwjgl.openal.AL10.AL_MAX_GAIN;
+import static org.lwjgl.openal.AL10.AL_PITCH;
+import static org.lwjgl.openal.AL10.AL_REFERENCE_DISTANCE;
+import static org.lwjgl.openal.AL10.AL_ROLLOFF_FACTOR;
+import static org.lwjgl.openal.AL10.alSourcef;
+import static org.lwjgl.openal.AL10.alSourcei;
+import static org.lwjgl.openal.AL11.alSource3i;
 import static org.lwjgl.openal.EXTEfx.*;
+import static org.lwjgl.openal.EXTEfx.AL_AUXILIARY_SEND_FILTER;
 
-/**
- * @author USS_Shenzhou
- */
-public class PlayerAudio {
-    private static final int MAX_BUFFER_10MS = 3 * 100;
-    private final MpscArrayQueue<short[]> audioBuffer = new MpscArrayQueue<>((int) (1.1 * MAX_BUFFER_10MS));
-    private int readyBufferMs = 0;
-    public final int alSource, sampleRate, alDirectFilter, alReverbFilter;
-    public final UUID playerId;
-    private double x, y, z;
+public abstract class Audio {
+    protected static final int MAX_BUFFER_10MS = 3 * 100;
+    protected int readyBufferMs = 0;
+    protected final int alSource, sampleRate, alDirectFilter, alReverbFilter;
+    protected double x, y, z;
 
-    public PlayerAudio(UUID playerId, int sampleRate) {
-        this.playerId = playerId;
+    public Audio(int sampleRate) {
         this.sampleRate = sampleRate;
         this.alSource = alGenSources();
         alSourcef(alSource, AL_GAIN, 1);
@@ -56,49 +55,22 @@ public class PlayerAudio {
         }
     }
 
-    public void push(short[] audio) {
-        int length = sampleRate / 100;
-        for (int i = 0; i < audio.length / length; i++) {
-            audioBuffer.offer(Arrays.copyOfRange(audio, i * length, (i + 1) * length));
-        }
+    public void updateSourceParameters(SourceAudioData data, int auxSlot) {
+        alFilterf(this.alDirectFilter, AL_LOWPASS_GAIN, data.directGain());
+        alFilterf(this.alDirectFilter, AL_LOWPASS_GAINHF, data.directHF());
+        alSourcei(this.alSource, AL_DIRECT_FILTER, this.alDirectFilter);
+
+        alFilterf(this.alReverbFilter, AL_LOWPASS_GAIN, data.reverbGain());
+        alFilterf(this.alReverbFilter, AL_LOWPASS_GAINHF, 1);
+        alSource3i(this.alSource, AL_AUXILIARY_SEND_FILTER, auxSlot, 0, this.alReverbFilter);
+
+        alSource3f(this.alSource, AL_POSITION, (float) data.virtualPos().x, (float) data.virtualPos().y, (float) data.virtualPos().z);
     }
 
-    @Nullable
-    public List<ByteBuffer> read(int sizeIn10Ms) {
-        if (audioBuffer.isEmpty()) {
-            return null;
-        }
-        checkTooMuchDelay();
-        int toRead = Math.min(sizeIn10Ms, audioBuffer.size());
-        int length = sampleRate / 100;
-        List<ByteBuffer> buffers = new ArrayList<>(toRead);
-        for (int i = 0; i < toRead; i++) {
-            var chunk = audioBuffer.poll();
-            if (chunk != null) {
-                var buffer = ByteBuffer.allocateDirect(length * 2).order(ByteOrder.LITTLE_ENDIAN);
-                buffer.asShortBuffer().put(chunk).rewind();
-                buffers.add(buffer);
-            }
-        }
-        return buffers;
-    }
-
-    public void checkTooMuchDelay() {
-        if (audioBuffer.size() >= ChannelClientConfig.get().networkTolerance * 1.5 / 10 || audioBuffer.size() >= MAX_BUFFER_10MS) {
-            int targetBufferSize = (int) (ChannelClientConfig.get().networkTolerance * 1.1 / 10);
-            int drop = audioBuffer.size() - targetBufferSize;
-            for (int i = 0; i < drop; i++) {
-                audioBuffer.poll();
-            }
-        }
-    }
-
-    public void play() {
+    public boolean play() {
         //TODO close self by last active time
-        var vol = ChannelPlayerConfig.getOrDefault(playerId);
-        alSourcef(alSource, AL_GAIN, AudioHelper.db2factor(vol));
-        OutputConfigPanel.PlayerVolumePanel.update(playerId, vol);
-
+        //TODO use low-pass filter to make underwater effect in 26.2
+        alSourcef(alSource, AL_GAIN, getGain());
         int processed = alGetSourcei(alSource, AL_BUFFERS_PROCESSED);
         while (processed-- > 0) {
             int buf = alSourceUnqueueBuffers(alSource);
@@ -106,7 +78,6 @@ public class PlayerAudio {
             alDeleteBuffers(buf);
         }
         var pcms = read(MAX_BUFFER_10MS);
-        //TODO use low-pass filter to make underwater effect in 26.2
         if (pcms != null) {
             for (ByteBuffer pcm : pcms) {
                 int buf = alGenBuffers();
@@ -123,6 +94,22 @@ public class PlayerAudio {
                 alSourcePlay(alSource);
             }
         }
+        return false;
+    }
+
+    protected abstract float getGain();
+
+    @Nullable
+    public abstract List<ByteBuffer> read(int sizeIn10Ms);
+
+    protected static void checkTooMuchDelay(MpscArrayQueue<short[]> buffer) {
+        if (buffer.size() >= ChannelClientConfig.get().networkTolerance * 1.5 / 10 || buffer.size() >= MAX_BUFFER_10MS) {
+            int targetBufferSize = (int) (ChannelClientConfig.get().networkTolerance * 1.1 / 10);
+            int drop = buffer.size() - targetBufferSize;
+            for (int i = 0; i < drop; i++) {
+                buffer.poll();
+            }
+        }
     }
 
     public void close() {
@@ -137,11 +124,7 @@ public class PlayerAudio {
     }
 
     public Vec3 getPos(Level level) {
-        var player = level.getPlayerByUUID(this.playerId);
-        if (player == null) {
-            return new Vec3(x, y, z);
-        }
-        return player.getEyePosition();
+        return new Vec3(x, y, z);
     }
 
     public void setPos(double x, double y, double z) {
@@ -151,15 +134,8 @@ public class PlayerAudio {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof PlayerAudio that)) {
-            return false;
-        }
-        return playerId == that.playerId;
-    }
+    public abstract int hashCode();
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(playerId);
-    }
+    public abstract boolean equals(Object obj);
 }

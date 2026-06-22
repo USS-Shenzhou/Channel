@@ -12,6 +12,7 @@
 #include <bit>
 #include <stdexcept>
 #include <format>
+#include <unordered_set>
 
 #include "../Config.h"
 

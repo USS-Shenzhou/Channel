@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "facing=north,mic=1": {
+      "model": "channel:block/mic_1"
+    },
+    "facing=east,mic=1": {
+      "model": "channel:block/mic_1",
+      "y": 90
+    },
+    "facing=south,mic=1": {
+      "model": "channel:block/mic_1",
+      "y": 180
+    },
+    "facing=west,mic=1": {
+      "model": "channel:block/mic_1",
+      "y": 270
+    },
+    "facing=north,mic=2": {
+      "model": "channel:block/mic_2"
+    },
+    "facing=east,mic=2": {
+      "model": "channel:block/mic_2",
+      "y": 90
+    },
+    "facing=south,mic=2": {
+      "model": "channel:block/mic_2",
+      "y": 180
+    },
+    "facing=west,mic=2": {
+      "model": "channel:block/mic_2",
+      "y": 270
+    },
+    "facing=north,mic=3": {
+      "model": "channel:block/mic_3"
+    },
+    "facing=east,mic=3": {
+      "model": "channel:block/mic_3",
+      "y": 90
+    },
+    "facing=south,mic=3": {
+      "model": "channel:block/mic_3",
+      "y": 180
+    },
+    "facing=west,mic=3": {
+      "model": "channel:block/mic_3",
+      "y": 270
+    },
+    "facing=north,mic=4": {
+      "model": "channel:block/mic_4"
+    },
+    "facing=east,mic=4": {
+      "model": "channel:block/mic_4",
+      "y": 90
+    },
+    "facing=south,mic=4": {
+      "model": "channel:block/mic_4",
+      "y": 180
+    },
+    "facing=west,mic=4": {
+      "model": "channel:block/mic_4",
+      "y": 270
+    }
+  }
+}

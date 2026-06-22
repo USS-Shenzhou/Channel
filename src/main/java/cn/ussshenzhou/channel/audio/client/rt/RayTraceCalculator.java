@@ -1,5 +1,7 @@
 package cn.ussshenzhou.channel.audio.client.rt;
 
+import cn.ussshenzhou.channel.Channel;
+import cn.ussshenzhou.channel.util.AudioHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.level.ClipContext;
@@ -385,7 +387,7 @@ public class RayTraceCalculator {
 
     //----------Direct Sound----------
     static SourceAudioData calculateSourceAudioData(Vec3 sourcePos) {
-        var cameraPos = getEarPos();
+        var cameraPos = AudioHelper.getEarPos();
         var tuple = calculateVirtualDirection(sourcePos);
         double meanReverbWeight = tuple.getA();
         var hitA = shoot(sourcePos, cameraPos, ClipContext.Block.OUTLINE);
@@ -397,7 +399,7 @@ public class RayTraceCalculator {
             wallThickness = (float) hitA.getLocation().distanceTo(hitB.getLocation());
         }
         double wallDecay = Math.pow(inWater ? 0.5 : 0.25, wallThickness);
-        double directWeight = wallDecay / Math.max(1, cameraPos.distanceTo(sourcePos));
+        double directWeight = wallDecay / Math.max(1, cameraPos.distanceTo(sourcePos) - Channel.DISTANCE_COMPENSATE);
         var virtualPos = tuple.getB();
         double directDirectionWeight = 10 * Math.pow(inWater ? 0.25 : 0.1, wallThickness);
         var finalPos = virtualPos.scale(meanReverbWeight).add(sourcePos.scale(directDirectionWeight)).scale(1 / (meanReverbWeight + directDirectionWeight));
@@ -431,6 +433,9 @@ public class RayTraceCalculator {
                     break;
                 } else {
                     for (int j = 1; j < MAX_BOUNCE_ROUND; j++) {
+                        if (i + j >= HIT_POINTS.size()) {
+                            break;
+                        }
                         var p = HIT_POINTS.get(i + j);
                         if (p.round() == 0) {
                             continue flag;

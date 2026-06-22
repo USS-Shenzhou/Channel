@@ -47,13 +47,10 @@ public class ServerEventListener {
         }
     }
 
-    public static int tickCount = 0;
-
     @SubscribeEvent
     public static void updatePlayerData(ServerTickEvent.Post event) {
-        if (SubspaceConnection.using() && tickCount % 10 == 0) {
+        if (SubspaceConnection.using() && event.getServer().getTickCount() % 10 == 0) {
             SubspaceConnection.send(new DataUpdatePacket());
         }
-        tickCount++;
     }
 }

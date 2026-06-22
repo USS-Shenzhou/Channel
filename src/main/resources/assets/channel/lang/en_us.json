@@ -46,8 +46,8 @@
   "channel.config.pre.trigger.always.tooltip": "All captured sound will be sent to the server.",
   "channel.config.pre.trigger.vad.tooltip": "§6Experimental Feature§r\nOnly sends to the server when voice is detected in the captured sound.",
   "channel.config.pre.trigger.threshold.tooltip": "Only sound exceeding the specified loudness will be sent to the server.",
-  "channel.config.pre.trigger.ptt.tooltip": "The captured sound will only be sent to the server while the key is held down.\n§6Even while muted, your security software may indicate that Minecraft is using the microphone; this is normal.",
-  "channel.config.pre.trigger.switch.tooltip": "Press the key to toggle mute.\n§6Even while muted, your security software may indicate that Minecraft is using the microphone; this is normal.",
+  "channel.config.pre.trigger.ptt.tooltip": "The captured sound will only be sent to the server while the key is held down.\n§bEven while muted, your security software may indicate that Minecraft is using the microphone; this is normal.",
+  "channel.config.pre.trigger.switch.tooltip": "Press the key to toggle mute.\n§bEven while muted, your security software may indicate that Minecraft is using the microphone; this is normal.",
   "channel.config.pre.vad": "VAD Threshold",
   "channel.config.pre.vad.tooltip": "Set the trigger threshold for voice activity detection.\nA lower option makes it easier for the same audio segment to be considered as containing voice.",
   "channel.config.pre.threshold": "Trigger Loudness Threshold",
@@ -96,17 +96,20 @@
   "channel.config.post.rt": "Path Tracing",
   "channel.config.post.rt.tooltip": "§6Experimental Feature§r\nUse path tracing for a more realistic audio experience.\nWill consume additional CPU resources.",
   "channel.config.post.player_control": "  Adjust Individual Loudness",
-  "channel.config.post.player_control.tooltip": "Adjust the sound loudness of this person individually.\nWill override the overall loudness.\nA larger value makes the sound you hear louder.\n§6Not controlled by the limiter.",
+  "channel.config.post.player_control.tooltip": "Adjust the sound loudness of this person individually.\nA larger value makes the sound you hear louder.\n§bPriority is higher than overall loudness.\n§6Not controlled by the limiter; not effective on speaker blocks.",
   "channel.config.post.control": "  Adjust Overall Loudness",
   "channel.config.post.control_adjust": "Adjust Overall Loudness",
-  "channel.config.post.control_adjust.tooltip": "Adjust the sound loudness of all outputs.\nA larger value makes the sound you hear louder.\n§6Not controlled by the limiter.",
+  "channel.config.post.control_adjust.tooltip": "Adjust the sound loudness of all outputs.\nA larger value makes the sound you hear louder.\n§bPriority is lower than individual loudness.\n§6Not controlled by the limiter.",
+  "channel.config.post.mute_all": "§cMute All",
+  "channel.config.post.mute_all.tooltip": "Mute all players.\n§bPriority is lower than individual loudness.\n§6Click on a player's avatar to mute individually.",
+  "channel.config.post.mute.tooltip": "Click on a player's avatar to mute individually.",
   "channel.config.post.player_control_clear": "§6Reset All",
   "channel.config.post.player_control_clear.tooltip": "Reset all individual loudness adjustments below.",
 
   "channel.config.tab.general": "General",
   "channel.config.dispay": "  Display",
   "channel.config.dispay.hud": "Show Microphone Icon",
-  "channel.config.dispay.hud.tooltip": "",
+  "channel.config.dispay.hud.tooltip": "The color and text at the tail of the microphone icon represent different states.\n§7■§bStand By§r No sound input\n§7■§cMute§r Muted\n§a■Talking§r Talking\n§7■§dSubspace§r Connecting to subspace relay\n§6■VAD§r Voice activity detection not passed\n§6■Volume§r Volume detection not passed\n§c■Error§r Program error or input device unavailable",
   "channel.config.dispay.hud_text": "Show Microphone Text",
   "channel.config.unit": "Display Unit",
   "channel.config.unit.db": "Decibel dB / Decibels relative to full scale dBFS",
@@ -119,5 +122,15 @@
 
   "channel.notify.no_valid": "No input device available.",
   "channel.notify.unsupported": "The selected parameters are not supported by this input device.",
-  "channel.notify.failed_init": "Failed to initialize device %1$s."
+  "channel.notify.failed_init": "Failed to initialize device %1$s.",
+
+  "channel.tab.title": "Channel",
+  "channel.setting.title": "Channel Settings",
+  "channel.setting.none": "Not Specified",
+
+  "item.channel.handheld_mic": "Handheld Microphone",
+  "item.channel.mic": "Fixed Microphone",
+  "item.channel.speaker": "Speaker",
+  "item.channel.speaker_stand": "Speaker (Standing)",
+  "item.channel.speaker_hang": "Speaker (Hanging)"
 }

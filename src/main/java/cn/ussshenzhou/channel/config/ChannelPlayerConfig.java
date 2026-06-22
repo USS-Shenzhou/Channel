@@ -31,6 +31,23 @@ public class ChannelPlayerConfig implements TConfig {
         return ChannelClientConfig.get().outputAdjust;
     }
 
+    public static void mute(UUID uuid) {
+        write(thiz -> thiz.playerVolumeAdjust.compute(new PlayerId(uuid, "UNKNOWN"), (_, _) -> -96f));
+    }
+
+    public static void unmute(UUID uuid) {
+        write(thiz -> thiz.playerVolumeAdjust.remove(new PlayerId(uuid, "UNKNOWN")));
+    }
+
+    public static boolean muted(UUID uuid) {
+        var map = get().playerVolumeAdjust;
+        var key = new PlayerId(uuid, "UNKNOWN");
+        if (map.containsKey(key)) {
+            return get().playerVolumeAdjust.get(key) == -96f;
+        }
+        return ChannelClientConfig.get().muteAll;
+    }
+
     public static void set(Player player, float db) {
         write(thiz -> thiz.playerVolumeAdjust.put(PlayerId.from(player), db));
     }

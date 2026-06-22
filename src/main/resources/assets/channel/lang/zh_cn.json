@@ -96,10 +96,13 @@
   "channel.config.post.rt": "路径追踪",
   "channel.config.post.rt.tooltip": "§6实验性功能§r\n使用路径追踪来获得更真实的音频体验。\n会额外占用CPU资源。",
   "channel.config.post.player_control": "  单独调整响度",
-  "channel.config.post.player_control.tooltip": "单独调整此人的声音响度。\n将会覆盖总体响度。\n更大的值使你听到的的声音更响。\n§6不受限幅器控制。",
+  "channel.config.post.player_control.tooltip": "单独调整此人的声音响度。\n更大的值使你听到的的声音更响。\n§b优先级高于整体响度。\n§6不受限幅器控制；对音响方块无效。",
   "channel.config.post.control": "  整体调整响度",
   "channel.config.post.control_adjust": "整体调整响度",
-  "channel.config.post.control_adjust.tooltip": "调整所有输出的声音响度。\n更大的值使你听到的的声音更响。\n§6不受限幅器控制。",
+  "channel.config.post.control_adjust.tooltip": "调整所有输出的声音响度。\n更大的值使你听到的的声音更响。\n§b优先级低于单独响度。\n§6不受限幅器控制。",
+  "channel.config.post.mute_all": "§c全体静音",
+  "channel.config.post.mute_all.tooltip": "将所有玩家静音。\n§b优先级低于单独响度。\n§6点击玩家头像以单独静音。",
+  "channel.config.post.mute.tooltip": "点击玩家头像以单独静音。",
   "channel.config.post.player_control_clear": "§6重置全部",
   "channel.config.post.player_control_clear.tooltip": "重置以下全部单独调整响度。",
   "channel.config.post.delay": "网络质量容忍",
@@ -119,5 +122,15 @@
 
   "channel.notify.no_valid": "无可用的输入设备。",
   "channel.notify.unsupported": "选择的参数不受此输入设备支持。",
-  "channel.notify.failed_init": "初始化设备 %1$s 失败。"
+  "channel.notify.failed_init": "初始化设备 %1$s 失败。",
+
+  "channel.tab.title": "沉浸语音",
+  "channel.setting.title": "频道设置",
+  "channel.setting.none": "未指定",
+
+  "item.channel.handheld_mic": "话筒",
+  "item.channel.mic": "固定式麦克风",
+  "item.channel.speaker": "音响",
+  "item.channel.speaker_stand": "音响（立式）",
+  "item.channel.speaker_hang": "音响（挂式）"
 }

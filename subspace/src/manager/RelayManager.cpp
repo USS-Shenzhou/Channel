@@ -13,6 +13,13 @@ namespace subspace {
         playerDatas[uuid] = data;
     }
 
+    void RelayManager::updateChannelData(std::unordered_map<UUID, std::vector<int>>&& newPlayerChannelsSend,
+                                         std::unordered_map<int, std::vector<UUID>>&& newChannelPlayersReceive) {
+        std::unique_lock lock(channelLock);
+        playerChannelsSend = std::move(newPlayerChannelsSend);
+        channelPlayersReceive = std::move(newChannelPlayersReceive);
+    }
+
     void RelayManager::registerConnection(const UUID& uuid, const std::shared_ptr<ClientTcpConnection>& connection) {
         std::unique_lock lock(connectionLock);
         connections[uuid] = connection;
@@ -31,7 +38,7 @@ namespace subspace {
     void RelayManager::relay(const UUID& from, int sampleRate, const ByteArray& opus) {
         PlayerData fr;
         {
-            std::shared_lock lock1(dataLock);
+            std::shared_lock lock(dataLock);
             auto f = playerDatas.find(from);
             if (f == playerDatas.end()) {
                 spdlog::warn("Received voice data from unknown player {}", from.toString());
@@ -39,11 +46,30 @@ namespace subspace {
             }
             fr = f->second;
         }
-        auto to = findTargets(from, fr);
+        std::vector<int> senderChannels;
+        std::unordered_set<UUID> channelReceiverUUIDs;
+        {
+            std::shared_lock lock(channelLock);
+            if (auto it = playerChannelsSend.find(from); it != playerChannelsSend.end()) {
+                senderChannels = it->second;
+                for (int ch : senderChannels) {
+                    if (auto recvIt = channelPlayersReceive.find(ch); recvIt != channelPlayersReceive.end()) {
+                        for (const auto& uuid : recvIt->second) {
+                            channelReceiverUUIDs.insert(uuid);
+                        }
+                    }
+                }
+            }
+        }
+        auto to = findTargets(from, fr, channelReceiverUUIDs);
         FriendlyByteBuf buf;
         buf.writeVarInt(sampleRate);
         buf.writeUUID(from);
         buf.writeByteArray(opus);
+        buf.writeVarInt(static_cast<int>(senderChannels.size()));
+        for (int ch : senderChannels) {
+            buf.writeVarInt(ch);
+        }
         buf.writeDouble(fr.x);
         buf.writeDouble(fr.y);
         buf.writeDouble(fr.z);
@@ -53,8 +79,9 @@ namespace subspace {
         }
     }
 
-    std::vector<std::shared_ptr<ClientTcpConnection>> RelayManager::findTargets(const UUID& from, const PlayerData& fr) {
+    std::vector<std::shared_ptr<ClientTcpConnection>> RelayManager::findTargets(const UUID& from, const PlayerData& fr, const std::unordered_set<UUID>& channelReceiverUUIDs) {
         std::vector<std::shared_ptr<ClientTcpConnection>> targets;
+        std::unordered_set<UUID> added;
         std::shared_lock lock0(connectionLock);
         std::shared_lock lock1(dataLock);
         for (const auto& [uuid, to] : playerDatas) {
@@ -78,8 +105,18 @@ namespace subspace {
             auto toConnection = connections.find(uuid);
             if (toConnection != connections.end()) {
                 targets.push_back(toConnection->second);
+                added.insert(uuid);
+            }
+        }
+        for (const auto& uuid : channelReceiverUUIDs) {
+            if (added.contains(uuid)) {
+                continue;
+            }
+            auto conn = connections.find(uuid);
+            if (conn != connections.end()) {
+                targets.push_back(conn->second);
             }
         }
         return targets;
     }
-} // subspace
+} // namespace subspace

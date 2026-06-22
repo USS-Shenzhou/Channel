@@ -6,10 +6,7 @@
 
 namespace subspace {
     ServerConnection::ServerConnection(asio::ip::tcp::socket socket) :
-        BaseConnection(CryptHelper::NULL_ENCODE_DECODE, CryptHelper::AES_GCM_DECODE),
-        socket(std::move(socket)),
-        handshakeTimer(this->socket.get_executor()) {
-    }
+        BaseConnection(CryptHelper::NULL_ENCODE_DECODE, CryptHelper::AES_GCM_DECODE), socket(std::move(socket)), handshakeTimer(this->socket.get_executor()) {}
 
     void ServerConnection::start() {
         remoteAddress = socket.remote_endpoint().address().to_string() + ":" + std::to_string(socket.remote_endpoint().port());
@@ -68,15 +65,13 @@ namespace subspace {
 
     void ServerConnection::extractContent(int length) {
         content.resize(length);
-        asyncRead(socket, content, [this]()-> void {
+        asyncRead(socket, content, [this]() -> void {
             handleRaw(content);
             waitAndReadPacketLengthHeader();
         });
     }
 
-    const ByteArray& ServerConnection::getToken() {
-        return TokenManager::getServerToken();
-    }
+    const ByteArray& ServerConnection::getToken() { return TokenManager::getServerToken(); }
 
     void ServerConnection::handle(FriendlyByteBuf& decrypted) {
         int id = decrypted.readVarInt();
@@ -107,8 +102,8 @@ namespace subspace {
         auto securityLevel = buf.readEnum<SecurityLevel>();
         auto& cfg = getConfig();
         if (ready() && (*cfg.protocol != protocol || *cfg.securityLevel != securityLevel)) {
-            spdlog::warn("Server {} trying to use different protocol and security level: [{}, {}]. Refusing.",
-                         getRemoteAddress(), static_cast<int>(protocol), static_cast<int>(securityLevel));
+            spdlog::warn("Server {} trying to use different protocol and security level: [{}, {}]. Refusing.", getRemoteAddress(), static_cast<int>(protocol),
+                         static_cast<int>(securityLevel));
             disconnect();
             return;
         }
@@ -139,13 +134,41 @@ namespace subspace {
         const int count = buf.readVarInt();
         for (int i = 0; i < count; ++i) {
             const UUID uuid = buf.readUUID();
-            PlayerData route;
-            route.x = buf.readDouble();
-            route.y = buf.readDouble();
-            route.z = buf.readDouble();
-            route.dimensionHash = buf.readInt();
-            route.spectator = buf.readBool();
-            RelayManager::updateData(uuid, route);
+            PlayerData data;
+            data.x = buf.readDouble();
+            data.y = buf.readDouble();
+            data.z = buf.readDouble();
+            data.dimensionHash = buf.readInt();
+            data.spectator = buf.readBool();
+            RelayManager::updateData(uuid, data);
         }
+
+        std::unordered_map<UUID, std::vector<int>> playerChannelsSend;
+        const int playerChannelCount = buf.readVarInt();
+        for (int i = 0; i < playerChannelCount; ++i) {
+            const UUID uuid = buf.readUUID();
+            const int channelCount = buf.readVarInt();
+            std::vector<int> channels;
+            channels.reserve(channelCount);
+            for (int j = 0; j < channelCount; ++j) {
+                channels.push_back(buf.readVarInt());
+            }
+            playerChannelsSend[uuid] = std::move(channels);
+        }
+
+        std::unordered_map<int, std::vector<UUID>> channelPlayersReceive;
+        const int channelPlayerCount = buf.readVarInt();
+        for (int i = 0; i < channelPlayerCount; ++i) {
+            const int channel = buf.readVarInt();
+            const int playerCount = buf.readVarInt();
+            std::vector<UUID> players;
+            players.reserve(playerCount);
+            for (int j = 0; j < playerCount; ++j) {
+                players.push_back(buf.readUUID());
+            }
+            channelPlayersReceive[channel] = std::move(players);
+        }
+
+        RelayManager::updateChannelData(std::move(playerChannelsSend), std::move(channelPlayersReceive));
     }
-} // subspace
+} // namespace subspace

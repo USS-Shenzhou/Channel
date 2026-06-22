@@ -4,7 +4,9 @@ import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.audio.NC;
 import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.util.ModConstant;
+import com.mojang.logging.LogUtils;
 import net.neoforged.fml.loading.FMLEnvironment;
+import org.jline.utils.Log;
 
 import javax.annotation.Nullable;
 import java.lang.foreign.Arena;
@@ -42,10 +44,6 @@ public class WebRTCHelper {
     }
 
     private static void loadWebRTC() {
-        if (!FMLEnvironment.isProduction()) {
-            System.load(Path.of("").toAbsolutePath().resolve("webrtc.dll").toString());
-            return;
-        }
         String os;
         String arch;
         String libName;
@@ -62,6 +60,11 @@ public class WebRTCHelper {
             libName = "webrtc.dylib";
         } else {
             throw new RuntimeException("Unsupported OS: " + osName);
+        }
+        if (!FMLEnvironment.isProduction()) {
+            LogUtils.getLogger().warn("RUNNING IN DEV ENV: If you are loading Channel in dev env, you may need to manually extract lib file (e.g. webrtc.dll) in the jar to your run/ dir.");
+            System.load(Path.of("").toAbsolutePath().resolve(libName).toString());
+            return;
         }
         if (osArch.contains("amd64") || osArch.contains("x86_64")) {
             arch = "x86_64";
@@ -176,6 +179,33 @@ public class WebRTCHelper {
             }
             byte[] result = new byte[totalOutBytes];
             MemorySegment.copy(dst, ValueLayout.JAVA_BYTE, 0, result, 0, totalOutBytes);
+            return result;
+        }
+    }
+
+    @SuppressWarnings("IntegerMultiplicationImplicitCastToLong")
+    public static short[] resample(short[] raw, int sampleRateIn, int sampleRateOut) {
+        var resampler = CreateResampler(sampleRateIn, sampleRateOut, ModConstant.MIC_CHANNEL);
+        var segAmount = MicReader.getFrameLength() / 10;
+        var inStepSamples = raw.length / segAmount;
+        var outStepSamples = (int) ((float) raw.length / sampleRateIn * sampleRateOut / segAmount);
+        int totalOutSamples = (int) ((float) raw.length / sampleRateIn * sampleRateOut);
+        try (var arena = Arena.ofConfined()) {
+            var src = arena.allocate(raw.length * 2);
+            var dst = arena.allocate(totalOutSamples * 2);
+            MemorySegment.copy(raw, 0, src, ValueLayout.JAVA_SHORT, 0, raw.length);
+            for (int i = 0; i < segAmount; i++) {
+                long srcOffset = (long) i * inStepSamples * 2;
+                long destOffset = (long) i * outStepSamples * 2;
+                var subSrc = src.asSlice(srcOffset, inStepSamples * 2);
+                var subDest = dst.asSlice(destOffset, outStepSamples * 2);
+                Resample(resampler,
+                        subSrc, sampleRateIn / 100,
+                        subDest, sampleRateOut / 100);
+            }
+            short[] result = new short[totalOutSamples];
+            MemorySegment.copy(dst, ValueLayout.JAVA_SHORT, 0, result, 0, totalOutSamples);
+            FreeResampler(resampler);
             return result;
         }
     }

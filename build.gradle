@@ -109,7 +109,7 @@ dependencies {
     // compileOnly "mezz.jei:jei-${mc_version}-forge-api:${jei_version}"
     // runtimeOnly "mezz.jei:jei-${mc_version}-forge:${jei_version}"
 
-    implementation(annotationProcessor("cn.ussshenzhou:t88:26.+"))
+    implementation(annotationProcessor("cn.ussshenzhou:t88:26.1+"))
 
     implementation 'io.github.jaredmdobson:concentus:1.0.2'
     jarJar 'io.github.jaredmdobson:concentus:1.0.2'

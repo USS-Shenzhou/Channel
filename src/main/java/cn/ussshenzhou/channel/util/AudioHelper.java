@@ -1,6 +1,8 @@
 package cn.ussshenzhou.channel.util;
 
+import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * @author USS_Shenzhou
@@ -21,5 +23,13 @@ public class AudioHelper {
 
     public static void onSoundThread(Runnable r) {
         Minecraft.getInstance().getSoundManager().soundEngine.executor.execute(r);
+    }
+
+    public static Vec3 getEarPos() {
+        var mc = Minecraft.getInstance();
+        if (ChannelClientConfig.get().showRaytrace && mc.getCameraEntity() != null) {
+            return mc.getCameraEntity().getEyePosition();
+        }
+        return Minecraft.getInstance().gameRenderer.getMainCamera().position();
     }
 }

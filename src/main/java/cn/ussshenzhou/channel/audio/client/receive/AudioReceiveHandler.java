@@ -1,0 +1,119 @@
+package cn.ussshenzhou.channel.audio.client.receive;
+
+import cn.ussshenzhou.channel.audio.client.send.WebRTCHelper;
+import cn.ussshenzhou.channel.blockentity.SpeakerBlockEntity;
+import cn.ussshenzhou.channel.config.ChannelPlayerConfig;
+import cn.ussshenzhou.channel.network.AudioPacket2C;
+import cn.ussshenzhou.channel.audio.OpusManager;
+import cn.ussshenzhou.channel.subspace.client.SubspaceAudioPacket;
+import cn.ussshenzhou.channel.util.AudioHelper;
+import com.google.common.collect.MapMaker;
+import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * @author USS_Shenzhou
+ */
+@EventBusSubscriber(Dist.CLIENT)
+public class AudioReceiveHandler {
+    public static final int PLAY_RATE10 = 2;
+    @SuppressWarnings("MapOrSetKeyShouldOverrideHashCodeEquals")
+    public static final Set<SpeakerBlockEntity> CHANNELED_BLOCK_CACHE_C = Collections.newSetFromMap(new MapMaker().weakKeys().makeMap());
+
+    @SubscribeEvent
+    public static void removeRemovedBlock(ClientTickEvent.Pre event) {
+        CHANNELED_BLOCK_CACHE_C.removeIf(BlockEntity::isRemoved);
+    }
+
+    public static void handle(AudioPacket2C packet) {
+        try {
+            var level = Minecraft.getInstance().level;
+            if (level == null) {
+                return;
+            }
+            if (ChannelPlayerConfig.muted(packet.from)) {
+                return;
+            }
+            handleInternal(packet, level);
+        } catch (Exception e) {
+            LogUtils.getLogger().error("Something went wrong, but it should be okay. You can ignore this if nothing else went wrong.");
+            LogUtils.getLogger().error(e.toString(), e);
+        }
+    }
+
+    private static void handleInternal(AudioPacket2C packet, Level level) throws Exception {
+        double x = 0, y = 0, z = 0;
+        var from = level.getPlayerByUUID(packet.from);
+        if (from != null) {
+            // talking nearby
+            var pos = from.getEyePosition();
+            x = pos.x;
+            y = pos.y;
+            z = pos.z;
+        } else if (packet instanceof SubspaceAudioPacket subspace) {
+            // through subspace
+            x = subspace.x;
+            y = subspace.y;
+            z = subspace.z;
+        } else if (packet.channels.length == 0) {
+            // should not happen
+            return;
+        }
+        var earPos = AudioHelper.getEarPos();
+        var decoded = OpusManager.decode(packet.opus, packet.sampleRate, packet.from);
+        if (Minecraft.getInstance().player != null && earPos.distanceToSqr(x, y, z) <= 64 * 64) {
+            // direct talking sound always apply
+            var audio = getDirectAudioAndCheckSampleRate(packet.from, packet.sampleRate);
+            audio.push(decoded);
+            audio.setPos(x, y, z);
+        }
+        // through speaker
+        var resampled = WebRTCHelper.resample(decoded, packet.sampleRate, 48000);
+        for (var speaker : CHANNELED_BLOCK_CACHE_C) {
+            var pos = speaker.getBlockPos();
+            if (earPos.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64 * 64) {
+                return;
+            }
+            var audio = getSpeakerAudioAndCheckSampleRate(speaker, 48000);
+            audio.push(packet.from, resampled);
+        }
+    }
+
+    private static DirectAudio getDirectAudioAndCheckSampleRate(UUID from, int sampleRate) {
+        return (DirectAudio) AudioManager.audios.compute(from.hashCode(), (_, old) -> {
+            if (old == null) {
+                return new DirectAudio(from, sampleRate);
+            } else if (old.sampleRate != sampleRate) {
+                old.close();
+                return new DirectAudio(from, sampleRate);
+            } else {
+                return old;
+            }
+        });
+    }
+
+    private static SpeakerAudio getSpeakerAudioAndCheckSampleRate(SpeakerBlockEntity blockEntity, int sampleRate) {
+        return (SpeakerAudio) AudioManager.audios.compute(SpeakerAudio.hashcode(blockEntity.getBlockPos()), (_, old) -> {
+            if (old == null) {
+                return new SpeakerAudio(blockEntity, sampleRate);
+            } else if (old.sampleRate != sampleRate) {
+                old.close();
+                return new SpeakerAudio(blockEntity, sampleRate);
+            } else {
+                return old;
+            }
+        });
+    }
+}

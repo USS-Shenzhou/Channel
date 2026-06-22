@@ -23,6 +23,7 @@ namespace subspace {
     class RelayManager {
     public:
         static void updateData(const UUID& uuid, const PlayerData& data);
+        static void updateChannelData(std::unordered_map<UUID, std::vector<int>>&& playerChannelsSend, std::unordered_map<int, std::vector<UUID>>&& channelPlayersReceive);
 
         static void registerConnection(const UUID& uuid, const std::shared_ptr<ClientTcpConnection>& connection);
         static void disconnect(const UUID& uuid, const ClientTcpConnection* toRemove);
@@ -34,9 +35,12 @@ namespace subspace {
         inline static std::unordered_map<UUID, PlayerData> playerDatas;
         inline static std::shared_mutex connectionLock;
         inline static std::unordered_map<UUID, std::shared_ptr<ClientTcpConnection>> connections;
+        inline static std::shared_mutex channelLock;
+        inline static std::unordered_map<UUID, std::vector<int>> playerChannelsSend;
+        inline static std::unordered_map<int, std::vector<UUID>> channelPlayersReceive;
 
-        static std::vector<std::shared_ptr<ClientTcpConnection>> findTargets(const UUID& from, const PlayerData& fr);
+        static std::vector<std::shared_ptr<ClientTcpConnection>> findTargets(const UUID& from, const PlayerData& fr, const std::unordered_set<UUID>& channelReceiverUUIDs);
     };
-} // subspace
+} // namespace subspace
 
-#endif //SUBSPACE_RELAYMANAGER_H
+#endif // SUBSPACE_RELAYMANAGER_H
