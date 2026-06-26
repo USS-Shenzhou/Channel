@@ -34,12 +34,12 @@ public class OpusManager {
         return Arrays.copyOf(result, length);
     }
 
-    public static short[] decode(byte[] opus, int sampleRate, UUID from) throws OpusException {
-        var length = OpusPacketInfo.getNumSamples(opus, 0, opus.length, sampleRate);
+    public static short[] decode(byte[] opus, UUID from) throws OpusException {
+        var length = OpusPacketInfo.getNumSamples(opus, 0, opus.length, 48000);
         var outArray = new short[length];
-        if (!decoders.containsKey(from) || decoders.get(from).sampleRate != sampleRate) {
+        if (!decoders.containsKey(from)) {
             try {
-                decoders.put(from, new Decoder(sampleRate, new OpusDecoder(sampleRate, 1)));
+                decoders.put(from, new Decoder(48000, new OpusDecoder(48000, 1)));
             } catch (Exception e) {
                 LogUtils.getLogger().error(e.getMessage());
             }

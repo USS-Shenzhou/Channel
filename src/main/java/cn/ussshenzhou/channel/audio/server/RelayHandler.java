@@ -5,6 +5,7 @@ import cn.ussshenzhou.channel.Item.ModItems;
 import cn.ussshenzhou.channel.blockentity.ChanneledBlockEntity;
 import cn.ussshenzhou.channel.blockentity.MicBlockEntity;
 import cn.ussshenzhou.channel.blockentity.SpeakerBlockEntity;
+import cn.ussshenzhou.channel.config.ChannelServerConfig;
 import cn.ussshenzhou.channel.network.AudioPacket2C;
 import cn.ussshenzhou.t88.network.NetworkHelper;
 import com.google.common.collect.MapMaker;
@@ -15,6 +16,7 @@ import it.unimi.dsi.fastutil.ints.IntArraySet;
 import net.minecraft.SharedConstants;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -144,10 +146,13 @@ public class RelayHandler {
             .setDaemon(true)
             .build());
 
-    public static void process(ServerPlayer from, byte[] opusAudio, int sampleRate) {
+    public static void process(ServerPlayer from, byte[] opusAudio) {
+        if (ChannelServerConfig.get().muteNoneOP && !from.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) {
+            return;
+        }
         SERVER_RELAY_THREAD.execute(() -> {
             try {
-                talking(from, opusAudio, sampleRate);
+                talking(from, opusAudio);
             } catch (Exception e) {
                 LogUtils.getLogger().error("Something went wrong, but it should be okay. You can ignore this if nothing else went wrong.");
                 LogUtils.getLogger().error(e.getMessage(), e);
@@ -155,7 +160,7 @@ public class RelayHandler {
         });
     }
 
-    public static void talking(ServerPlayer from, byte[] opusAudio, int sampleRate) {
+    public static void talking(ServerPlayer from, byte[] opusAudio) {
         HashSet<ServerPlayer> tos = new HashSet<>();
         for (var p : from.level().players()) {
             if (closeHear(from, p)) {
@@ -171,7 +176,7 @@ public class RelayHandler {
                 }
             }
         }
-        tos.forEach(to -> NetworkHelper.sendToPlayer(to, new AudioPacket2C(sampleRate, from.getUUID(), opusAudio, channels)));
+        tos.forEach(to -> NetworkHelper.sendToPlayer(to, new AudioPacket2C(from.getUUID(), opusAudio, channels)));
     }
 
     public static boolean closeHear(ServerPlayer from, ServerPlayer to) {

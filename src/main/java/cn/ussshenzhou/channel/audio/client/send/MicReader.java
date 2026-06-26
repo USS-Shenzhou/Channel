@@ -46,7 +46,7 @@ public class MicReader {
     }
 
     private static synchronized void read() {
-        if (Minecraft.getInstance().getConnection() == null || MicrophoneHud.getStatus() == MicrophoneHud.Status.SUBSPACE) {
+        if (Minecraft.getInstance().getConnection() == null || MicrophoneHud.getStatus() == MicrophoneHud.Status.SUBSPACE || MicrophoneHud.getStatus() == MicrophoneHud.Status.OP) {
             return;
         }
         var cfg = ChannelClientConfig.get();
@@ -91,7 +91,7 @@ public class MicReader {
             }
             //-----encode-----
             var opus = OpusManager.encode(audio, networkSampleRate);
-            var packet = new TalkPacket2S(networkSampleRate, opus);
+            var packet = new TalkPacket2S(opus);
             if (SubspaceConnection.using()) {
                 SubspaceConnection.send(packet);
             } else {

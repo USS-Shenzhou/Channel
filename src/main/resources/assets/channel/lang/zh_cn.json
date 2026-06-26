@@ -111,7 +111,7 @@
   "channel.config.tab.general": "通用",
   "channel.config.dispay": "  显示",
   "channel.config.dispay.hud": "显示麦克风图标",
-  "channel.config.dispay.hud.tooltip": "麦克风尾部的颜色和文字代表了不同的状态。\n§7■§bStand By§r无声音输入\n§7■§cMute§r静音\n§a■Talking§r发话中\n§7■§dSubspace§r正在连接子空间中继\n§6■VAD§r人声检测不通过\n§6■Volume§r音量检测不通过\n§c■Error§r程序故障或输入设备不可用",
+  "channel.config.dispay.hud.tooltip": "麦克风尾部的颜色和文字代表了不同的状态。\n§7■§bStand By§r 无声音输入\n§7■§cMute§r 静音\n§a■Talking§r 发话中\n§7■§dSubspace§r 正在连接子空间中继\n§6■VAD§r 人声检测不通过\n§6■Volume§r 音量检测不通过\n§c■Error§r 程序故障或输入设备不可用\n§7■§cOP Only§r 仅OP讲话",
   "channel.config.dispay.hud_text": "显示麦克风文字",
   "channel.config.unit": "显示单位",
   "channel.config.unit.db": "分贝 dB / 满刻度分贝 dBFS",
@@ -132,5 +132,8 @@
   "item.channel.mic": "固定式麦克风",
   "item.channel.speaker": "音响",
   "item.channel.speaker_stand": "音响（立式）",
-  "item.channel.speaker_hang": "音响（挂式）"
+  "item.channel.speaker_hang": "音响（挂式）",
+
+  "notice.channel.mute_true": "OP已开启静音。仅有服务器管理员可以讲话。",
+  "notice.channel.mute_false": "OP已解除静音。所有人均可讲话。"
 }

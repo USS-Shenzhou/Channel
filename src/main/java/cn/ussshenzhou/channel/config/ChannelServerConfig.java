@@ -19,6 +19,7 @@ public class ChannelServerConfig implements TConfig {
     public String subspaceFrequency = "";
     public Protocol subspaceProtocol = Protocol.TCP;
     public SecurityLevel subspaceSecurityLevel = SecurityLevel.MID;
+    public boolean muteNoneOP = false;
 
     public static ChannelServerConfig get() {
         return ConfigHelper.getConfigRead(ChannelServerConfig.class);

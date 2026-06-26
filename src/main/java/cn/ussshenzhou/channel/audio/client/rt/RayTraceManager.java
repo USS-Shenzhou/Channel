@@ -43,6 +43,8 @@ public class RayTraceManager {
     private static int AUX_SLOT = -1, REVERB_EFFECT;
     private static final ConcurrentHashMap<Vec3, SourceAudioData> SOURCE_AUDIO_DATA_CACHE = new ConcurrentHashMap<>();
     static boolean inWater = false;
+    public static ClipContext.Block CHANNEL_OUTLINE = ClipContext.Block.valueOf("CHANNEL_OUTLINE");
+    public static ClipContext.Block CHANNEL_VISUAL = ClipContext.Block.valueOf("CHANNEL_VISUAL");
 
     public static int getSlot() {
         if (AUX_SLOT == -1) {
@@ -101,12 +103,13 @@ public class RayTraceManager {
             boolean debug = ChannelClientConfig.get().showRaytrace;
             var earPos = AudioHelper.getEarPos();
             for (var ray : generateRays(getRayAmount(), 0)) {
+                //TODO IExtensibleEnum
                 //noinspection DataFlowIssue
-                generateOneRay(earPos, ray, level, debug, ClipContext.Block.OUTLINE, 0x80ffffff);
+                generateOneRay(earPos, ray, level, debug, CHANNEL_OUTLINE, 0x80ffffff);
             }
             for (var ray : generateRays(getRayAmount(), 0.5)) {
                 //noinspection DataFlowIssue
-                generateOneRay(earPos, ray, level, debug, ClipContext.Block.VISUAL, 0x8000ff00);
+                generateOneRay(earPos, ray, level, debug, CHANNEL_VISUAL, 0x8000ff00);
             }
         }
     }
@@ -174,8 +177,8 @@ public class RayTraceManager {
         alEffectf(REVERB_EFFECT, AL_EAXREVERB_LATE_REVERB_GAIN, lateRefGain);
         alEffectf(REVERB_EFFECT, AL_EAXREVERB_LATE_REVERB_DELAY, lateRefDelay);
         //-----Echo-----
-        alEffectf(REVERB_EFFECT, AL_EAXREVERB_ECHO_TIME, echoTime);
-        alEffectf(REVERB_EFFECT, AL_EAXREVERB_ECHO_DEPTH, echoDepth);
+        alEffectf(REVERB_EFFECT, AL_EAXREVERB_ECHO_TIME, Float.isNaN(echoTime) ? 0.25f : echoTime);
+        alEffectf(REVERB_EFFECT, AL_EAXREVERB_ECHO_DEPTH, Float.isNaN(echoDepth) ? 0.05f : echoDepth);
         //-----Modulation-----
         alEffectf(REVERB_EFFECT, AL_EAXREVERB_MODULATION_TIME, 0.4f);
         alEffectf(REVERB_EFFECT, AL_EAXREVERB_MODULATION_DEPTH, 0.025f);
@@ -240,6 +243,6 @@ public class RayTraceManager {
     }
 
     public static boolean canSee(Vec3 from, Vec3 to) {
-        return shoot(from, to, ClipContext.Block.OUTLINE).getType() == HitResult.Type.MISS;
+        return shoot(from, to, CHANNEL_OUTLINE).getType() == HitResult.Type.MISS;
     }
 }

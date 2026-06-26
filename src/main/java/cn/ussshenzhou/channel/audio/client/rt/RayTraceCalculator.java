@@ -66,7 +66,10 @@ public class RayTraceCalculator {
         });
         post(() -> {
             journeyStandardDeviation = (float) Math.sqrt(journeySquaredDiffSum / pointTotalAmount);
-            density = Mth.clamp(journeyStandardDeviation / (MAX_DISTANCE / 2f) + (inWater ? 0.6f : 0), 0, 1);
+            float targetDensity = Mth.clamp(journeyStandardDeviation / (MAX_DISTANCE / 2f) + (inWater ? 0.6f : 0), 0, 1);
+            float delta = Mth.clamp(targetDensity - density, -0.01f, 0.01f);
+            //noinspection NonAtomicOperationOnVolatileField
+            density += delta;
         });
     }
 
@@ -390,12 +393,12 @@ public class RayTraceCalculator {
         var cameraPos = AudioHelper.getEarPos();
         var tuple = calculateVirtualDirection(sourcePos);
         double meanReverbWeight = tuple.getA();
-        var hitA = shoot(sourcePos, cameraPos, ClipContext.Block.OUTLINE);
+        var hitA = shoot(sourcePos, cameraPos, CHANNEL_OUTLINE);
         float wallThickness;
         if (hitA.getType() == HitResult.Type.MISS) {
             wallThickness = 0;
         } else {
-            var hitB = shoot(cameraPos, sourcePos, ClipContext.Block.OUTLINE);
+            var hitB = shoot(cameraPos, sourcePos, CHANNEL_OUTLINE);
             wallThickness = (float) hitA.getLocation().distanceTo(hitB.getLocation());
         }
         double wallDecay = Math.pow(inWater ? 0.5 : 0.25, wallThickness);
@@ -410,7 +413,7 @@ public class RayTraceCalculator {
             directHF *= 0.15f;
             reverbGain = Mth.clamp(reverbGain * 1.3f, 0, 1);
         }
-        return new SourceAudioData(directGain, directHF, reverbGain, finalPos);
+        return new SourceAudioData(directGain, wallThickness, directHF, reverbGain, finalPos);
     }
 
     private static Tuple<Double, Vec3> calculateVirtualDirection(Vec3 sourcePos) {

@@ -24,7 +24,7 @@ public class DebugHud extends TPanel {
 
     @Override
     public void resizeAsHud(int screenWidth, int screenHeight) {
-        this.setAbsBounds(100, 100, 200, 100);
+        this.setAbsBounds(50, 50, 200, 100);
         super.resizeAsHud(screenWidth, screenHeight);
     }
 

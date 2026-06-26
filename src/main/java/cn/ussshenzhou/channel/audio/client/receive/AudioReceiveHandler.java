@@ -9,6 +9,7 @@ import cn.ussshenzhou.channel.subspace.client.SubspaceAudioPacket;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import com.google.common.collect.MapMaker;
 import com.mojang.logging.LogUtils;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -72,22 +73,28 @@ public class AudioReceiveHandler {
             return;
         }
         var earPos = AudioHelper.getEarPos();
-        var decoded = OpusManager.decode(packet.opus, packet.sampleRate, packet.from);
-        if (Minecraft.getInstance().player != null && earPos.distanceToSqr(x, y, z) <= 64 * 64) {
+        var decoded = OpusManager.decode(packet.opus, packet.from);
+        if (Minecraft.getInstance().player != null && !Minecraft.getInstance().player.getUUID().equals(packet.from) && earPos.distanceToSqr(x, y, z) <= 64 * 64) {
             // direct talking sound always apply
-            var audio = getDirectAudioAndCheckSampleRate(packet.from, packet.sampleRate);
+            var audio = getDirectAudioAndCheckSampleRate(packet.from, 48000);
             audio.push(decoded);
             audio.setPos(x, y, z);
         }
         // through speaker
-        var resampled = WebRTCHelper.resample(decoded, packet.sampleRate, 48000);
+        if (packet.channels.length == 0) {
+            return;
+        }
+        var channels = IntArraySet.of(packet.channels);
         for (var speaker : CHANNELED_BLOCK_CACHE_C) {
+            if (!channels.contains(speaker.getChannel())) {
+                continue;
+            }
             var pos = speaker.getBlockPos();
             if (earPos.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64 * 64) {
                 return;
             }
             var audio = getSpeakerAudioAndCheckSampleRate(speaker, 48000);
-            audio.push(packet.from, resampled);
+            audio.push(packet.from, decoded);
         }
     }
 

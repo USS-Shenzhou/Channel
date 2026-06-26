@@ -4,6 +4,7 @@ import net.minecraft.world.phys.Vec3;
 
 public record SourceAudioData(
         float directGain,
+        float wallThickness,
         float directHF,
         float reverbGain,
         Vec3 virtualPos

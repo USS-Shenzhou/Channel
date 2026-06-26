@@ -28,7 +28,7 @@ namespace subspace {
         static void registerConnection(const UUID& uuid, const std::shared_ptr<ClientTcpConnection>& connection);
         static void disconnect(const UUID& uuid, const ClientTcpConnection* toRemove);
 
-        static void relay(const UUID& from, int sampleRate, const ByteArray& opus);
+        static void relay(const UUID& from, const ByteArray& opus);
 
     private:
         inline static std::shared_mutex dataLock;

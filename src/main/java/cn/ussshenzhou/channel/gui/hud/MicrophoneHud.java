@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -36,6 +37,7 @@ public class MicrophoneHud extends TPanel {
     }
 
     private static Status status = Status.STANDBY;
+    private static Status prevStatus = Status.STANDBY;
     private final TImage microphone = new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/microphone.png"));
     private final TImage outline = new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/outline.png"));
     private final TImage color = new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/color.png"));
@@ -68,6 +70,9 @@ public class MicrophoneHud extends TPanel {
 
     @Override
     public void tickT() {
+        if (getStatus() == Status.OP && Minecraft.getInstance().player != null && Minecraft.getInstance().player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) {
+            resumeStatus();
+        }
         volume.setValue(Mth.clamp(ModConstant.ABS_MIN_DBFS + AudioHelper.s2dbfs(LevelGatherer.getProcessed()), 0, ModConstant.ABS_MIN_DBFS));
         var cfg = ChannelClientConfig.get();
         microphone.setVisibleT(cfg.showHudIcon);
@@ -113,23 +118,30 @@ public class MicrophoneHud extends TPanel {
         this.word.setColor(switch (status) {
             case STANDBY -> 0x3c91ff;
             case TALKING -> 0x00ff00;
-            case ERROR, MUTE -> 0xff0000;
+            case ERROR, MUTE, OP -> 0xff0000;
             case VAD_FAIL, VOLUME_FAIL -> 0xff9933;
             case SUBSPACE -> 0x9966ff;
         });
         this.color.setColor(switch (status) {
-            case STANDBY, MUTE, SUBSPACE -> 0x404040;
+            case STANDBY, MUTE, SUBSPACE, OP -> 0x404040;
             case TALKING -> 0x00ff00;
             case ERROR -> 0xff0000;
             case VAD_FAIL, VOLUME_FAIL -> 0xff9933;
         });
         var cfg = ChannelClientConfig.get();
-        this.slash.setVisibleT(cfg.showHudIcon && (status == Status.MUTE || status == Status.ERROR || status == Status.SUBSPACE));
+        this.slash.setVisibleT(cfg.showHudIcon && (status == Status.MUTE || status == Status.ERROR || status == Status.SUBSPACE || status == Status.OP));
         super.extractRenderState(graphics, mouseX, mouseY, pPartialTick);
     }
 
     public static void setStatus(Status status) {
-        MicrophoneHud.status = status;
+        if (MicrophoneHud.status != status) {
+            MicrophoneHud.prevStatus = MicrophoneHud.status;
+            MicrophoneHud.status = status;
+        }
+    }
+
+    public static void resumeStatus(){
+        MicrophoneHud.status = MicrophoneHud.prevStatus;
     }
 
     public static Status getStatus() {
@@ -143,7 +155,8 @@ public class MicrophoneHud extends TPanel {
         ERROR,
         VAD_FAIL,
         VOLUME_FAIL,
-        SUBSPACE
+        SUBSPACE,
+        OP
     }
 
 }

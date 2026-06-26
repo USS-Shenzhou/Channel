@@ -16,24 +16,20 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
  */
 @NetPacket(modid = ModConstant.SHORT_ID, handleOnNetwork = true, id = "tsp")
 public class TalkPacket2S extends SubspacePacket {
-    private final int sampleRate;
     private final byte[] opus;
 
-    public TalkPacket2S(int sampleRate, byte[] opus) {
-        this.sampleRate = sampleRate;
+    public TalkPacket2S(byte[] opus) {
         this.opus = opus;
     }
 
     @Decoder
     public TalkPacket2S(FriendlyByteBuf buf) {
-        this.sampleRate = buf.readVarInt();
         this.opus = buf.readByteArray();
     }
 
     @Override
     @Encoder
     public void encode(FriendlyByteBuf buf) {
-        buf.writeVarInt(this.sampleRate);
         buf.writeByteArray(this.opus);
     }
 
@@ -44,6 +40,6 @@ public class TalkPacket2S extends SubspacePacket {
 
     @ServerHandler
     public void serverHandler(IPayloadContext context) {
-        RelayHandler.process((ServerPlayer) context.player(), opus, sampleRate);
+        RelayHandler.process((ServerPlayer) context.player(), opus);
     }
 }

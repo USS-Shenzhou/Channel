@@ -35,7 +35,7 @@ namespace subspace {
         }
     }
 
-    void RelayManager::relay(const UUID& from, int sampleRate, const ByteArray& opus) {
+    void RelayManager::relay(const UUID& from, const ByteArray& opus) {
         PlayerData fr;
         {
             std::shared_lock lock(dataLock);
@@ -63,7 +63,6 @@ namespace subspace {
         }
         auto to = findTargets(from, fr, channelReceiverUUIDs);
         FriendlyByteBuf buf;
-        buf.writeVarInt(sampleRate);
         buf.writeUUID(from);
         buf.writeByteArray(opus);
         buf.writeVarInt(static_cast<int>(senderChannels.size()));

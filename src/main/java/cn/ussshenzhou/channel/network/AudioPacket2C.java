@@ -18,13 +18,11 @@ import java.util.UUID;
  */
 @NetPacket(modid = ModConstant.SHORT_ID, handleOnNetwork = true, id = "au")
 public class AudioPacket2C {
-    public final int sampleRate;
     public final UUID from;
     public final byte[] opus;
     public final int[] channels;
 
-    public AudioPacket2C(int sampleRate, UUID from, byte[] opus, @Nullable IntArraySet channels) {
-        this.sampleRate = sampleRate;
+    public AudioPacket2C(UUID from, byte[] opus, @Nullable IntArraySet channels) {
         this.from = from;
         this.opus = opus;
         if (channels == null) {
@@ -36,7 +34,6 @@ public class AudioPacket2C {
 
     @Decoder
     public AudioPacket2C(FriendlyByteBuf buf) {
-        this.sampleRate = buf.readVarInt();
         this.from = buf.readUUID();
         this.opus = buf.readByteArray();
         int channelCount = buf.readVarInt();
@@ -48,7 +45,6 @@ public class AudioPacket2C {
 
     @Encoder
     public void encode(FriendlyByteBuf buf) {
-        buf.writeVarInt(this.sampleRate);
         buf.writeUUID(this.from);
         buf.writeByteArray(this.opus);
         buf.writeVarInt(this.channels.length);

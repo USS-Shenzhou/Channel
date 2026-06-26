@@ -136,9 +136,8 @@ namespace subspace {
     }
 
     void ClientTcpConnection::voiceFromClient(FriendlyByteBuf& buf) {
-        auto sampleRate = buf.readVarInt();
         auto opus = buf.readByteArray();
-        RelayManager::relay(playerUuid, sampleRate, opus);
+        RelayManager::relay(playerUuid, opus);
     }
 
     void ClientTcpConnection::send(const ByteArray& data) {

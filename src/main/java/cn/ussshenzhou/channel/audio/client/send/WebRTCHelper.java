@@ -183,33 +183,6 @@ public class WebRTCHelper {
         }
     }
 
-    @SuppressWarnings("IntegerMultiplicationImplicitCastToLong")
-    public static short[] resample(short[] raw, int sampleRateIn, int sampleRateOut) {
-        var resampler = CreateResampler(sampleRateIn, sampleRateOut, ModConstant.MIC_CHANNEL);
-        var segAmount = MicReader.getFrameLength() / 10;
-        var inStepSamples = raw.length / segAmount;
-        var outStepSamples = (int) ((float) raw.length / sampleRateIn * sampleRateOut / segAmount);
-        int totalOutSamples = (int) ((float) raw.length / sampleRateIn * sampleRateOut);
-        try (var arena = Arena.ofConfined()) {
-            var src = arena.allocate(raw.length * 2);
-            var dst = arena.allocate(totalOutSamples * 2);
-            MemorySegment.copy(raw, 0, src, ValueLayout.JAVA_SHORT, 0, raw.length);
-            for (int i = 0; i < segAmount; i++) {
-                long srcOffset = (long) i * inStepSamples * 2;
-                long destOffset = (long) i * outStepSamples * 2;
-                var subSrc = src.asSlice(srcOffset, inStepSamples * 2);
-                var subDest = dst.asSlice(destOffset, outStepSamples * 2);
-                Resample(resampler,
-                        subSrc, sampleRateIn / 100,
-                        subDest, sampleRateOut / 100);
-            }
-            short[] result = new short[totalOutSamples];
-            MemorySegment.copy(dst, ValueLayout.JAVA_SHORT, 0, result, 0, totalOutSamples);
-            FreeResampler(resampler);
-            return result;
-        }
-    }
-
     private static boolean vad(MemorySegment audio, int sampleRate, int samplesPerChannel) {
         if (ChannelClientConfig.get().trigger != Trigger.VAD) {
             return true;
