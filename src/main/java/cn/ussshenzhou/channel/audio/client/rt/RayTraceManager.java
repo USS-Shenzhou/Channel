@@ -5,6 +5,7 @@ import cn.ussshenzhou.channel.audio.client.receive.AudioManager;
 import cn.ussshenzhou.channel.audio.client.receive.AudioReceiveHandler;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.util.AudioHelper;
+import com.mojang.logging.LogUtils;
 import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -26,6 +27,9 @@ import org.joml.Vector3f;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static cn.ussshenzhou.channel.audio.client.rt.RayTraceCalculator.*;
 import static org.lwjgl.openal.EXTEfx.*;
@@ -45,6 +49,17 @@ public class RayTraceManager {
     static boolean inWater = false;
     public static ClipContext.Block CHANNEL_OUTLINE = ClipContext.Block.valueOf("CHANNEL_OUTLINE");
     public static ClipContext.Block CHANNEL_VISUAL = ClipContext.Block.valueOf("CHANNEL_VISUAL");
+    public static ForkJoinPool RAYTRACE_THREADS;
+
+    static {
+        var index = new AtomicInteger();
+        RAYTRACE_THREADS = new ForkJoinPool(8, pool -> {
+            ForkJoinWorkerThread thread = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+            thread.setName("Channel-RayTrace-Thread-" + index.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
+        }, null, false);
+    }
 
     public static int getSlot() {
         if (AUX_SLOT == -1) {
@@ -98,20 +113,21 @@ public class RayTraceManager {
     }
 
     private static void generateHitPoints() {
-        synchronized (HIT_POINTS) {
-            var level = Minecraft.getInstance().level;
-            boolean debug = ChannelClientConfig.get().showRaytrace;
-            var earPos = AudioHelper.getEarPos();
-            for (var ray : generateRays(getRayAmount(), 0)) {
-                //TODO IExtensibleEnum
-                //noinspection DataFlowIssue
-                generateOneRay(earPos, ray, level, debug, CHANNEL_OUTLINE, 0x80ffffff);
-            }
-            for (var ray : generateRays(getRayAmount(), 0.5)) {
-                //noinspection DataFlowIssue
-                generateOneRay(earPos, ray, level, debug, CHANNEL_VISUAL, 0x8000ff00);
-            }
-        }
+        long time = Util.getNanos();
+
+        var level = Minecraft.getInstance().level;
+        boolean debug = ChannelClientConfig.get().showRaytrace;
+        var earPos = AudioHelper.getEarPos();
+        RAYTRACE_THREADS.submit(() -> generateRays(getRayAmount(), 0).parallelStream().forEach(ray -> {
+            //noinspection DataFlowIssue
+            generateOneRay(earPos, ray, level, debug, CHANNEL_OUTLINE, 0x80ffffff);
+        })).join();
+        RAYTRACE_THREADS.submit(() -> generateRays(getRayAmount(), 0).parallelStream().forEach(ray -> {
+            //noinspection DataFlowIssue
+            generateOneRay(earPos, ray, level, debug, CHANNEL_VISUAL, 0x8000ff00);
+        })).join();
+
+        LogUtils.getLogger().warn("{} ms", (Util.getNanos() - time) / 1000_000f);
     }
 
     private static void generateOneRay(Vec3 earPos, Vector3d ray, ClientLevel level, boolean debug, ClipContext.Block blockCollision, int color) {

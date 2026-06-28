@@ -31,7 +31,7 @@
     - [ ] UDP
     - [ ] GRPC
 - 游戏内：
-  - [ ] 话筒和音响方块
+  - [x] 话筒和音响方块
   - [ ] 对讲机物品
 
 
@@ -45,7 +45,7 @@
       - [ ] UDP
       - [ ] GRPC
 - In-game:
-    - [ ] Microphone and Speaker blocks
+    - [x] Microphone and Speaker blocks
     - [ ] Walkie-talkie items
 
 
