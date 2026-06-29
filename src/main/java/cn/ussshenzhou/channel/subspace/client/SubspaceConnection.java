@@ -213,6 +213,7 @@ public class SubspaceConnection {
                             if (!activelyDisconnect) {
                                 LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 10s...");
                                 reconnectFuture = group.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
+                                channel = null;
                             }
                         });
                         send(new HandshakePacket());
@@ -220,6 +221,7 @@ public class SubspaceConnection {
                     } else {
                         LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
                         reconnectFuture = group.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
+                        channel = null;
                     }
                 });
     }
