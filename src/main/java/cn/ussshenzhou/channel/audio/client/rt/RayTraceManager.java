@@ -113,8 +113,6 @@ public class RayTraceManager {
     }
 
     private static void generateHitPoints() {
-        long time = Util.getNanos();
-
         var level = Minecraft.getInstance().level;
         boolean debug = ChannelClientConfig.get().showRaytrace;
         var earPos = AudioHelper.getEarPos();
@@ -126,8 +124,6 @@ public class RayTraceManager {
             //noinspection DataFlowIssue
             generateOneRay(earPos, ray, level, debug, CHANNEL_VISUAL, 0x8000ff00);
         })).join();
-
-        LogUtils.getLogger().warn("{} ms", (Util.getNanos() - time) / 1000_000f);
     }
 
     private static void generateOneRay(Vec3 earPos, Vector3d ray, ClientLevel level, boolean debug, ClipContext.Block blockCollision, int color) {
