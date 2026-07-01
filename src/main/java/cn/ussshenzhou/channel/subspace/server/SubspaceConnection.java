@@ -18,12 +18,10 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.Varint21FrameDecoder;
 import net.minecraft.network.Varint21LengthFieldPrepender;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.security.SecureRandom;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
@@ -31,7 +29,7 @@ import java.util.concurrent.locks.LockSupport;
  * @author USS_Shenzhou
  */
 public class SubspaceConnection {
-    private static EventLoopGroup group;
+    private static final EventLoopGroup EVENT_LOOP_GROUP = new MultiThreadIoEventLoopGroup(1, new DefaultThreadFactory("Channel-Server-Subspace", true), NioIoHandler.newFactory());
     private static volatile Channel channel;
     private static volatile boolean activelyDisconnect;
 
@@ -52,9 +50,8 @@ public class SubspaceConnection {
      */
     public static void connect() {
         var cfg = ChannelServerConfig.get();
-        group = new MultiThreadIoEventLoopGroup(1, new DefaultThreadFactory("Channel-Server-Subspace", true), NioIoHandler.newFactory());
         new Bootstrap()
-                .group(group)
+                .group(EVENT_LOOP_GROUP)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -72,15 +69,17 @@ public class SubspaceConnection {
                     if (future.isSuccess()) {
                         channel = future.channel();
                         channel.closeFuture().addListener((ChannelFutureListener) f -> {
-                            if (!activelyDisconnect) {
+                            if (activelyDisconnect) {
+                                activelyDisconnect = false;
+                            } else {
                                 LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 10s...");
-                                group.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
+                                EVENT_LOOP_GROUP.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
                                 channel = null;
                             }
                         });
                         send(new InitPacket());
                         LogUtils.getLogger().info("Subspace server connected.");
-                        group.schedule(() -> {
+                        EVENT_LOOP_GROUP.schedule(() -> {
                             LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3000));
                             if (channel.isActive() && ServerLifecycleHooks.getCurrentServer() != null) {
                                 ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(SubspaceConnection::newPlayer);
@@ -88,7 +87,7 @@ public class SubspaceConnection {
                         }, 1, TimeUnit.SECONDS);
                     } else {
                         LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
-                        group.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
+                        EVENT_LOOP_GROUP.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
                         channel = null;
                     }
                 });
@@ -108,7 +107,6 @@ public class SubspaceConnection {
         if (channel != null) {
             channel.close();
         }
-        activelyDisconnect = false;
         connect();
     }
 
@@ -117,20 +115,20 @@ public class SubspaceConnection {
         if (channel != null) {
             channel.close();
         }
-        if (group != null) {
-            group.shutdownGracefully();
-        }
-        activelyDisconnect = false;
+        EVENT_LOOP_GROUP.shutdownGracefully();
     }
 
     public static void newPlayer(Player player) {
+        if (!using()) {
+            return;
+        }
         byte[] token = new SecureRandom().generateSeed(32);
         SubspaceConnection.send(new PlayerLoginPacket(token, player.getUUID(), player.getId()));
         var cfg = ChannelServerConfig.get();
         NetworkHelper.sendToPlayer((ServerPlayer) player, new SubspaceInitPacket(token, cfg.subspaceProtocol, cfg.subspaceAddress, cfg.subspaceClientPort, cfg.subspaceSecurityLevel));
     }
 
-    public static boolean using(){
+    public static boolean using() {
         return channel != null && channel.isActive();
     }
 }

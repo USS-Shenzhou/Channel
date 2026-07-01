@@ -34,10 +34,7 @@ public class ServerEventListener {
 
     @SubscribeEvent
     public static void playerLogIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (SubspaceConnection.using()) {
-            SubspaceConnection.newPlayer(event.getEntity());
-        }
-
+        SubspaceConnection.newPlayer(event.getEntity());
     }
 
     @SubscribeEvent

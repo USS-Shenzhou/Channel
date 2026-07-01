@@ -26,7 +26,8 @@ import java.util.concurrent.TimeUnit;
 public class SubspaceConnection {
     private static Protocol protocol;
     private static SecurityLevel securityLevel;
-    private static EventLoopGroup group;
+    private static final EventLoopGroup EVENT_LOOP_GROUP = new MultiThreadIoEventLoopGroup(1, new DefaultThreadFactory("Channel-Client-Subspace", true), NioIoHandler.newFactory());
+    ;
     private static volatile Channel channel;
     private static volatile boolean activelyDisconnect;
     private static ScheduledFuture<?> reconnectFuture;
@@ -179,12 +180,8 @@ public class SubspaceConnection {
     }
 
     private static void connectTcp(SubspaceInitPacket packet) {
-        if (group != null) {
-            group.shutdownGracefully();
-        }
-        group = new MultiThreadIoEventLoopGroup(1, new DefaultThreadFactory("Channel-Client-Subspace", true), NioIoHandler.newFactory());
         new Bootstrap()
-                .group(group)
+                .group(EVENT_LOOP_GROUP)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -210,9 +207,11 @@ public class SubspaceConnection {
                     if (future.isSuccess()) {
                         channel = future.channel();
                         channel.closeFuture().addListener((ChannelFutureListener) f -> {
-                            if (!activelyDisconnect) {
+                            if (activelyDisconnect) {
+                                activelyDisconnect = false;
+                            } else {
                                 LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 10s...");
-                                reconnectFuture = group.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
+                                reconnectFuture = EVENT_LOOP_GROUP.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
                                 channel = null;
                             }
                         });
@@ -220,7 +219,7 @@ public class SubspaceConnection {
                         MicrophoneHud.setStatus(MicrophoneHud.Status.STANDBY);
                     } else {
                         LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
-                        reconnectFuture = group.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
+                        reconnectFuture = EVENT_LOOP_GROUP.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
                         channel = null;
                     }
                 });
@@ -240,14 +239,11 @@ public class SubspaceConnection {
             channel.close();
             channel = null;
         }
-        if (group != null) {
-            group.shutdownGracefully();
-        }
+        EVENT_LOOP_GROUP.shutdownGracefully();
         protocol = null;
         securityLevel = null;
         reconnectFuture = null;
-        activelyDisconnect = false;
-        MicrophoneHud.setStatus(MicrophoneHud.Status.STANDBY);
+        MicrophoneHud.resumeStatus();
     }
 
     public static Protocol getProtocol() {
@@ -262,7 +258,7 @@ public class SubspaceConnection {
         return channel;
     }
 
-    public static boolean using(){
+    public static boolean using() {
         return channel != null && channel.isActive();
     }
 }
