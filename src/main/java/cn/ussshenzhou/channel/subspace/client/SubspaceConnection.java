@@ -239,10 +239,12 @@ public class SubspaceConnection {
             channel.close();
             channel = null;
         }
-        EVENT_LOOP_GROUP.shutdownGracefully();
+        if (reconnectFuture != null) {
+            reconnectFuture.cancel(false);
+            reconnectFuture = null;
+        }
         protocol = null;
         securityLevel = null;
-        reconnectFuture = null;
         MicrophoneHud.resumeStatus();
     }
 

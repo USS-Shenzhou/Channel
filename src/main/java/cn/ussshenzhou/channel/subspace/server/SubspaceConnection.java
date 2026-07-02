@@ -115,7 +115,6 @@ public class SubspaceConnection {
         if (channel != null) {
             channel.close();
         }
-        EVENT_LOOP_GROUP.shutdownGracefully();
     }
 
     public static void newPlayer(Player player) {
