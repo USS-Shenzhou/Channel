@@ -4,6 +4,7 @@ import cn.ussshenzhou.channel.config.ChannelServerConfig;
 import cn.ussshenzhou.channel.network.SubspaceInitPacket;
 import cn.ussshenzhou.channel.subspace.AesGcmEncoder;
 import cn.ussshenzhou.channel.subspace.SubspacePacket;
+import cn.ussshenzhou.channel.subspace.server.send.DataUpdatePacket;
 import cn.ussshenzhou.channel.subspace.server.send.InitPacket;
 import cn.ussshenzhou.channel.subspace.server.send.PlayerLoginPacket;
 import cn.ussshenzhou.t88.network.NetworkHelper;
@@ -74,17 +75,14 @@ public class SubspaceConnection {
                             } else {
                                 LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 10s...");
                                 EVENT_LOOP_GROUP.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
-                                channel = null;
                             }
+                            channel = null;
                         });
                         send(new InitPacket());
                         LogUtils.getLogger().info("Subspace server connected.");
-                        EVENT_LOOP_GROUP.schedule(() -> {
-                            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3000));
-                            if (channel.isActive() && ServerLifecycleHooks.getCurrentServer() != null) {
-                                ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(SubspaceConnection::newPlayer);
-                            }
-                        }, 1, TimeUnit.SECONDS);
+                        if (ServerLifecycleHooks.getCurrentServer() != null) {
+                            ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(SubspaceConnection::newPlayer);
+                        }
                     } else {
                         LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
                         EVENT_LOOP_GROUP.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
@@ -123,6 +121,7 @@ public class SubspaceConnection {
         }
         byte[] token = new SecureRandom().generateSeed(32);
         SubspaceConnection.send(new PlayerLoginPacket(token, player.getUUID(), player.getId()));
+        SubspaceConnection.send(new DataUpdatePacket());
         var cfg = ChannelServerConfig.get();
         NetworkHelper.sendToPlayer((ServerPlayer) player, new SubspaceInitPacket(token, cfg.subspaceProtocol, cfg.subspaceAddress, cfg.subspaceClientPort, cfg.subspaceSecurityLevel));
     }
