@@ -120,7 +120,7 @@ public class RayTraceManager {
             //noinspection DataFlowIssue
             generateOneRay(earPos, ray, level, debug, CHANNEL_OUTLINE, 0x80ffffff);
         })).join();
-        RAYTRACE_THREADS.submit(() -> generateRays(getRayAmount(), 0).parallelStream().forEach(ray -> {
+        RAYTRACE_THREADS.submit(() -> generateRays(getRayAmount(), 0.5).parallelStream().forEach(ray -> {
             //noinspection DataFlowIssue
             generateOneRay(earPos, ray, level, debug, CHANNEL_VISUAL, 0x8000ff00);
         })).join();
