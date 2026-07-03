@@ -71,6 +71,7 @@ public class SubspaceConnection {
                         channel = future.channel();
                         channel.closeFuture().addListener((ChannelFutureListener) f -> {
                             if (activelyDisconnect) {
+                                LogUtils.getLogger().info("Disconnected from subspace.");
                                 activelyDisconnect = false;
                             } else {
                                 LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 10s...");
@@ -79,7 +80,7 @@ public class SubspaceConnection {
                             channel = null;
                         });
                         send(new InitPacket());
-                        LogUtils.getLogger().info("Subspace server connected.");
+                        LogUtils.getLogger().info("Subspace connected. Sending InitPacket...");
                         if (ServerLifecycleHooks.getCurrentServer() != null) {
                             ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(SubspaceConnection::newPlayer);
                         }
