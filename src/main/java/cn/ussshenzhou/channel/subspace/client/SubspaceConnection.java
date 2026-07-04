@@ -236,6 +236,9 @@ public class SubspaceConnection {
     }
 
     public static void terminate() {
+        if (channel == null) {
+            return;
+        }
         activelyDisconnect = true;
         if (channel != null) {
             channel.close();
