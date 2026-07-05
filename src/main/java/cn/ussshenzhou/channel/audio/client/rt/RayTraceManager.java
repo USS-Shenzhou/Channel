@@ -102,7 +102,9 @@ public class RayTraceManager {
         synchronized (HIT_POINTS) {
             HIT_POINTS.clear();
         }
-        DebugRayTrace.rays.clear();
+        synchronized (DebugRayTrace.rays) {
+            DebugRayTrace.rays.clear();
+        }
         SOURCE_AUDIO_DATA_CACHE.clear();
     }
 
@@ -150,11 +152,13 @@ public class RayTraceManager {
                 HIT_POINTS.add(new HitPoint(round, new Vec3(hitPos.x, hitPos.y, hitPos.z), journey, distance, BlockSoundProperty.get(soundType), hitResult.getDirection()));
             }
             if (debug) {
-                DebugRayTrace.rays.add(new DebugRayTrace.Ray(
-                        new Vec3(startPos.x, startPos.y, startPos.z),
-                        new Vec3(startPos.x + ray.x * distance, startPos.y + ray.y * distance, startPos.z + ray.z * distance),
-                        color
-                ));
+                synchronized (DebugRayTrace.rays) {
+                    DebugRayTrace.rays.add(new DebugRayTrace.Ray(
+                            new Vec3(startPos.x, startPos.y, startPos.z),
+                            new Vec3(startPos.x + ray.x * distance, startPos.y + ray.y * distance, startPos.z + ray.z * distance),
+                            color
+                    ));
+                }
             }
             switch (hitResult.getDirection()) {
                 case UP, DOWN -> ray.mul(1, -1, 1);

@@ -27,8 +27,10 @@ public class DebugRayTrace {
         var posestack = event.getPoseStack();
         posestack.pushPose();
         posestack.translate(Minecraft.getInstance().gameRenderer.getMainCamera().position().scale(-1));
-        for (var ray : rays) {
-            Gizmos.line(ray.from, ray.to, ray.color, 1f);
+        synchronized (DebugRayTrace.rays) {
+            for (var ray : rays) {
+                Gizmos.line(ray.from, ray.to, ray.color, 1f);
+            }
         }
         posestack.popPose();
     }
