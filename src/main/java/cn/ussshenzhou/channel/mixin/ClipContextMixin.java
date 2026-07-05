@@ -10,14 +10,20 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ClipContext.Block.class)
 enum ClipContextMixin {
     CHANNEL_OUTLINE((state, level, pos, context) -> {
-        if (state.is(ModTags.AUDIO_SOURCE) || (CompatHelper.MEK_BLOCK_CLASS != null && CompatHelper.MEK_BLOCK_CLASS.isInstance(state.getBlock()))) {
+        if (state.is(ModTags.AUDIO_SOURCE)) {
             return Shapes.empty();
+        }
+        if (CompatHelper.MEK_BLOCK_CLASS != null && CompatHelper.MEK_BLOCK_CLASS.isInstance(state.getBlock())) {
+            return Shapes.block();
         }
         return state.getShape(level, pos, context);
     }),
     CHANNEL_VISUAL((state, level, pos, context) -> {
-        if (state.is(ModTags.AUDIO_SOURCE) || (CompatHelper.MEK_BLOCK_CLASS != null && CompatHelper.MEK_BLOCK_CLASS.isInstance(state.getBlock()))) {
+        if (state.is(ModTags.AUDIO_SOURCE)) {
             return Shapes.empty();
+        }
+        if (CompatHelper.MEK_BLOCK_CLASS != null && CompatHelper.MEK_BLOCK_CLASS.isInstance(state.getBlock())) {
+            return Shapes.block();
         }
         return state.getVisualShape(level, pos, context);
     });

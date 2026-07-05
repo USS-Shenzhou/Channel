@@ -7,7 +7,7 @@ public class CompatHelper {
     static {
         Class<?> mek;
         try {
-            mek = Class.forName("mekanism.common.tile.base.TileEntityUpdateable");
+            mek = Class.forName("mekanism.common.block.BlockMekanism");
         } catch (ClassNotFoundException e) {
             mek = null;
         }
