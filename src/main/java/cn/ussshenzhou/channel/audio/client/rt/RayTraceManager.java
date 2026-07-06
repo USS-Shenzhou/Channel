@@ -75,7 +75,7 @@ public class RayTraceManager {
             audio.read(AudioReceiveHandler.PLAY_RATE10);
             return true;
         }
-        var data = SOURCE_AUDIO_DATA_CACHE.compute(sourcePos, (p, _) -> RayTraceCalculator.calculateSourceAudioData(p));
+        var data = SOURCE_AUDIO_DATA_CACHE.compute(sourcePos, (p, old) -> old == null || Util.getMillis() - old.updateAt() >= 500 ? RayTraceCalculator.calculateSourceAudioData(p) : old);
         audio.updateSourceParameters(data, getSlot());
         return audio.play();
     }

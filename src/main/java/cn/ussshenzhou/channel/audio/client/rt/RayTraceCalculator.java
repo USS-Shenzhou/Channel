@@ -4,6 +4,7 @@ import cn.ussshenzhou.channel.Channel;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
+import net.minecraft.util.Util;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -413,7 +414,7 @@ public class RayTraceCalculator {
             directHF *= 0.15f;
             reverbGain = Mth.clamp(reverbGain * 1.3f, 0, 1);
         }
-        return new SourceAudioData(directGain, wallThickness, directHF, reverbGain, finalPos);
+        return new SourceAudioData(directGain, wallThickness, directHF, reverbGain, finalPos, Util.getMillis());
     }
 
     private static Tuple<Double, Vec3> calculateVirtualDirection(Vec3 sourcePos) {

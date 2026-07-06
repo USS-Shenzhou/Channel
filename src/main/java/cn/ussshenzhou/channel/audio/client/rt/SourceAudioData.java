@@ -7,6 +7,7 @@ public record SourceAudioData(
         float wallThickness,
         float directHF,
         float reverbGain,
-        Vec3 virtualPos
+        Vec3 virtualPos,
+        long updateAt
 ) {
 }
