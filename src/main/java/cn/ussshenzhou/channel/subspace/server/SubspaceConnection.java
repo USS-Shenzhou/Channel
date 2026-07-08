@@ -101,14 +101,6 @@ public class SubspaceConnection {
         }
     }
 
-    public static void changeSubspace() {
-        activelyDisconnect = true;
-        if (channel != null) {
-            channel.close();
-        }
-        connect();
-    }
-
     public static void shutdown() {
         activelyDisconnect = true;
         if (channel != null) {
@@ -124,7 +116,7 @@ public class SubspaceConnection {
         SubspaceConnection.send(new PlayerLoginPacket(token, player.getUUID(), player.getId()));
         SubspaceConnection.send(new DataUpdatePacket());
         var cfg = ChannelServerConfig.get();
-        NetworkHelper.sendToPlayer((ServerPlayer) player, new SubspaceInitPacket(token, cfg.subspaceProtocol, cfg.subspaceAddress, cfg.subspaceClientPort, cfg.subspaceSecurityLevel));
+        EVENT_LOOP_GROUP.schedule(() -> NetworkHelper.sendToPlayer((ServerPlayer) player, new SubspaceInitPacket(token, cfg.subspaceProtocol, cfg.subspaceAddress, cfg.subspaceClientPort, cfg.subspaceSecurityLevel)), 3, TimeUnit.SECONDS);
     }
 
     public static boolean using() {

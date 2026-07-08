@@ -212,6 +212,7 @@ public class SubspaceConnection {
                                 activelyDisconnect = false;
                             } else {
                                 LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 10s...");
+                                MicrophoneHud.setStatus(MicrophoneHud.Status.SUBSPACE);
                                 reconnectFuture = EVENT_LOOP_GROUP.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
                             }
                             channel = null;
@@ -221,6 +222,7 @@ public class SubspaceConnection {
                         MicrophoneHud.setStatus(MicrophoneHud.Status.STANDBY);
                     } else {
                         LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
+                        MicrophoneHud.setStatus(MicrophoneHud.Status.SUBSPACE);
                         reconnectFuture = EVENT_LOOP_GROUP.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
                         channel = null;
                     }
