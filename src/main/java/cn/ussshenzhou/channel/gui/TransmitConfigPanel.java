@@ -1,6 +1,7 @@
 package cn.ussshenzhou.channel.gui;
 
 import cn.ussshenzhou.channel.audio.OpusManager;
+import cn.ussshenzhou.channel.audio.client.send.MicReader;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.subspace.client.SubspaceConnection;
 import cn.ussshenzhou.channel.util.ModConstant;
@@ -36,7 +37,10 @@ public class TransmitConfigPanel extends TOptionsPanel {
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.net.length"),
                 Stream.concat(ModConstant.USABLE_FRAME_LENGTH.stream(), Stream.of(cfg.frameLengthMs)).distinct().collect(Collectors.toList()),
-                length -> _ -> ChannelClientConfig.write(c -> c.frameLengthMs = length),
+                length -> _ -> {
+                    ChannelClientConfig.write(c -> c.frameLengthMs = length);
+                    MicReader.frameLengthChange();
+                },
                 entry -> entry.getContent() == cfg.frameLengthMs
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.net.length.tooltip")));
         var netSampleRate = addOptionCycleButtonInit(

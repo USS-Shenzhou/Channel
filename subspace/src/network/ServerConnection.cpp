@@ -9,6 +9,7 @@ namespace subspace {
         BaseConnection(CryptHelper::NULL_ENCODE_DECODE, CryptHelper::AES_GCM_DECODE), socket(std::move(socket)), handshakeTimer(this->socket.get_executor()) {}
 
     void ServerConnection::start() {
+        socket.set_option(asio::ip::tcp::no_delay(true));
         remoteAddress = socket.remote_endpoint().address().to_string() + ":" + std::to_string(socket.remote_endpoint().port());
         spdlog::info("Minecraft Server connecting, from {}", getRemoteAddress());
         handshakeTimer.expires_from_now(std::chrono::seconds(3));

@@ -183,6 +183,7 @@ public class SubspaceConnection {
         new Bootstrap()
                 .group(EVENT_LOOP_GROUP)
                 .channel(NioSocketChannel.class)
+                .option(ChannelOption.TCP_NODELAY, true)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {

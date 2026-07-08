@@ -46,6 +46,7 @@ namespace subspace {
     }
 
     void ClientTcpConnection::start() {
+        socket.set_option(asio::ip::tcp::no_delay(true));
         remoteAddress = socket.remote_endpoint().address().to_string() + ":" + std::to_string(socket.remote_endpoint().port());
         spdlog::info("Client connecting from {}", getRemoteAddress());
         handshakeTimer.expires_after(std::chrono::seconds(5));

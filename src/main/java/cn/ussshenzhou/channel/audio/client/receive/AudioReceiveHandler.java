@@ -74,6 +74,7 @@ public class AudioReceiveHandler {
         }
         var earPos = AudioHelper.getEarPos();
         var decoded = OpusManager.decode(packet.opus, packet.from);
+        LogUtils.getLogger().warn("{}",decoded.length);
         if (Minecraft.getInstance().player != null && !Minecraft.getInstance().player.getUUID().equals(packet.from) && earPos.distanceToSqr(x, y, z) <= 64 * 64) {
             // direct talking sound always apply
             var audio = getDirectAudioAndCheckSampleRate(packet.from, 48000);

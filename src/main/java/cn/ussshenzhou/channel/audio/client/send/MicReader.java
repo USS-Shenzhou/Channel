@@ -37,7 +37,6 @@ public class MicReader {
         slidingWindow = new WebRTCHelper.SimpleSlidingBooleanWindow(ModConstant.VAD_SMOOTH_WINDOW_LENGTH_MS / frameLength);
     }
 
-    @Deprecated
     public static synchronized void frameLengthChange() {
         keepReading.cancel(false);
         frameLength = ChannelClientConfig.get().frameLengthMs;
