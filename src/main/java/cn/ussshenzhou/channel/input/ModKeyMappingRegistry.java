@@ -54,7 +54,7 @@ public class ModKeyMappingRegistry {
     @SubscribeEvent
     public static void mute(InputEvent.Key event) {
         var screen = Minecraft.getInstance().screen;
-        if (screen != null && (screen.getFocused() instanceof EditBox || screen.getFocused() instanceof MultilineTextField || screen.getFocused() instanceof AbstractTextAreaWidget)) {
+        if (screen != null) {
             return;
         }
         var cfg = ChannelClientConfig.get();

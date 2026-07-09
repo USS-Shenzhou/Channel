@@ -105,7 +105,6 @@ public class MicReader {
     private static boolean checkThreshold(byte[] audio) {
         var level = LevelGatherer.updateProcessed(audio);
         if (level == 0) {
-            MicrophoneHud.setStatus(MicrophoneHud.Status.STANDBY);
             return false;
         }
         var cfg = ChannelClientConfig.get();

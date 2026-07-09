@@ -36,8 +36,8 @@ public class MicrophoneHud extends TPanel {
         HudManager.removeInstanceOf(MicrophoneHud.class);
     }
 
-    private static Status status = Status.STANDBY;
-    private static Status prevStatus = Status.STANDBY;
+    private static Status status = ChannelClientConfig.get().onAir ? Status.STANDBY : Status.MUTE;
+    private static Status prevStatus = ChannelClientConfig.get().onAir ? Status.STANDBY : Status.MUTE;
     private final TImage microphone = new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/microphone.png"));
     private final TImage outline = new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/outline.png"));
     private final TImage color = new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/color.png"));
@@ -140,7 +140,7 @@ public class MicrophoneHud extends TPanel {
         }
     }
 
-    public static void resumeStatus(){
+    public static void resumeStatus() {
         MicrophoneHud.status = MicrophoneHud.prevStatus;
     }
 

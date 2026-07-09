@@ -220,7 +220,7 @@ public class SubspaceConnection {
                         });
                         send(new HandshakePacket());
                         LogUtils.getLogger().info("Subspace connected. Sending HandshakePacket");
-                        MicrophoneHud.setStatus(MicrophoneHud.Status.STANDBY);
+                        MicrophoneHud.resumeStatus();
                     } else {
                         LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
                         MicrophoneHud.setStatus(MicrophoneHud.Status.SUBSPACE);
