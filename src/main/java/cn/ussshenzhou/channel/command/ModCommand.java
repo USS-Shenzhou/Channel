@@ -8,6 +8,6 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 public class ModCommand {
     @SubscribeEvent
     public static void regCommand(RegisterCommandsEvent event) {
-        OpMuteCommand.channelCommand(event.getDispatcher());
+        ChannelCommand.channelCommand(event.getDispatcher());
     }
 }

@@ -163,7 +163,9 @@ public class SubspaceConnection {
     public static void connect(SubspaceInitPacket packet) {
         MicrophoneHud.setStatus(MicrophoneHud.Status.SUBSPACE);
         if (channel != null && channel.isActive()) {
+            activelyDisconnect = true;
             channel.close();
+            channel = null;
         }
         if (reconnectFuture != null) {
             reconnectFuture.cancel(false);
@@ -248,7 +250,7 @@ public class SubspaceConnection {
             channel = null;
         }
         if (reconnectFuture != null) {
-            reconnectFuture.cancel(false);
+            reconnectFuture.cancel(true);
             reconnectFuture = null;
         }
         protocol = null;

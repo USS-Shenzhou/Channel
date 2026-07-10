@@ -2,6 +2,7 @@ package cn.ussshenzhou.channel.command;
 
 import cn.ussshenzhou.channel.config.ChannelServerConfig;
 import cn.ussshenzhou.channel.network.OpMutePacket;
+import cn.ussshenzhou.channel.subspace.server.SubspaceConnection;
 import cn.ussshenzhou.t88.network.NetworkHelper;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -15,7 +16,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 @EventBusSubscriber
-public class OpMuteCommand {
+public class ChannelCommand {
 
     public static void channelCommand(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
@@ -29,6 +30,16 @@ public class OpMuteCommand {
                                                     ChannelServerConfig.write(c -> c.muteNoneOP = !now);
                                                     ct.getSource().sendSystemMessage(Component.literal(now ? "All players can talk now." : "Only OP 2 can talk now."));
                                                     NetworkHelper.sendToAllPlayers(new OpMutePacket(!now));
+                                                    return Command.SINGLE_SUCCESS;
+                                                })
+                                        )
+                                        .then(Commands.literal("reset_subspace")
+                                                .executes(ct -> {
+                                                    if (!ChannelServerConfig.get().useSubspace) {
+                                                        ct.getSource().sendSystemMessage(Component.literal("Subspace is not enabled."));
+                                                    }
+                                                    ct.getSource().sendSystemMessage(Component.literal("Resetting start..."));
+                                                    SubspaceConnection.reset();
                                                     return Command.SINGLE_SUCCESS;
                                                 })
                                         )

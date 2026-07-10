@@ -24,13 +24,12 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author USS_Shenzhou
  */
 public class SubspaceConnection {
-    private static final EventLoopGroup EVENT_LOOP_GROUP = new MultiThreadIoEventLoopGroup(1, new DefaultThreadFactory("Channel-Server-Subspace", true), NioIoHandler.newFactory());
+    private static EventLoopGroup eventLoopGroup = new MultiThreadIoEventLoopGroup(1, new DefaultThreadFactory("Channel-Server-Subspace", true), NioIoHandler.newFactory());
     private static volatile Channel channel;
     private static volatile boolean activelyDisconnect;
 
@@ -52,7 +51,7 @@ public class SubspaceConnection {
     public static void connect() {
         var cfg = ChannelServerConfig.get();
         new Bootstrap()
-                .group(EVENT_LOOP_GROUP)
+                .group(eventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -76,7 +75,7 @@ public class SubspaceConnection {
                                 activelyDisconnect = false;
                             } else {
                                 LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 10s...");
-                                EVENT_LOOP_GROUP.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
+                                eventLoopGroup.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
                             }
                             channel = null;
                         });
@@ -87,7 +86,7 @@ public class SubspaceConnection {
                         }
                     } else {
                         LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
-                        EVENT_LOOP_GROUP.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
+                        eventLoopGroup.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
                         channel = null;
                     }
                 });
@@ -117,10 +116,18 @@ public class SubspaceConnection {
         SubspaceConnection.send(new PlayerLoginPacket(token, player.getUUID(), player.getId()));
         SubspaceConnection.send(new DataUpdatePacket());
         var cfg = ChannelServerConfig.get();
-        EVENT_LOOP_GROUP.schedule(() -> NetworkHelper.sendToPlayer((ServerPlayer) player, new SubspaceInitPacket(token, cfg.subspaceProtocol, cfg.subspaceAddress, cfg.subspaceClientPort, cfg.subspaceSecurityLevel)), 3, TimeUnit.SECONDS);
+        eventLoopGroup.schedule(() -> NetworkHelper.sendToPlayer((ServerPlayer) player, new SubspaceInitPacket(token, cfg.subspaceProtocol, cfg.subspaceAddress, cfg.subspaceClientPort, cfg.subspaceSecurityLevel)), 3, TimeUnit.SECONDS);
     }
 
     public static boolean using() {
         return channel != null && channel.isActive();
+    }
+
+    public static void reset(){
+        LogUtils.getLogger().info("Resetting subspace connection...");
+        shutdown();
+        eventLoopGroup.shutdownGracefully();
+        eventLoopGroup = new MultiThreadIoEventLoopGroup(1, new DefaultThreadFactory("Channel-Server-Subspace", true), NioIoHandler.newFactory());
+        connect();
     }
 }
