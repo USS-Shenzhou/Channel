@@ -39,19 +39,22 @@ public class InputConfigPanel extends TOptionsPanel {
         var cfg = ChannelClientConfig.get();
 
         addOptionSplitter(Component.translatable("channel.config.mic"));
+        var deviceList = Stream.of(AudioSystem.getMixerInfo())
+                .filter(info -> "DirectAudioDeviceInfo".equals(info.getClass().getSimpleName()) &&
+                        AudioSystem.getMixer(info).getTargetLineInfo().length > 0)
+                .map(Mixer.Info::getName)
+                .toList();
         devices = addOptionCycleButtonInit(
                 Component.translatable("channel.config.mic.device"),
-                Stream.of(AudioSystem.getMixerInfo())
-                        .filter(info -> "DirectAudioDeviceInfo".equals(info.getClass().getSimpleName()) &&
-                                AudioSystem.getMixer(info).getTargetLineInfo().length > 0)
-                        .map(Mixer.Info::getName)
-                        .toList(),
+                deviceList,
                 deviceName -> _ -> {
+                    updateDeviceTooltip(deviceList);
                     ChannelClientConfig.write(c -> c.useDevice = deviceName);
                     notifyMicManager();
                 },
                 entry -> entry.getContent().equals(cfg.useDevice)
         ).getB();
+        updateDeviceTooltip(deviceList);
         addOption(Component.translatable("channel.config.mic.samplerate"), new TLabel(Component.literal(String.valueOf(cfg.micSampleRate))))
                 .getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.samplerate.tooltip")));
         addOption(Component.translatable("channel.config.mic.samplebits"), new TLabel(Component.literal(String.valueOf(ModConstant.MIC_SAMPLE_BITS))))
@@ -242,6 +245,19 @@ public class InputConfigPanel extends TOptionsPanel {
 
     private void notifyMicManager() {
         MicManager.update(devices.getSelected().getContent());
+    }
+
+    public void updateDeviceTooltip(List<String> deviceList) {
+        StringBuilder text = new StringBuilder();
+        var selectedDevice = devices.getSelected() == null ? null : devices.getSelected().getContent();
+        for (var device : deviceList) {
+            if (device.equals(selectedDevice)) {
+                text.append("§l> ").append(device).append("§r\n");
+            } else {
+                text.append(device).append("\n");
+            }
+        }
+        devices.setTooltip(Tooltip.create(Component.literal(text.toString().strip())));
     }
 
 }
