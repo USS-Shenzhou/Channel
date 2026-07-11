@@ -7,6 +7,7 @@ import cn.ussshenzhou.channel.config.ChannelPlayerConfig;
 import cn.ussshenzhou.channel.network.AudioPacket2C;
 import cn.ussshenzhou.channel.audio.OpusManager;
 import cn.ussshenzhou.channel.subspace.client.SubspaceAudioPacket;
+import cn.ussshenzhou.channel.subspace.client.SubspaceConnection;
 import cn.ussshenzhou.channel.subspace.packet;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import com.google.common.collect.MapMaker;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -32,13 +34,19 @@ import java.util.UUID;
 @EventBusSubscriber(Dist.CLIENT)
 public class AudioReceiveHandler {
     public static final int PLAY_RATE10 = 2;
-    @SuppressWarnings("MapOrSetKeyShouldOverrideHashCodeEquals")
     private static final Set<SpeakerBlockEntity> CHANNELED_BLOCK_CACHE_C = Collections.newSetFromMap(new MapMaker().weakKeys().makeMap());
 
     @SubscribeEvent
     public static void removeRemovedBlock(ClientTickEvent.Pre event) {
         synchronized (CHANNELED_BLOCK_CACHE_C) {
             CHANNELED_BLOCK_CACHE_C.removeIf(BlockEntity::isRemoved);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onExit(ClientPlayerNetworkEvent.LoggingOut event) {
+        synchronized (CHANNELED_BLOCK_CACHE_C) {
+            CHANNELED_BLOCK_CACHE_C.clear();
         }
     }
 

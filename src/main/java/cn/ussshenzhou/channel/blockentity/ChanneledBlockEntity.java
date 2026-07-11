@@ -36,7 +36,7 @@ public abstract class ChanneledBlockEntity extends BlockEntity {
         super.setLevel(level);
         if (!level.isClientSide()) {
             RelayHandler.addBlockEntity(this);
-        } else if (this instanceof SpeakerBlockEntity speaker){
+        } else if (this instanceof SpeakerBlockEntity speaker) {
             AudioReceiveHandler.add(speaker);
         }
     }
@@ -79,11 +79,14 @@ public abstract class ChanneledBlockEntity extends BlockEntity {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return this.getBlockPos().hashCode() ^ this.channel;
     }
 
     @Override
     public boolean equals(Object obj) {
+        if (obj instanceof ChanneledBlockEntity that) {
+            return that.getBlockPos().equals(this.getBlockPos()) && that.channel == this.channel;
+        }
         return super.equals(obj);
     }
 }
