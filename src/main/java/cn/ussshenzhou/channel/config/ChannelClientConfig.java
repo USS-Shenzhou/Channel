@@ -41,6 +41,7 @@ public class ChannelClientConfig implements TConfig {
     public boolean showRaytrace = false;
     public boolean onAir = true;
     public boolean muteAll = false;
+    public boolean hearMyself = false;
 
     public static ChannelClientConfig get() {
         return ConfigHelper.getConfigRead(ChannelClientConfig.class);

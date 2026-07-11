@@ -105,6 +105,8 @@
   "channel.config.post.mute.tooltip": "Click on a player's avatar to mute individually.",
   "channel.config.post.player_control_clear": "§6Reset All",
   "channel.config.post.player_control_clear.tooltip": "Reset all individual loudness adjustments below.",
+  "channel.config.post.hearself": "Hear Myself",
+  "channel.config.post.hearself.tooltip": "Play sounds sent back from server or subspace.",
 
   "channel.config.tab.general": "General",
   "channel.config.dispay": "  Display",

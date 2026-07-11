@@ -180,8 +180,7 @@ public class RelayHandler {
     }
 
     public static boolean closeHear(ServerPlayer from, ServerPlayer to) {
-        return /*(SharedConstants.IS_RUNNING_IN_IDE ||*/ to.getId() != from.getId()/*)*/
-                && to.position().distanceToSqr(from.position()) < 64 * 64
+        return to.position().distanceToSqr(from.position()) < 64 * 64
                 && (!from.isSpectator() || to.isSpectator());
     }
 }

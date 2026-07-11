@@ -47,6 +47,14 @@ public class OutputConfigPanel extends TOptionsPanel {
                 cfg.networkTolerance, false
 
         );
+        addOptionCycleButtonInit(Component.translatable("channel.config.post.hearself"),
+                List.of(true, false),
+                bool -> _ -> {
+                    ChannelClientConfig.write(c -> c.hearMyself = bool);
+                    AudioManager.reset();
+                },
+                entry -> entry.getContent() == cfg.hearMyself
+        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.hearself.tooltip")));
 
         addOptionSplitter(Component.translatable("channel.config.post.control"));
         addOptionSliderDoubleInit(Component.translatable("channel.config.post.control_adjust"),

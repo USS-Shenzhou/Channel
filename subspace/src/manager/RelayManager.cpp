@@ -84,11 +84,11 @@ namespace subspace {
         std::shared_lock lock0(connectionLock);
         std::shared_lock lock1(dataLock);
         for (const auto& [uuid, to] : playerDatas) {
-#ifdef NDEBUG
-            if (uuid == from) {
-                continue;
-            }
-#endif
+//#ifdef NDEBUG
+//            if (uuid == from) {
+//                continue;
+//            }
+//#endif
             if (fr.dimensionHash != to.dimensionHash) {
                 continue;
             }
