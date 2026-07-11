@@ -107,7 +107,7 @@
   "channel.config.post.player_control_clear.tooltip": "重置以下全部单独调整响度。",
   "channel.config.post.delay": "网络质量容忍",
   "channel.config.post.delay.tooltip": "通过调整缓冲区大小来应对不同的网络质量。\n更小的值有助于减少声音延迟。\n更大的值有助于应对不稳定的网络环境，减少爆音和跳变。",
-  "channel.config.post.hearself": "听见自己",
+  "channel.config.post.hearself": "侦听（听见自己）",
   "channel.config.post.hearself.tooltip": "播放由服务器回传的声音。",
 
   "channel.config.tab.general": "通用",
