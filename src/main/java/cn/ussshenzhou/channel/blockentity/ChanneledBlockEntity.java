@@ -37,8 +37,7 @@ public abstract class ChanneledBlockEntity extends BlockEntity {
         if (!level.isClientSide()) {
             RelayHandler.addBlockEntity(this);
         } else if (this instanceof SpeakerBlockEntity speaker){
-            //noinspection MapOrSetKeyShouldOverrideHashCodeEquals
-            AudioReceiveHandler.CHANNELED_BLOCK_CACHE_C.add(speaker);
+            AudioReceiveHandler.add(speaker);
         }
     }
 

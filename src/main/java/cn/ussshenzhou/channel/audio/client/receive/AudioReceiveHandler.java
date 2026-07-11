@@ -33,11 +33,20 @@ import java.util.UUID;
 public class AudioReceiveHandler {
     public static final int PLAY_RATE10 = 2;
     @SuppressWarnings("MapOrSetKeyShouldOverrideHashCodeEquals")
-    public static final Set<SpeakerBlockEntity> CHANNELED_BLOCK_CACHE_C = Collections.newSetFromMap(new MapMaker().weakKeys().makeMap());
+    private static final Set<SpeakerBlockEntity> CHANNELED_BLOCK_CACHE_C = Collections.newSetFromMap(new MapMaker().weakKeys().makeMap());
 
     @SubscribeEvent
     public static void removeRemovedBlock(ClientTickEvent.Pre event) {
-        CHANNELED_BLOCK_CACHE_C.removeIf(BlockEntity::isRemoved);
+        synchronized (CHANNELED_BLOCK_CACHE_C) {
+            CHANNELED_BLOCK_CACHE_C.removeIf(BlockEntity::isRemoved);
+        }
+    }
+
+    public static void add(SpeakerBlockEntity blockEntity){
+        synchronized (CHANNELED_BLOCK_CACHE_C) {
+            //noinspection MapOrSetKeyShouldOverrideHashCodeEquals
+            AudioReceiveHandler.CHANNELED_BLOCK_CACHE_C.add(blockEntity);
+        }
     }
 
     public static void handle(AudioPacket2C packet) {
@@ -92,16 +101,18 @@ public class AudioReceiveHandler {
             return;
         }
         var channels = IntArraySet.of(packet.channels);
-        for (var speaker : CHANNELED_BLOCK_CACHE_C) {
-            if (!channels.contains(speaker.getChannel())) {
-                continue;
+        synchronized (CHANNELED_BLOCK_CACHE_C) {
+            for (var speaker : CHANNELED_BLOCK_CACHE_C) {
+                if (!channels.contains(speaker.getChannel())) {
+                    continue;
+                }
+                var pos = speaker.getBlockPos();
+                if (earPos.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64 * 64) {
+                    continue;
+                }
+                var audio = getSpeakerAudioAndCheckSampleRate(speaker, 48000);
+                audio.push(packet.from, decoded);
             }
-            var pos = speaker.getBlockPos();
-            if (earPos.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64 * 64) {
-                return;
-            }
-            var audio = getSpeakerAudioAndCheckSampleRate(speaker, 48000);
-            audio.push(packet.from, decoded);
         }
     }
 
