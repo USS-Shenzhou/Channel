@@ -128,6 +128,7 @@ namespace subspace {
         auto uuid = buf.readUUID();
         TokenManager::remove(uuid);
         ShortIdManager::remove(uuid);
+        RelayManager::remove(uuid);
         // Client needs to disconnect actively.
     }
 

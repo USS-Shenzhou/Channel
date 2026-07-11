@@ -13,11 +13,33 @@ namespace subspace {
         playerDatas[uuid] = data;
     }
 
-    void RelayManager::updateChannelData(std::unordered_map<UUID, std::vector<int>>&& newPlayerChannelsSend,
-                                         std::unordered_map<int, std::vector<UUID>>&& newChannelPlayersReceive) {
+    void RelayManager::updateChannelData(std::unordered_map<UUID, std::vector<int>> newPlayerChannelsSend,
+                                         std::unordered_map<int, std::vector<UUID>> newChannelPlayersReceive) {
         std::unique_lock lock(channelLock);
-        playerChannelsSend = std::move(newPlayerChannelsSend);
-        channelPlayersReceive = std::move(newChannelPlayersReceive);
+        for (auto& [playerId, channels] : newPlayerChannelsSend) {
+            playerChannelsSend[playerId] = std::move(channels);
+        }
+        for (auto& [channelId, players] : newChannelPlayersReceive) {
+            channelPlayersReceive[channelId] = std::move(players);
+        }
+    }
+
+    void RelayManager::remove(const UUID& uuid) {
+        {
+            std::unique_lock lock0(dataLock);
+            playerDatas.erase(uuid);
+        }
+        {
+            std::unique_lock lock1(channelLock);
+            playerChannelsSend.erase(uuid);
+            for (auto& [_, players] : channelPlayersReceive) {
+                std::erase(players, uuid);
+            }
+        }
+        {
+            std::unique_lock lock2(connectionLock);
+            connections.erase(uuid);
+        }
     }
 
     void RelayManager::registerConnection(const UUID& uuid, const std::shared_ptr<ClientTcpConnection>& connection) {
@@ -84,11 +106,11 @@ namespace subspace {
         std::shared_lock lock0(connectionLock);
         std::shared_lock lock1(dataLock);
         for (const auto& [uuid, to] : playerDatas) {
-//#ifdef NDEBUG
-//            if (uuid == from) {
-//                continue;
-//            }
-//#endif
+            //#ifdef NDEBUG
+            //            if (uuid == from) {
+            //                continue;
+            //            }
+            //#endif
             if (fr.dimensionHash != to.dimensionHash) {
                 continue;
             }

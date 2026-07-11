@@ -23,7 +23,8 @@ namespace subspace {
     class RelayManager {
     public:
         static void updateData(const UUID& uuid, const PlayerData& data);
-        static void updateChannelData(std::unordered_map<UUID, std::vector<int>>&& playerChannelsSend, std::unordered_map<int, std::vector<UUID>>&& channelPlayersReceive);
+        static void updateChannelData(std::unordered_map<UUID, std::vector<int>> playerChannelsSend, std::unordered_map<int, std::vector<UUID>> channelPlayersReceive);
+        static void remove(const UUID& uuid);
 
         static void registerConnection(const UUID& uuid, const std::shared_ptr<ClientTcpConnection>& connection);
         static void disconnect(const UUID& uuid, const ClientTcpConnection* toRemove);
