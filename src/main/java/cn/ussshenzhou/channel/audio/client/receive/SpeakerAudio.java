@@ -27,7 +27,7 @@ public class SpeakerAudio extends Audio {
     private final WeakReference<SpeakerBlockEntity> speakerBlockEntity;
     private final ConcurrentHashMap<UUID, MpscArrayQueue<short[]>> audioBuffers = new ConcurrentHashMap<>();
     protected int x, y, z;
-    public static final float REVERB_ENHANCE = 1.5f;
+    public static final float REVERB_ENHANCE = 3f;
 
     public SpeakerAudio(SpeakerBlockEntity speakerBlockEntity, int sampleRate) {
         super(sampleRate);
@@ -59,12 +59,12 @@ public class SpeakerAudio extends Audio {
         if (distance >= 32) {
             extraDecay = 1 - (distance - 32) / 32;
         }
-        double wallDecay = Math.pow(0.5, data.wallThickness());
-        alFilterf(this.alDirectFilter, AL_LOWPASS_GAIN, (float) (extraDecay * correctedGain * wallDecay / REVERB_ENHANCE));
+        double directWallDecay = Math.pow(0.5, data.wallThickness());
+        alFilterf(this.alDirectFilter, AL_LOWPASS_GAIN, (float) (extraDecay * correctedGain * directWallDecay));
         alFilterf(this.alDirectFilter, AL_LOWPASS_GAINHF, data.directHF());
         alSourcei(this.alSource, AL_DIRECT_FILTER, this.alDirectFilter);
 
-        alFilterf(this.alReverbFilter, AL_LOWPASS_GAIN, (float) (extraDecay * wallDecay));
+        alFilterf(this.alReverbFilter, AL_LOWPASS_GAIN, (float) (Math.sqrt(data.reverbGain()) * REVERB_ENHANCE));
         alFilterf(this.alReverbFilter, AL_LOWPASS_GAINHF, 1);
         alSource3i(this.alSource, AL_AUXILIARY_SEND_FILTER, auxSlot, 0, this.alReverbFilter);
 
@@ -83,7 +83,7 @@ public class SpeakerAudio extends Audio {
 
     @Override
     protected float getGain() {
-        return REVERB_ENHANCE * AudioHelper.db2factor(ChannelClientConfig.get().outputAdjust);
+        return AudioHelper.db2factor(ChannelClientConfig.get().outputAdjust);
     }
 
     @Override

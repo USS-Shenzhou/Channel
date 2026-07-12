@@ -37,7 +37,7 @@ public abstract class Audio {
         alSourcef(alSource, AL_GAIN, 1);
         alSourcef(alSource, AL_PITCH, 1);
         alSourcef(alSource, AL_LOOPING, AL_FALSE);
-        alSourcef(alSource, AL_REFERENCE_DISTANCE, 1.5f);
+        alSourcef(alSource, AL_REFERENCE_DISTANCE, 2);
         alSourcef(alSource, AL_MAX_GAIN, AudioHelper.db2factor(30));
         if (ChannelClientConfig.get().rayTraceAudio) {
             alSourcef(alSource, AL_ROLLOFF_FACTOR, 0);
