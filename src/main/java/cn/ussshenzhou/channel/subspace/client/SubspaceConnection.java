@@ -27,7 +27,6 @@ public class SubspaceConnection {
     private static Protocol protocol;
     private static SecurityLevel securityLevel;
     private static final EventLoopGroup EVENT_LOOP_GROUP = new MultiThreadIoEventLoopGroup(1, new DefaultThreadFactory("Channel-Client-Subspace", true), NioIoHandler.newFactory());
-    ;
     private static volatile Channel channel;
     private static volatile boolean activelyDisconnect;
     private static ScheduledFuture<?> reconnectFuture;
@@ -214,9 +213,9 @@ public class SubspaceConnection {
                                 LogUtils.getLogger().info("Disconnected from subspace.");
                                 activelyDisconnect = false;
                             } else {
-                                LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 10s...");
+                                LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 30s...");
                                 MicrophoneHud.setStatus(MicrophoneHud.Status.SUBSPACE);
-                                reconnectFuture = EVENT_LOOP_GROUP.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
+                                reconnectFuture = EVENT_LOOP_GROUP.schedule(() -> connect(packet), 30, TimeUnit.SECONDS);
                             }
                             channel = null;
                         });
@@ -224,9 +223,9 @@ public class SubspaceConnection {
                         LogUtils.getLogger().info("Subspace connected. Sending HandshakePacket");
                         MicrophoneHud.resumeStatus();
                     } else {
-                        LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
+                        LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 30s...");
                         MicrophoneHud.setStatus(MicrophoneHud.Status.SUBSPACE);
-                        reconnectFuture = EVENT_LOOP_GROUP.schedule(() -> connect(packet), 10, TimeUnit.SECONDS);
+                        reconnectFuture = EVENT_LOOP_GROUP.schedule(() -> connect(packet), 30, TimeUnit.SECONDS);
                         channel = null;
                     }
                 });

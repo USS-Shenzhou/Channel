@@ -49,7 +49,7 @@ namespace subspace {
         socket.set_option(asio::ip::tcp::no_delay(true));
         remoteAddress = socket.remote_endpoint().address().to_string() + ":" + std::to_string(socket.remote_endpoint().port());
         spdlog::info("Client connecting from {}", getRemoteAddress());
-        handshakeTimer.expires_after(std::chrono::seconds(5));
+        handshakeTimer.expires_after(std::chrono::seconds(10));
         handshakeTimer.async_wait([thiz = std::dynamic_pointer_cast<ClientTcpConnection>(shared_from_this())](const std::error_code& ec) {
             if (ec) {
                 return;

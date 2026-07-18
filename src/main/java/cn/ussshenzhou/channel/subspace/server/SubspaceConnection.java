@@ -74,8 +74,8 @@ public class SubspaceConnection {
                                 LogUtils.getLogger().info("Disconnected from subspace.");
                                 activelyDisconnect = false;
                             } else {
-                                LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 10s...");
-                                eventLoopGroup.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
+                                LogUtils.getLogger().warn("Disconnected from subspace. Reconnecting in 30s...");
+                                eventLoopGroup.schedule(SubspaceConnection::connect, 30, TimeUnit.SECONDS);
                             }
                             channel = null;
                         });
@@ -85,8 +85,8 @@ public class SubspaceConnection {
                             ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(SubspaceConnection::newPlayer);
                         }
                     } else {
-                        LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 10s...");
-                        eventLoopGroup.schedule(SubspaceConnection::connect, 10, TimeUnit.SECONDS);
+                        LogUtils.getLogger().error("Failed to connect to subspace server. Try again in 30s...");
+                        eventLoopGroup.schedule(SubspaceConnection::connect, 30, TimeUnit.SECONDS);
                         channel = null;
                     }
                 });
