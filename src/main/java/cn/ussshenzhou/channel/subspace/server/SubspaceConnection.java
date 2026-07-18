@@ -93,12 +93,23 @@ public class SubspaceConnection {
     }
 
     public static void send(SubspacePacket packet) {
-        if (channel != null && channel.isActive()) {
-            var buf = new FriendlyByteBuf(channel.alloc().buffer());
-            buf.writeVarInt(packet.getId());
-            packet.encode(buf);
-            channel.writeAndFlush(buf);
+        if (channel == null) {
+            LogUtils.getLogger().warn("channel is null. This should not happen. Skip send {}.", packet.getClass().getSimpleName());
+            return;
         }
+        if (!channel.isActive()) {
+            LogUtils.getLogger().warn("channel is inactive. This should not happen. Skip send {}.", packet.getClass().getSimpleName());
+            return;
+        }
+        var buf = new FriendlyByteBuf(channel.alloc().buffer());
+        buf.writeVarInt(packet.getId());
+        packet.encode(buf);
+        channel.writeAndFlush(buf)
+                .addListener((ChannelFutureListener) future -> {
+                    if (!future.isSuccess()) {
+                        LogUtils.getLogger().error("Failed to send {}.", packet.getClass().getSimpleName(), future.cause());
+                    }
+                });
     }
 
     public static void shutdown() {
@@ -123,7 +134,7 @@ public class SubspaceConnection {
         return channel != null && channel.isActive();
     }
 
-    public static void reset(){
+    public static void reset() {
         LogUtils.getLogger().info("Resetting subspace connection...");
         shutdown();
         eventLoopGroup.shutdownGracefully();
