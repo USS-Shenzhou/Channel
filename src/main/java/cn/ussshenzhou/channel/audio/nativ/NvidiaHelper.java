@@ -22,6 +22,9 @@ public class NvidiaHelper {
 
     public static void init() {
         NvidiaInit.checkRequire();
+        if (stat != NvidiaHelper.Stat.OK) {
+            return;
+        }
         NvidiaInit.tryLoadDll();
         refresh();
     }
