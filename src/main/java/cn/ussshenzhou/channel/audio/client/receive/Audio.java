@@ -13,27 +13,22 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import static org.lwjgl.openal.AL10.*;
-import static org.lwjgl.openal.AL10.AL_FALSE;
-import static org.lwjgl.openal.AL10.AL_LOOPING;
-import static org.lwjgl.openal.AL10.AL_MAX_GAIN;
-import static org.lwjgl.openal.AL10.AL_PITCH;
-import static org.lwjgl.openal.AL10.AL_REFERENCE_DISTANCE;
-import static org.lwjgl.openal.AL10.AL_ROLLOFF_FACTOR;
-import static org.lwjgl.openal.AL10.alSourcef;
-import static org.lwjgl.openal.AL10.alSourcei;
-import static org.lwjgl.openal.AL11.alSource3i;
+import static org.lwjgl.openal.AL11.*;
 import static org.lwjgl.openal.EXTEfx.*;
-import static org.lwjgl.openal.EXTEfx.AL_AUXILIARY_SEND_FILTER;
 
 public abstract class Audio {
     protected static final int MAX_BUFFER_10MS = 3 * 100;
     protected int readyBufferMs = 0;
-    protected final int alSource, sampleRate, alDirectFilter, alReverbFilter;
+    protected int alSource, sampleRate, alDirectFilter, alReverbFilter;
     protected double x, y, z;
 
-    public Audio(int sampleRate) {
-        this.sampleRate = sampleRate;
+    public Audio() {
+        this.sampleRate = 48000;
         this.alSource = alGenSources();
+        initAL();
+    }
+
+    protected void initAL() {
         alSourcef(alSource, AL_GAIN, 1);
         alSourcef(alSource, AL_PITCH, 1);
         alSourcef(alSource, AL_LOOPING, AL_FALSE);

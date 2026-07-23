@@ -91,7 +91,7 @@ public class RelayHandler {
 
     private static void checkHandSend(ServerPlayer from, IntArraySet channels, InteractionHand hand) {
         var item0 = from.getItemInHand(hand);
-        if (item0.is(ModItems.HANDHELD_MIC_ITEM.get())) {
+        if (item0.is(ModItems.HANDHELD_MIC_ITEM.get()) || item0.is(ModItems.WALKIE_TALKIE.get())) {
             var ch = item0.get(ModItems.CHANNEL.get());
             if (ch != null && ch > 0) {
                 channels.add(ch.intValue());

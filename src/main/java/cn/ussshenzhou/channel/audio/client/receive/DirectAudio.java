@@ -20,8 +20,8 @@ public class DirectAudio extends Audio {
     private final MpscArrayQueue<short[]> audioBuffer = new MpscArrayQueue<>((int) (1.1 * MAX_BUFFER_10MS));
     public final UUID playerId;
 
-    public DirectAudio(UUID playerId, int sampleRate) {
-        super(sampleRate);
+    public DirectAudio(UUID playerId) {
+        super();
         this.playerId = playerId;
     }
 

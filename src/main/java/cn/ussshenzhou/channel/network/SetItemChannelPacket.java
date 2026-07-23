@@ -40,7 +40,7 @@ public class SetItemChannelPacket {
     @ServerHandler
     public void serverHandler(IPayloadContext context) {
         var item = context.player().getItemInHand(hand);
-        if (item.is(ModItems.HANDHELD_MIC_ITEM.get())) {
+        if (item.has(ModItems.CHANNEL.get())) {
             item.set(ModItems.CHANNEL.get(), channel);
         }
     }

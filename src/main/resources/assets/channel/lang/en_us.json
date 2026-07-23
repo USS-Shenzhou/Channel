@@ -134,5 +134,10 @@
   "item.channel.mic": "Fixed Microphone",
   "item.channel.speaker": "Speaker",
   "item.channel.speaker_stand": "Speaker (Standing)",
-  "item.channel.speaker_hang": "Speaker (Hanging)"
+  "item.channel.speaker_hang": "Speaker (Hanging)",
+  "item.channel.walkie_talkie": "Walkie-Talkie",
+  "item.channel.walkie_talkie.tooltip": "Hold to speak. Receive audio while in inventory.",
+
+  "notice.channel.mute_true": "OP has enabled muting. Only OP can talk now.",
+  "notice.channel.mute_false": "OP has disable muting. Everyone can talk now."
 }

@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
+import cn.ussshenzhou.channel.Item.ModItems;
 import cn.ussshenzhou.channel.audio.client.send.WebRTCHelper;
 import cn.ussshenzhou.channel.blockentity.SpeakerBlockEntity;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
@@ -25,6 +26,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -50,7 +52,7 @@ public class AudioReceiveHandler {
         }
     }
 
-    public static void add(SpeakerBlockEntity blockEntity){
+    public static void add(SpeakerBlockEntity blockEntity) {
         synchronized (CHANNELED_BLOCK_CACHE_C) {
             //noinspection MapOrSetKeyShouldOverrideHashCodeEquals
             AudioReceiveHandler.CHANNELED_BLOCK_CACHE_C.add(blockEntity);
@@ -93,17 +95,6 @@ public class AudioReceiveHandler {
         }
         var earPos = AudioHelper.getEarPos();
         var decoded = OpusManager.decode(packet.opus, packet.from);
-        var localPlayer = Minecraft.getInstance().player;
-        if (localPlayer != null) {
-            boolean hearingSelf = ChannelClientConfig.get().hearMyself && localPlayer.getUUID().equals(packet.from);
-            boolean hearingOther = !localPlayer.getUUID().equals(packet.from) && earPos.distanceToSqr(x, y, z) <= 64 * 64;
-            if (hearingSelf || hearingOther) {
-                // direct talking sound always apply
-                var audio = getDirectAudioAndCheckSampleRate(packet.from, 48000);
-                audio.push(decoded);
-                audio.setPos(x, y, z);
-            }
-        }
         // through speaker
         if (packet.channels.length == 0) {
             return;
@@ -118,35 +109,34 @@ public class AudioReceiveHandler {
                 if (earPos.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64 * 64) {
                     continue;
                 }
-                var audio = getSpeakerAudioAndCheckSampleRate(speaker, 48000);
+                var audio = (SpeakerAudio) AudioManager.audios.compute(SpeakerAudio.hashcode(speaker.getBlockPos()), (_, old) -> old == null ? new SpeakerAudio(speaker) : old);
                 audio.push(packet.from, decoded);
             }
         }
-    }
+        //direct audio
+        var localPlayer = Minecraft.getInstance().player;
+        if (localPlayer == null) {
+            return;
+        }
 
-    private static DirectAudio getDirectAudioAndCheckSampleRate(UUID from, int sampleRate) {
-        return (DirectAudio) AudioManager.audios.compute(from.hashCode(), (_, old) -> {
-            if (old == null) {
-                return new DirectAudio(from, sampleRate);
-            } else if (old.sampleRate != sampleRate) {
-                old.close();
-                return new DirectAudio(from, sampleRate);
-            } else {
-                return old;
+        boolean hearingSelf = ChannelClientConfig.get().hearMyself && localPlayer.getUUID().equals(packet.from);
+        boolean hearingOther = !localPlayer.getUUID().equals(packet.from) && earPos.distanceToSqr(x, y, z) <= 64 * 64;
+        if (hearingSelf || hearingOther) {
+            // direct talking sound always apply
+            var audio = (DirectAudio) AudioManager.audios.compute(packet.from.hashCode(), (_, old) -> old == null ? new DirectAudio(packet.from) : old);
+            audio.push(decoded);
+            audio.setPos(x, y, z);
+        }
+        // through walkie-talkie
+        for (var item : localPlayer.getInventory()) {
+            if (item.is(ModItems.WALKIE_TALKIE.get())) {
+                var ch = item.get(ModItems.CHANNEL.get());
+                if (ch != null && ch > 0 && channels.contains(ch.intValue())) {
+                    var audio = (WalkieTalkieAudio) AudioManager.audios.compute(0, (_, old) -> old == null ? new WalkieTalkieAudio() : old);
+                    audio.push(packet.from, decoded);
+                    break;
+                }
             }
-        });
-    }
-
-    private static SpeakerAudio getSpeakerAudioAndCheckSampleRate(SpeakerBlockEntity blockEntity, int sampleRate) {
-        return (SpeakerAudio) AudioManager.audios.compute(SpeakerAudio.hashcode(blockEntity.getBlockPos()), (_, old) -> {
-            if (old == null) {
-                return new SpeakerAudio(blockEntity, sampleRate);
-            } else if (old.sampleRate != sampleRate) {
-                old.close();
-                return new SpeakerAudio(blockEntity, sampleRate);
-            } else {
-                return old;
-            }
-        });
+        }
     }
 }

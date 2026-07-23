@@ -56,6 +56,11 @@ public class ModItems {
     public static final Supplier<Item> SPEAKER_HANG_ITEM = ITEMS.register("speaker_hang", () -> new BlockItem(ModBlocks.SPEAKER_HANG_BLOCK.get(), new Item.Properties()
             .setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Channel.MODID, "speaker_hang")))
     ));
+    public static final Supplier<Item> WALKIE_TALKIE = ITEMS.register("walkie_talkie", () -> new WalkieTalkie(new Item.Properties()
+            .stacksTo(1)
+            .component(CHANNEL.get(), 0)
+            .setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Channel.MODID, "walkie_talkie")))
+    ));
 
     //----------Creative Mode Tab----------
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Channel.MODID);
@@ -74,7 +79,8 @@ public class ModItems {
                     MIC_ITEM,
                     SPEAKER_ITEM,
                     SPEAKER_STAND_ITEM,
-                    SPEAKER_HANG_ITEM
+                    SPEAKER_HANG_ITEM,
+                    WALKIE_TALKIE
             ).map(s -> new ItemStack(s.get())).toList());
         }
     }

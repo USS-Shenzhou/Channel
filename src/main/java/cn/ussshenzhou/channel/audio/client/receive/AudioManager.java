@@ -91,6 +91,9 @@ public class AudioManager {
      * @return true, if want to remove player and their audio. Must close audio before return true.
      */
     protected static boolean play(Level level, Audio audio) {
+        if (audio instanceof WalkieTalkieAudio) {
+            return audio.play();
+        }
         var pos = audio.getPos(level);
         if (ChannelClientConfig.get().rayTraceAudio) {
             return RayTraceManager.play(audio, pos);

@@ -135,6 +135,8 @@
   "item.channel.speaker": "音响",
   "item.channel.speaker_stand": "音响（立式）",
   "item.channel.speaker_hang": "音响（挂式）",
+  "item.channel.walkie_talkie": "对讲机",
+  "item.channel.walkie_talkie.tooltip": "手持即可讲话。放置于背包中时可接收。",
 
   "notice.channel.mute_true": "OP已开启静音。仅有服务器管理员可以讲话。",
   "notice.channel.mute_false": "OP已解除静音。所有人均可讲话。"
