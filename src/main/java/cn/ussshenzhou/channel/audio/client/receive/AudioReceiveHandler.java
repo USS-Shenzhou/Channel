@@ -96,21 +96,20 @@ public class AudioReceiveHandler {
         var earPos = AudioHelper.getEarPos();
         var decoded = OpusManager.decode(packet.opus, packet.from);
         // through speaker
-        if (packet.channels.length == 0) {
-            return;
-        }
         var channels = IntArraySet.of(packet.channels);
-        synchronized (CHANNELED_BLOCK_CACHE_C) {
-            for (var speaker : CHANNELED_BLOCK_CACHE_C) {
-                if (!channels.contains(speaker.getChannel())) {
-                    continue;
+        if (packet.channels.length != 0) {
+            synchronized (CHANNELED_BLOCK_CACHE_C) {
+                for (var speaker : CHANNELED_BLOCK_CACHE_C) {
+                    if (!channels.contains(speaker.getChannel())) {
+                        continue;
+                    }
+                    var pos = speaker.getBlockPos();
+                    if (earPos.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64 * 64) {
+                        continue;
+                    }
+                    var audio = (SpeakerAudio) AudioManager.audios.compute(SpeakerAudio.hashcode(speaker.getBlockPos()), (_, old) -> old == null ? new SpeakerAudio(speaker) : old);
+                    audio.push(packet.from, decoded);
                 }
-                var pos = speaker.getBlockPos();
-                if (earPos.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64 * 64) {
-                    continue;
-                }
-                var audio = (SpeakerAudio) AudioManager.audios.compute(SpeakerAudio.hashcode(speaker.getBlockPos()), (_, old) -> old == null ? new SpeakerAudio(speaker) : old);
-                audio.push(packet.from, decoded);
             }
         }
         //direct audio
@@ -118,7 +117,6 @@ public class AudioReceiveHandler {
         if (localPlayer == null) {
             return;
         }
-
         boolean hearingSelf = ChannelClientConfig.get().hearMyself && localPlayer.getUUID().equals(packet.from);
         boolean hearingOther = !localPlayer.getUUID().equals(packet.from) && earPos.distanceToSqr(x, y, z) <= 64 * 64;
         if (hearingSelf || hearingOther) {

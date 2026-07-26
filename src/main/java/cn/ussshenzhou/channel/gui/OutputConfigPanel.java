@@ -182,12 +182,12 @@ public class OutputConfigPanel extends TOptionsPanel {
                     ChannelPlayerConfig.unmute(uuid);
                     muteButton.setBorder(null);
                     muteButton.setNormalBackGround(0x0);
-                    this.volume.setVisibleT(false);
+                    this.volume.setVisibleT(true);
                 } else {
                     ChannelPlayerConfig.mute(uuid);
                     muteButton.setBorder(new Border(0xffff0000, 1));
                     muteButton.setNormalBackGround(0x80ff0000);
-                    this.volume.setVisibleT(true);
+                    this.volume.setVisibleT(false);
                 }
             });
             if (ChannelPlayerConfig.muted(uuid)) {
