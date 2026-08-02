@@ -70,6 +70,15 @@ public class OutputConfigPanel extends TOptionsPanel {
                 List.of(true, false),
                 bool -> _ -> {
                     ChannelClientConfig.write(c -> c.muteAll = bool);
+                    OutputConfigPanel.this.container.getChildren().forEach(tWidget -> {
+                        if (tWidget instanceof PlayerVolumePanel playerVolumePanel) {
+                            playerVolumePanel.getChildren().forEach(t -> {
+                                if (t instanceof PlayerVolumeBar playerVolumeBar) {
+                                    playerVolumeBar.update();
+                                }
+                            });
+                        }
+                    });
                 },
                 entry -> entry.getContent() == cfg.muteAll
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.mute_all.tooltip")));
@@ -77,6 +86,15 @@ public class OutputConfigPanel extends TOptionsPanel {
         addOption(Component.empty(), new TButton(Component.translatable("channel.config.post.player_control_clear"), _ -> {
             ChannelPlayerConfig.clear();
             PlayerVolumePanel.PLAYER_VOLUME.replaceAll((_, _) -> 0f);
+            OutputConfigPanel.this.container.getChildren().forEach(tWidget -> {
+                if (tWidget instanceof PlayerVolumePanel playerVolumePanel) {
+                    playerVolumePanel.getChildren().forEach(t -> {
+                        if (t instanceof PlayerVolumeBar playerVolumeBar) {
+                            playerVolumeBar.update();
+                        }
+                    });
+                }
+            });
         })).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.player_control_clear.tooltip")));
         this.container.add(new PlayerVolumePanel());
     }
@@ -190,15 +208,24 @@ public class OutputConfigPanel extends TOptionsPanel {
                     this.volume.setVisibleT(false);
                 }
             });
-            if (ChannelPlayerConfig.muted(uuid)) {
-                muteButton.setBorder(new Border(0xffff0000, 1));
-                muteButton.setNormalBackGround(0x80ff0000);
-                this.volume.setVisibleT(false);
-            }
+            update();
             muteButton.setBorder(null);
             muteButton.setTooltip(Tooltip.create(Component.translatable("channel.config.post.mute.tooltip")));
             this.add(muteButton);
             //TODO show player volume under silder
+        }
+
+        protected void update() {
+            if (ChannelPlayerConfig.muted(uuid)) {
+                muteButton.setBorder(new Border(0xffff0000, 1));
+                muteButton.setNormalBackGround(0x80ff0000);
+                this.volume.setVisibleT(false);
+            } else {
+                muteButton.setBorder(null);
+                muteButton.setNormalBackGround(0x0);
+                this.volume.setVisibleT(true);
+            }
+            this.volume.setAbsValueWithoutRespond(PlayerVolumePanel.PLAYER_VOLUME.getOrDefault(uuid, 0f));
         }
 
         @Override
