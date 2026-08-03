@@ -70,59 +70,54 @@ public class OutputConfigPanel extends TOptionsPanel {
                 List.of(true, false),
                 bool -> _ -> {
                     ChannelClientConfig.write(c -> c.muteAll = bool);
-                    OutputConfigPanel.this.container.getChildren().forEach(tWidget -> {
-                        if (tWidget instanceof PlayerVolumePanel playerVolumePanel) {
-                            playerVolumePanel.getChildren().forEach(t -> {
-                                if (t instanceof PlayerVolumeBar playerVolumeBar) {
-                                    playerVolumeBar.update();
-                                }
-                            });
-                        }
-                    });
+                    refreshVolumePanel();
                 },
                 entry -> entry.getContent() == cfg.muteAll
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.mute_all.tooltip")));
         addOptionSplitter(Component.translatable("channel.config.post.player_control"));
         addOption(Component.empty(), new TButton(Component.translatable("channel.config.post.player_control_clear"), _ -> {
             ChannelPlayerConfig.clear();
-            PlayerVolumePanel.PLAYER_VOLUME.replaceAll((_, _) -> 0f);
-            OutputConfigPanel.this.container.getChildren().forEach(tWidget -> {
-                if (tWidget instanceof PlayerVolumePanel playerVolumePanel) {
-                    playerVolumePanel.getChildren().forEach(t -> {
-                        if (t instanceof PlayerVolumeBar playerVolumeBar) {
-                            playerVolumeBar.update();
-                        }
-                    });
-                }
-            });
+            refreshVolumePanel();
         })).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.player_control_clear.tooltip")));
         this.container.add(new PlayerVolumePanel());
+    }
+
+    private void refreshVolumePanel() {
+        this.container.getChildren().forEach(tWidget -> {
+            if (tWidget instanceof PlayerVolumePanel playerVolumePanel) {
+                playerVolumePanel.getChildren().forEach(t -> {
+                    if (t instanceof PlayerVolumeBar playerVolumeBar) {
+                        playerVolumeBar.update();
+                    }
+                });
+            }
+        });
     }
 
 
     @EventBusSubscriber(Dist.CLIENT)
     public static class PlayerVolumePanel extends TPanel {
 
-        private static final LinkedHashMap<UUID, Float> PLAYER_VOLUME = new LinkedHashMap<>();
+        private static final LinkedHashSet<UUID> PLAYERS = new LinkedHashSet<>();
         private static boolean dirty = true;
 
         public PlayerVolumePanel() {
             if (SharedConstants.IS_RUNNING_IN_IDE) {
-                update(Minecraft.getInstance().player.getUUID(), 0);
+                update(Minecraft.getInstance().player.getUUID());
             }
             dirty = true;
         }
 
-        public static void update(UUID id, float db) {
-            if (!PLAYER_VOLUME.containsKey(id) || Math.abs(PLAYER_VOLUME.get(id) - db) > 0.001) {
+        public static void update(UUID id) {
+            if (!PLAYERS.contains(id)) {
                 dirty = true;
             }
-            PLAYER_VOLUME.put(id, db);
+            PLAYERS.add(id);
         }
 
         @SubscribeEvent
         public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
-            PLAYER_VOLUME.clear();
+            PLAYERS.clear();
             dirty = true;
         }
 
@@ -132,13 +127,13 @@ public class OutputConfigPanel extends TOptionsPanel {
             }
             dirty = false;
             this.children.clear();
-            PLAYER_VOLUME.forEach((u, f) -> this.add(new PlayerVolumeBar(u, f)));
+            PLAYERS.forEach(u -> this.add(new PlayerVolumeBar(u)));
             layout();
         }
 
         @Override
         public Vector2i getPreferredSize() {
-            return new Vector2i(0, 20 * PLAYER_VOLUME.size());
+            return new Vector2i(0, 20 * PLAYERS.size());
         }
 
         @Override
@@ -165,7 +160,7 @@ public class OutputConfigPanel extends TOptionsPanel {
         private final TLabel name;
         private final TSlider volume;
 
-        public PlayerVolumeBar(UUID id, float db) {
+        public PlayerVolumeBar(UUID id) {
             this.uuid = id;
             name = new TLabel();
             this.add(name);
@@ -178,6 +173,7 @@ public class OutputConfigPanel extends TOptionsPanel {
                     true
             );
             this.add(volume);
+            var db = ChannelPlayerConfig.getOrDefault(uuid);
             volume.setAbsValueWithoutRespond(db);
             volume.addResponder(d -> {
                 var player = Minecraft.getInstance().level.getPlayerByUUID(uuid);
@@ -225,7 +221,7 @@ public class OutputConfigPanel extends TOptionsPanel {
                 muteButton.setNormalBackGround(0x0);
                 this.volume.setVisibleT(true);
             }
-            this.volume.setAbsValueWithoutRespond(PlayerVolumePanel.PLAYER_VOLUME.getOrDefault(uuid, 0f));
+            this.volume.setAbsValueWithoutRespond(ChannelPlayerConfig.getOrDefault(uuid));
         }
 
         @Override

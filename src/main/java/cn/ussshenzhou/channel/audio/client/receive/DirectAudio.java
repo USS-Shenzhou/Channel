@@ -56,7 +56,7 @@ public class DirectAudio extends Audio {
     @Override
     protected float getGain() {
         var vol = ChannelPlayerConfig.getOrDefault(playerId);
-        OutputConfigPanel.PlayerVolumePanel.update(playerId, vol);
+        OutputConfigPanel.PlayerVolumePanel.update(playerId);
         return AudioHelper.db2factor(vol);
     }
 
