@@ -7,6 +7,7 @@ import cn.ussshenzhou.channel.gui.hud.MicrophoneHud;
 import cn.ussshenzhou.channel.network.TalkPacket2S;
 import cn.ussshenzhou.channel.subspace.client.SubspaceConnection;
 import cn.ussshenzhou.channel.util.AudioHelper;
+import cn.ussshenzhou.channel.util.CompatHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.channel.audio.OpusManager;
 import cn.ussshenzhou.t88.network.NetworkHelper;
@@ -45,7 +46,10 @@ public class MicReader {
     }
 
     private static synchronized void read() {
-        if (Minecraft.getInstance().getConnection() == null || MicrophoneHud.getStatus() == MicrophoneHud.Status.SUBSPACE || MicrophoneHud.getStatus() == MicrophoneHud.Status.OP) {
+        if (Minecraft.getInstance().getConnection() == null ||
+                CompatHelper.isClientLevelValid() ||
+                MicrophoneHud.getStatus() == MicrophoneHud.Status.SUBSPACE ||
+                MicrophoneHud.getStatus() == MicrophoneHud.Status.OP) {
             return;
         }
         var cfg = ChannelClientConfig.get();

@@ -4,6 +4,7 @@ import cn.ussshenzhou.channel.gui.hud.MicrophoneHud;
 import cn.ussshenzhou.channel.network.TalkPacket2S;
 import cn.ussshenzhou.channel.network.SubspaceInitPacket;
 import cn.ussshenzhou.channel.subspace.*;
+import cn.ussshenzhou.channel.util.CompatHelper;
 import cn.ussshenzhou.channel.util.Protocol;
 import cn.ussshenzhou.channel.util.SecurityLevel;
 import com.mojang.logging.LogUtils;
@@ -160,6 +161,9 @@ public class SubspaceConnection {
      */
 
     public static void connect(SubspaceInitPacket packet) {
+        if (!CompatHelper.isClientLevelValid()) {
+            return;
+        }
         MicrophoneHud.setStatus(MicrophoneHud.Status.SUBSPACE);
         if (channel != null && channel.isActive()) {
             activelyDisconnect = true;

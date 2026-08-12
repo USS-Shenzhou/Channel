@@ -11,6 +11,7 @@ import cn.ussshenzhou.channel.subspace.client.SubspaceAudioPacket;
 import cn.ussshenzhou.channel.subspace.client.SubspaceConnection;
 import cn.ussshenzhou.channel.subspace.packet;
 import cn.ussshenzhou.channel.util.AudioHelper;
+import cn.ussshenzhou.channel.util.CompatHelper;
 import com.google.common.collect.MapMaker;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
@@ -61,23 +62,23 @@ public class AudioReceiveHandler {
 
     public static void handle(AudioPacket2C packet) {
         try {
-            var level = Minecraft.getInstance().level;
-            if (level == null) {
+            if (!CompatHelper.isClientLevelValid()) {
                 return;
             }
             if (ChannelPlayerConfig.muted(packet.from)) {
                 return;
             }
-            handleInternal(packet, level);
+            handleInternal(packet);
         } catch (Exception e) {
             LogUtils.getLogger().error("Something went wrong, but it should be okay. You can ignore this if nothing else went wrong.");
             LogUtils.getLogger().error(e.toString(), e);
         }
     }
 
-    private static void handleInternal(AudioPacket2C packet, Level level) throws Exception {
+    private static void handleInternal(AudioPacket2C packet) throws Exception {
         double x = 0, y = 0, z = 0;
-        var from = level.getPlayerByUUID(packet.from);
+        //noinspection DataFlowIssue
+        var from = Minecraft.getInstance().level.getPlayerByUUID(packet.from);
         if (from != null) {
             // talking nearby
             var pos = from.getEyePosition();

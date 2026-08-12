@@ -4,6 +4,7 @@ import cn.ussshenzhou.channel.Channel;
 import cn.ussshenzhou.channel.audio.client.send.LevelGatherer;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.util.AudioHelper;
+import cn.ussshenzhou.channel.util.CompatHelper;
 import cn.ussshenzhou.channel.util.ModConstant;
 import cn.ussshenzhou.t88.gui.HudManager;
 import cn.ussshenzhou.t88.gui.widegt.TImage;
@@ -70,6 +71,9 @@ public class MicrophoneHud extends TPanel {
 
     @Override
     public void tickT() {
+        if (!CompatHelper.isClientLevelValid()) {
+            HudManager.removeInstanceOf(MicrophoneHud.class);
+        }
         if (getStatus() == Status.OP && Minecraft.getInstance().player != null && Minecraft.getInstance().player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) {
             resumeStatus();
         }
