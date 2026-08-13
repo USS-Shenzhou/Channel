@@ -51,13 +51,13 @@ public class DebugManager {
     }
 
     public static void sending(byte[] opus) {
-        OPUS_SEND_CACHE.put(Arrays.hashCode(opus), Util.getMillis());
+        OPUS_SEND_CACHE.put(Arrays.hashCode(opus), Util.getNanos());
     }
 
     public static void receiving(byte[] opus) {
         var hashcode = Arrays.hashCode(opus);
         if (OPUS_SEND_CACHE.containsKey(hashcode)) {
-            RELAY_PING.put((int) (Util.getMillis() - OPUS_SEND_CACHE.get(hashcode)) * 1000);
+            RELAY_PING.put((int) (Util.getNanos() - OPUS_SEND_CACHE.get(hashcode)) / 1000);
             OPUS_SEND_CACHE.remove(hashcode);
         }
         if (OPUS_SEND_CACHE.size() > 500) {
