@@ -120,7 +120,7 @@
   "channel.config.unit.per": "振幅百分比 %",
   "channel.config.debug": "  调试",
   "channel.config.debug.raytrace": "显示检测射线",
-  "channel.config.debug.info": "显示混响参数",
+  "channel.config.debug.info": "显示调试信息",
 
   "channel.notify.no_valid": "无可用的输入设备。",
   "channel.notify.unsupported": "选择的参数不受此输入设备支持。",

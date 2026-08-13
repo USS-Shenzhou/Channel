@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.gui;
 
+import cn.ussshenzhou.channel.audio.DebugManager;
 import cn.ussshenzhou.channel.audio.OpusManager;
 import cn.ussshenzhou.channel.audio.client.send.MicReader;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
@@ -40,6 +41,7 @@ public class TransmitConfigPanel extends TOptionsPanel {
                 length -> _ -> {
                     ChannelClientConfig.write(c -> c.frameLengthMs = length);
                     MicReader.frameLengthChange();
+                    DebugManager.refresh();
                 },
                 entry -> entry.getContent() == cfg.frameLengthMs
         ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.net.length.tooltip")));

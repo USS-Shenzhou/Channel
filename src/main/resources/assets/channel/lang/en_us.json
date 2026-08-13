@@ -120,7 +120,7 @@
   "channel.config.post.delay.tooltip": "Copes with different network qualities by adjusting the buffer size.\nA smaller value helps reduce audio latency.\nA larger value helps cope with unstable network environments, reducing popping and stuttering.",
   "channel.config.debug": "  Debug",
   "channel.config.debug.raytrace": "Show Trace Rays",
-  "channel.config.debug.info": "Show Reverb Parameters",
+  "channel.config.debug.info": "Show Debug Info",
 
   "channel.notify.no_valid": "No input device available.",
   "channel.notify.unsupported": "The selected parameters are not supported by this input device.",

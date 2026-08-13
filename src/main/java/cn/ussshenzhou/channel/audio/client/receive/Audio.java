@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
+import cn.ussshenzhou.channel.audio.DebugManager;
 import cn.ussshenzhou.channel.audio.client.rt.RayTraceManager;
 import cn.ussshenzhou.channel.audio.client.rt.SourceAudioData;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
@@ -87,6 +88,7 @@ public abstract class Audio {
             int threshold = (state == AL_INITIAL) ? ChannelClientConfig.get().networkTolerance : ChannelClientConfig.get().networkTolerance / 5;
             if (readyBufferMs > threshold) {
                 alSourcePlay(alSource);
+                DebugManager.OPENAL_REPLAY_COUNTER.add(1);
             }
         }
         return false;

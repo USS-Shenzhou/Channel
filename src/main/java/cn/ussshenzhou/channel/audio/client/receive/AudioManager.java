@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
+import cn.ussshenzhou.channel.audio.DebugManager;
 import cn.ussshenzhou.channel.audio.client.rt.RayTraceManager;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.subspace.client.SubspaceConnection;
@@ -75,6 +76,7 @@ public class AudioManager {
                 reset();
                 initAL();
             }
+            DebugManager.PLAY_COUNTER.update();
             audios.entrySet().removeIf(e -> play(level, e.getValue()));
         } catch (Throwable e) {
             LogUtils.getLogger().error("Something went wrong, but it should be okay. You can ignore this if nothing else went wrong.");
@@ -83,6 +85,7 @@ public class AudioManager {
     }
 
     public static void reset() {
+        DebugManager.PLAY_RESET_COUNTER.add(1);
         audios.values().forEach(Audio::close);
         audios.clear();
     }

@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.network;
 
+import cn.ussshenzhou.channel.audio.DebugManager;
 import cn.ussshenzhou.channel.audio.server.RelayHandler;
 import cn.ussshenzhou.channel.subspace.SubspacePacket;
 import cn.ussshenzhou.channel.util.ModConstant;
@@ -31,6 +32,8 @@ public class TalkPacket2S extends SubspacePacket {
     @Encoder
     public void encode(FriendlyByteBuf buf) {
         buf.writeByteArray(this.opus);
+        DebugManager.MIC_SEND_COUNTER.update();
+        DebugManager.sending(opus);
     }
 
     @Override

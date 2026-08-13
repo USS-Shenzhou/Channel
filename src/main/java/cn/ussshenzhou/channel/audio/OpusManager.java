@@ -22,7 +22,7 @@ public class OpusManager {
 
     private static Encoder encoder;
     private static HashMap<UUID, Decoder> decoders = new HashMap<>();
-    public static final TimeCounter SEND_SPEED = new TimeCounter(1000);
+    public static final TimeCounter SEND_SPEED = new TimeCounter(2000);
 
     public static byte[] encode(byte[] audio, int sampleRate) throws OpusException {
         if (encoder == null || encoder.sampleRate != sampleRate) {

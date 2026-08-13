@@ -1,6 +1,7 @@
 package cn.ussshenzhou.channel.audio.client.receive;
 
 import cn.ussshenzhou.channel.Item.ModItems;
+import cn.ussshenzhou.channel.audio.DebugManager;
 import cn.ussshenzhou.channel.audio.client.send.WebRTCHelper;
 import cn.ussshenzhou.channel.blockentity.SpeakerBlockEntity;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
@@ -12,6 +13,7 @@ import cn.ussshenzhou.channel.subspace.client.SubspaceConnection;
 import cn.ussshenzhou.channel.subspace.packet;
 import cn.ussshenzhou.channel.util.AudioHelper;
 import cn.ussshenzhou.channel.util.CompatHelper;
+import cn.ussshenzhou.channel.util.IntervalCounter;
 import com.google.common.collect.MapMaker;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
@@ -76,6 +78,7 @@ public class AudioReceiveHandler {
     }
 
     private static void handleInternal(AudioPacket2C packet) throws Exception {
+        DebugManager.RECEIVE_COUNTER.computeIfAbsent(packet.from, _ -> new IntervalCounter(DebugManager.MEASURE_WINDOW_MS)).update();
         double x = 0, y = 0, z = 0;
         //noinspection DataFlowIssue
         var from = Minecraft.getInstance().level.getPlayerByUUID(packet.from);
@@ -118,8 +121,12 @@ public class AudioReceiveHandler {
         if (localPlayer == null) {
             return;
         }
-        boolean hearingSelf = ChannelClientConfig.get().hearMyself && localPlayer.getUUID().equals(packet.from);
-        boolean hearingOther = !localPlayer.getUUID().equals(packet.from) && earPos.distanceToSqr(x, y, z) <= 64 * 64;
+        var self = localPlayer.getUUID().equals(packet.from);
+        if (self) {
+            DebugManager.receiving(packet.opus);
+        }
+        boolean hearingSelf = ChannelClientConfig.get().hearMyself && self;
+        boolean hearingOther = !self && earPos.distanceToSqr(x, y, z) <= 64 * 64;
         if (hearingSelf || hearingOther) {
             // direct talking sound always apply
             var audio = (DirectAudio) AudioManager.audios.compute(packet.from.hashCode(), (_, old) -> old == null ? new DirectAudio(packet.from) : old);

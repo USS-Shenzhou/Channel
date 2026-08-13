@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.audio.client.send;
 
+import cn.ussshenzhou.channel.audio.DebugManager;
 import cn.ussshenzhou.channel.audio.Trigger;
 import cn.ussshenzhou.channel.audio.nativ.NvidiaHelper;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
@@ -47,7 +48,7 @@ public class MicReader {
 
     private static synchronized void read() {
         if (Minecraft.getInstance().getConnection() == null ||
-                CompatHelper.isClientLevelValid() ||
+                !CompatHelper.isClientLevelValid() ||
                 MicrophoneHud.getStatus() == MicrophoneHud.Status.SUBSPACE ||
                 MicrophoneHud.getStatus() == MicrophoneHud.Status.OP) {
             return;
