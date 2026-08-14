@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class MicReader {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
             .setNameFormat("Channel-Mic-Reader-Thread-%d")
+            .setPriority(Thread.MAX_PRIORITY)
             .setDaemon(true)
             .build());
     private static ScheduledFuture<?> keepReading;

@@ -31,8 +31,8 @@ public class AudioManager {
             Thread.ofPlatform()
                     .name("Channel-Audio-Play-Thread")
                     .daemon(true)
-                    .factory()
-                    .newThread(r)
+                    .priority(Thread.MAX_PRIORITY)
+                    .unstarted(r)
     );
     static final ConcurrentHashMap<Integer, Audio> audios = new ConcurrentHashMap<>();
     static long alCtx;
