@@ -46,6 +46,7 @@ public class DebugHud extends TPanel {
                         
                         Open Space Correction: %.3f
                         
+                        Reading Interval: %s
                         Sending Interval: %s
                         ICMP Ping: %s
                         Playing Interval: %s
@@ -68,6 +69,7 @@ public class DebugHud extends TPanel {
 
                 getOpenSpaceCorrection(),
 
+                DebugManager.MIC_READ_COUNTER.toString(),
                 DebugManager.MIC_SEND_COUNTER.toString(),
                 DebugManager.ICMP_PING.getStringAsMs(),
                 DebugManager.PLAY_COUNTER.toString(),

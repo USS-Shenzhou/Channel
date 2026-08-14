@@ -47,6 +47,7 @@ public class MicReader {
     }
 
     private static synchronized void read() {
+        DebugManager.MIC_READ_COUNTER.update();
         if (Minecraft.getInstance().getConnection() == null ||
                 !CompatHelper.isClientLevelValid() ||
                 MicrophoneHud.getStatus() == MicrophoneHud.Status.SUBSPACE ||

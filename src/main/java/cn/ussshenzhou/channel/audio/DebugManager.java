@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class DebugManager {
     public static final int MEASURE_WINDOW_MS = 2000;
     public static final int LONG_MEASURE_WINDOW_MS = 5000;
+    public static final IntervalCounter MIC_READ_COUNTER = new IntervalCounter(ChannelClientConfig.get().frameLengthMs, MEASURE_WINDOW_MS);
     public static final IntervalCounter MIC_SEND_COUNTER = new IntervalCounter(ChannelClientConfig.get().frameLengthMs, MEASURE_WINDOW_MS);
     public static final IntervalCounter PLAY_COUNTER = new IntervalCounter(10, MEASURE_WINDOW_MS);
     public static final HashMap<UUID, IntervalCounter> RECEIVE_COUNTER = new HashMap<>();
@@ -45,6 +46,7 @@ public class DebugManager {
     }
 
     public static void refresh() {
+        MIC_READ_COUNTER.setIdealIntervalMs(ChannelClientConfig.get().frameLengthMs);
         MIC_SEND_COUNTER.setIdealIntervalMs(ChannelClientConfig.get().frameLengthMs);
         PLAY_COUNTER.reset();
         RECEIVE_COUNTER.clear();
