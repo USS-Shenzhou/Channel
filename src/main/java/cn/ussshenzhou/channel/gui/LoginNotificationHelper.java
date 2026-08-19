@@ -18,7 +18,8 @@ public class LoginNotificationHelper {
     public static void showNotification(ClientPlayerNetworkEvent.LoggingIn event) {
         TSimpleNotification.fire(
                 Component.translatable("channel.welcome",
-                        ModKeyMappingRegistry.CONFIG.getKeyModifier().getCombinedName(ModKeyMappingRegistry.CONFIG.getKey(), () -> ModKeyMappingRegistry.CONFIG.getKey().getDisplayName()).getString()
+                        ModKeyMappingRegistry.CONFIG.getKeyModifier().getCombinedName(ModKeyMappingRegistry.CONFIG.getKey(), () -> ModKeyMappingRegistry.CONFIG.getKey().getDisplayName()).getString(),
+                        ModKeyMappingRegistry.PTT.getKeyModifier().getCombinedName(ModKeyMappingRegistry.PTT.getKey(), () -> ModKeyMappingRegistry.PTT.getKey().getDisplayName()).getString()
                 ),
                 12,
                 TSimpleNotification.Severity.TIP

@@ -1,5 +1,5 @@
 {
-  "channel.welcome": "按下[%1$s]打开沉浸语音配置界面，\n调整您的麦克风和音频处理选项。",
+  "channel.welcome": "按下 [%1$s] 打开沉浸语音配置界面，调整您的麦克风和音频处理选项。\n按下 [%2$s] 切换麦克风静音。",
 
   "key.category.channel.channel": "沉浸语音",
   "key.channel.config_screen": "配置界面",
