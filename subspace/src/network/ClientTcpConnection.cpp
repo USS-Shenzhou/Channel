@@ -94,12 +94,17 @@ namespace subspace {
         content.resize(length);
         asyncRead(socket, content, [this]() {
             if (waitingHandshake) {
-                FriendlyByteBuf buf(content);
-                playerUuid = buf.readUUID();
-                if (!TokenManager::contains(playerUuid)) {
-                    spdlog::warn("Unknown player UUID from {}, rejecting.", getRemoteAddress());
+                try {
+                    FriendlyByteBuf buf(content);
+                    playerUuid = buf.readUUID();
+                    if (!TokenManager::contains(playerUuid)) {
+                        spdlog::warn("Unknown player UUID from {}, rejecting.", getRemoteAddress());
+                        disconnect();
+                        return;
+                    }
+                } catch (std::exception& e) {
+                    spdlog::warn("Something went wrong: {}, disconnecting.", e.what());
                     disconnect();
-                    return;
                 }
             }
             handleRaw(content);
