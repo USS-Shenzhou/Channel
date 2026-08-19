@@ -183,4 +183,23 @@ public class RelayHandler {
         return to.position().distanceToSqr(from.position()) < 64 * 64
                 && (!from.isSpectator() || to.isSpectator());
     }
+
+    public static String dump() {
+        StringBuilder text = new StringBuilder();
+        text.append("PLAYER_CHANNELS_SEND");
+        PLAYER_CHANNELS_SEND.forEach((p, c) -> {
+            text.append("\n")
+                    .append(p.getScoreboardName())
+                    .append("  ")
+                    .append(Arrays.toString(c.toIntArray()));
+        });
+        text.append("\nCHANNEL_PLAYERS_RECEIVE");
+        CHANNEL_PLAYERS_RECEIVE.forEach((c, s) -> {
+            text.append("\n")
+                    .append(c)
+                    .append(" ");
+            s.forEach(p -> text.append(" ").append(p.getScoreboardName()));
+        });
+        return text.toString();
+    }
 }

@@ -1,5 +1,6 @@
 package cn.ussshenzhou.channel.command;
 
+import cn.ussshenzhou.channel.audio.server.RelayHandler;
 import cn.ussshenzhou.channel.config.ChannelServerConfig;
 import cn.ussshenzhou.channel.network.OpMutePacket;
 import cn.ussshenzhou.channel.subspace.server.SubspaceConnection;
@@ -40,6 +41,12 @@ public class ChannelCommand {
                                                     }
                                                     ct.getSource().sendSystemMessage(Component.literal("Resetting start..."));
                                                     SubspaceConnection.reset();
+                                                    return Command.SINGLE_SUCCESS;
+                                                })
+                                        )
+                                        .then(Commands.literal("dump_channels")
+                                                .executes(ct -> {
+                                                    ct.getSource().sendSystemMessage(Component.literal(RelayHandler.dump()));
                                                     return Command.SINGLE_SUCCESS;
                                                 })
                                         )
