@@ -6,7 +6,8 @@
 
 namespace subspace {
     ServerConnection::ServerConnection(asio::ip::tcp::socket socket) :
-        BaseConnection(CryptHelper::NULL_ENCODE_DECODE, CryptHelper::AES_GCM_DECODE), socket(std::move(socket)), handshakeTimer(this->socket.get_executor()) {}
+        BaseConnection(CryptHelper::NULL_ENCODE_DECODE, CryptHelper::AES_GCM_DECODE), socket(std::move(socket)), handshakeTimer(this->socket.get_executor()) {
+    }
 
     void ServerConnection::start() {
         socket.set_option(asio::ip::tcp::no_delay(true));
@@ -38,6 +39,11 @@ namespace subspace {
             if ((headerBuf & 0x80) == 0) {
                 if (headerBufValue < 0) {
                     spdlog::warn("Invalid packet length header: {}", headerBufValue);
+                    disconnect();
+                    return;
+                }
+                if (headerBufValue > 2 * 1024 * 1024) {
+                    spdlog::warn("Packet too big: {}", headerBufValue);
                     disconnect();
                     return;
                 }

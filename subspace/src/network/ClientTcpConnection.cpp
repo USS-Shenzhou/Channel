@@ -77,6 +77,11 @@ namespace subspace {
                     disconnect();
                     return;
                 }
+                if (headerBufValue > 2 * 1024 * 1024) {
+                    spdlog::warn("Packet too big: {}", headerBufValue);
+                    disconnect();
+                    return;
+                }
                 extractContent(headerBufValue);
             } else {
                 headerBufOffsetBit += 7;
