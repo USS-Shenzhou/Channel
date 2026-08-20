@@ -1,6 +1,7 @@
 package cn.ussshenzhou.channel.gui;
 
 import cn.ussshenzhou.channel.input.ModKeyMappingRegistry;
+import cn.ussshenzhou.channel.util.CompatHelper;
 import cn.ussshenzhou.t88.gui.notification.TSimpleNotification;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
@@ -16,6 +17,9 @@ public class LoginNotificationHelper {
 
     @SubscribeEvent
     public static void showNotification(ClientPlayerNetworkEvent.LoggingIn event) {
+        if (!CompatHelper.isClientLevelValid()) {
+            return;
+        }
         TSimpleNotification.fire(
                 Component.translatable("channel.welcome",
                         ModKeyMappingRegistry.CONFIG.getKeyModifier().getCombinedName(ModKeyMappingRegistry.CONFIG.getKey(), () -> ModKeyMappingRegistry.CONFIG.getKey().getDisplayName()).getString(),
