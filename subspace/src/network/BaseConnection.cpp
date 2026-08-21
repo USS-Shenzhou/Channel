@@ -8,8 +8,14 @@ namespace subspace {
     void BaseConnection::asyncRead(asio::ip::tcp::socket& socket, byte* out, int length, std::function<void()> doRead) {
         auto thiz = shared_from_this();
         asio::async_read(socket, asio::buffer(out, length), [this, thiz, doRead](auto errorCode, int readBytes)-> void {
-            if (errorCode) {
+            if (errorCode == asio::error::eof) {
+                spdlog::info("[FIN] Remote actively disconnected: {}", getRemoteAddress());
+            } else if (errorCode == asio::error::connection_reset) {
+                spdlog::info("[RST] Remote disconnected: {}", getRemoteAddress());
+            } else if (errorCode) {
                 spdlog::warn("Something went wrong: {}", errorCode.message());
+            }
+            if (errorCode) {
                 disconnect();
                 return;
             }
@@ -20,6 +26,16 @@ namespace subspace {
     void BaseConnection::asyncRead(asio::ip::tcp::socket& socket, ByteArray& out, std::function<void()> doRead) {
         auto thiz = shared_from_this();
         asio::async_read(socket, asio::buffer(out), [this, thiz, doRead](auto errorCode, int readBytes)-> void {
+            if (errorCode == asio::error::eof) {
+                spdlog::info("[FIN] Remote actively disconnected: {}", getRemoteAddress());
+                disconnect();
+                return;
+            }
+            if (errorCode == asio::error::connection_reset) {
+                spdlog::info("[RST] Remote disconnected: {}", getRemoteAddress());
+                disconnect();
+                return;
+            }
             if (errorCode) {
                 spdlog::warn("Something went wrong: {}", errorCode.message());
                 disconnect();

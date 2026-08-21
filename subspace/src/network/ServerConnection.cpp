@@ -11,6 +11,7 @@ namespace subspace {
 
     void ServerConnection::start() {
         socket.set_option(asio::ip::tcp::no_delay(true));
+        //FIXME socket.remote_endpoint() may throw
         remoteAddress = socket.remote_endpoint().address().to_string() + ":" + std::to_string(socket.remote_endpoint().port());
         spdlog::info("Minecraft Server connecting, from {}", getRemoteAddress());
         handshakeTimer.expires_from_now(std::chrono::seconds(10));

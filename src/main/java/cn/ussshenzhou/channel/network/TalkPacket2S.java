@@ -17,6 +17,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
  */
 @NetPacket(modid = ModConstant.SHORT_ID, handleOnNetwork = true, id = "tsp")
 public class TalkPacket2S extends SubspacePacket {
+    //empty array as heartbeat
     private final byte[] opus;
 
     public TalkPacket2S(byte[] opus) {
@@ -32,8 +33,10 @@ public class TalkPacket2S extends SubspacePacket {
     @Encoder
     public void encode(FriendlyByteBuf buf) {
         buf.writeByteArray(this.opus);
-        DebugManager.MIC_SEND_COUNTER.update();
-        DebugManager.sending(opus);
+        if (opus.length > 0) {
+            DebugManager.MIC_SEND_COUNTER.update();
+            DebugManager.sending(opus);
+        }
     }
 
     @Override

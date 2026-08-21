@@ -14,7 +14,7 @@ namespace subspace {
     void ServerListener::wait() {
         listener.async_accept([this](auto errorCode, auto socket) -> void {
             if (errorCode) {
-                spdlog::error("Something went wrong when establishing connection with {} : {}", socket.remote_endpoint().address().to_string(), errorCode.message());
+                spdlog::error("Something went wrong when establishing connection with server ? : {}", errorCode.message());
             } else {
                 auto connection = std::make_shared<ServerConnection>(std::move(socket));
                 connection->setOnDisconnect([this, c = connection.get()]()-> void {
