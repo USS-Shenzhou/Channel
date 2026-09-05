@@ -92,7 +92,7 @@ public class DebugHud extends TPanel {
             } else {
                 text.append(uuid.toString());
             }
-            text.append("    ").append(counter.toString());
+            text.append("    ").append(counter.toString()).append("\n");
         });
         return text.toString();
     }
