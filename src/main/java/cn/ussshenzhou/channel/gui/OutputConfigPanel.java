@@ -133,7 +133,7 @@ public class OutputConfigPanel extends TOptionsPanel {
 
         @Override
         public Vector2i getPreferredSize() {
-            return new Vector2i(0, 20 * PLAYERS.size());
+            return new Vector2i(0, 24 * PLAYERS.size());
         }
 
         @Override
