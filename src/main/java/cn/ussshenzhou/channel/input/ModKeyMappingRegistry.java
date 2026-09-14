@@ -2,6 +2,7 @@ package cn.ussshenzhou.channel.input;
 
 import cn.ussshenzhou.channel.Channel;
 import cn.ussshenzhou.channel.audio.Trigger;
+import cn.ussshenzhou.channel.audio.client.Initializer;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.gui.ConfigScreen;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -60,6 +61,9 @@ public class ModKeyMappingRegistry {
         }
         if (PTT.consumeClick()) {
             if (Util.getMillis() - lastSwitch >= 100) {
+                if (!ChannelClientConfig.get().onAir) {
+                    Initializer.init();
+                }
                 ChannelClientConfig.write(c -> c.onAir = !c.onAir);
                 lastSwitch = Util.getMillis();
             }
@@ -67,12 +71,15 @@ public class ModKeyMappingRegistry {
     }
 
     @SubscribeEvent
-    public static void pushMute(ClientTickEvent.Pre event) {
+    public static void pushTalk(ClientTickEvent.Pre event) {
         var cfg = ChannelClientConfig.get();
         if (cfg.trigger != Trigger.PUSH_TO_TALK) {
             return;
         }
         boolean toWrite = PTT.isDown();
+        if (toWrite) {
+            Initializer.init();
+        }
         if (toWrite != cfg.onAir) {
             ChannelClientConfig.write(c -> c.onAir = toWrite);
         }

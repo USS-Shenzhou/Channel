@@ -1,13 +1,18 @@
 package cn.ussshenzhou.channel.gui;
 
+import cn.ussshenzhou.channel.audio.client.Initializer;
+import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.input.ModKeyMappingRegistry;
 import cn.ussshenzhou.channel.util.CompatHelper;
 import cn.ussshenzhou.t88.gui.notification.TSimpleNotification;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author USS_Shenzhou
@@ -28,5 +33,13 @@ public class LoginNotificationHelper {
                 12,
                 TSimpleNotification.Severity.TIP
         );
+        if (ChannelClientConfig.get().onAir) {
+            Thread.startVirtualThread(() -> {
+                while (Minecraft.getInstance().screen != null) {
+                    LockSupport.parkNanos(1000_000_000);
+                }
+                Minecraft.getInstance().execute(Initializer::init);
+            });
+        }
     }
 }

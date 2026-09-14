@@ -42,6 +42,7 @@ public class ChannelClientConfig implements TConfig {
     public boolean onAir = true;
     public boolean muteAll = false;
     public boolean hearMyself = false;
+    public boolean cautiousMic = false;
 
     public static ChannelClientConfig get() {
         return ConfigHelper.getConfigRead(ChannelClientConfig.class);

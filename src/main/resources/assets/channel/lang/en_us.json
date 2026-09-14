@@ -1,5 +1,6 @@
 {
-  "channel.welcome": "Press [%1$s] to open the Channel config screen,and adjust your microphone and audio processing options. \nPress [%2$s] to turn on/off mic.",
+  "channel.welcome": "Press [%1$s] to open the Channel config screen, and adjust your microphone and audio processing options. \nPress [%2$s] to turn on/off mic.",
+  "channel.comfirm": "You just canceled mic mute.\nAllow Channel reading your mic?",
 
   "key.category.channel.channel": "Channel",
   "key.channel.config_screen": "Config Screen",
