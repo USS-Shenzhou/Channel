@@ -22,8 +22,14 @@ public class Initializer {
 
     @SubscribeEvent
     public static void initNative(ClientStartedEvent event){
+        MicReader.init();
         WebRTCHelper.init();
         NvidiaHelper.init();
+        AudioManager.init();
+        if (!ChannelClientConfig.get().cautiousMic) {
+            MicManager.init();
+            initialized = true;
+        }
     }
 
     public static void init() {
@@ -39,8 +45,6 @@ public class Initializer {
     public static void realInit() {
         if (!initialized) {
             MicManager.init();
-            MicReader.init();
-            AudioManager.init();
             initialized = true;
         }
     }
