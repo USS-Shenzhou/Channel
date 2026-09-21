@@ -211,3 +211,104 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           provenance: false
+
+  release:
+    name: Publish release
+    needs: [build]
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # The release name is mod_version verbatim. If a release with that name
+      # already exists (a commit that did not bump the version), this publish
+      # is cancelled instead of overwriting the earlier one.
+      - name: Resolve mod_version and check for an existing release
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MOD_VERSION="$(grep -E '^mod_version=' gradle.properties | cut -d'=' -f2-)"
+          if [ -z "$MOD_VERSION" ]; then
+            echo "mod_version not found in gradle.properties" >&2
+            exit 1
+          fi
+          echo "version=$MOD_VERSION" >> "$GITHUB_OUTPUT"
+          if gh release view "$MOD_VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $MOD_VERSION already exists - cancelling this publish."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Will publish release $MOD_VERSION"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The mod jar is produced by the `Neo Build` workflow, which runs on the
+      # same push. Wait for its run on this exact commit instead of rebuilding.
+      - name: Wait for the Neo Build run of this commit
+        id: neobuild
+        if: steps.version.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in $(seq 1 60); do
+            info="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/neobuild.yml/runs?head_sha=$GITHUB_SHA&per_page=1" --jq '(.workflow_runs[0] // {}) | "\(.id // "none") \(.status // "none") \(.conclusion // "none")"')"
+            run_id="$(echo "$info" | cut -d' ' -f1)"
+            status="$(echo "$info" | cut -d' ' -f2)"
+            conclusion="$(echo "$info" | cut -d' ' -f3)"
+            echo "attempt $attempt: run=$run_id status=$status conclusion=$conclusion"
+            if [ "$status" = "completed" ]; then
+              if [ "$conclusion" = "success" ]; then
+                echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              echo "Neo Build run $run_id concluded '$conclusion' - no jar to publish." >&2
+              exit 1
+            fi
+            sleep 30
+          done
+          echo "Timed out waiting for the Neo Build run of $GITHUB_SHA." >&2
+          exit 1
+
+      - name: Download the Neo Build jar
+        if: steps.version.outputs.skip != 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: channel
+          path: _jar
+          run-id: ${{ steps.neobuild.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Download subspace binaries
+        if: steps.version.outputs.skip != 'true'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: subspace-*
+          path: _artifacts
+
+      - name: Package per-platform zips
+        if: steps.version.outputs.skip != 'true'
+        run: |
+          mkdir -p _release
+          for platform in windows-x86_64 windows-aarch64 linux-x86_64 linux-aarch64 macos-x86_64 macos-aarch64; do
+            src="_artifacts/subspace-$platform"
+            if [ ! -d "$src" ]; then
+              echo "Missing build artifact for $platform" >&2
+              exit 1
+            fi
+            # upload-artifact drops the executable bit; restore it before zipping
+            chmod +x "$src"/*
+            zip -j "_release/subspace-$platform.zip" "$src"/*
+          done
+          cp _jar/*.jar _release/
+          ls -lh _release
+
+      - name: Create release
+        if: steps.version.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: gh release create "$VERSION" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$VERSION" --generate-notes _release/*
