@@ -35,7 +35,7 @@ public class Initializer {
     public static void init() {
         if (!initialized) {
             if (ChannelClientConfig.get().cautiousMic) {
-                Minecraft.getInstance().setScreen(new MicConfirmScreen());
+                Minecraft.getInstance().setScreenAndShow(new MicConfirmScreen());
             } else {
                 realInit();
             }

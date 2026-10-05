@@ -1,7 +1,6 @@
 package cn.ussshenzhou.channel.Item;
 
 import cn.ussshenzhou.channel.gui.ItemChannelSettingScreen;
-import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -13,7 +12,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class HandheldMic extends Item {
     public HandheldMic(Properties properties) {
         super(properties);
@@ -27,7 +25,7 @@ public class HandheldMic extends Item {
         return new Supplier<InteractionResult>() {
             @Override
             public InteractionResult get() {
-                Minecraft.getInstance().setScreen(new ItemChannelSettingScreen(hand, player.getItemInHand(hand)));
+                Minecraft.getInstance().setScreenAndShow(new ItemChannelSettingScreen(hand, player.getItemInHand(hand)));
                 return InteractionResult.SUCCESS;
             }
         }.get();

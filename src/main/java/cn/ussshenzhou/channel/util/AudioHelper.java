@@ -30,6 +30,6 @@ public class AudioHelper {
         if (ChannelClientConfig.get().showRaytrace && mc.getCameraEntity() != null) {
             return mc.getCameraEntity().getEyePosition();
         }
-        return Minecraft.getInstance().gameRenderer.getMainCamera().position();
+        return Minecraft.getInstance().gameRenderer.mainCamera().position();
     }
 }

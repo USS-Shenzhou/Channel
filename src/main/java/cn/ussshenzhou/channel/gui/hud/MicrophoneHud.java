@@ -87,7 +87,7 @@ public class MicrophoneHud extends TPanel {
         word.setVisibleT(cfg.showHudText);
         shadow.setVisibleT(cfg.showHudText);
 
-        render = !(Minecraft.getInstance().screen instanceof ChatScreen);
+        render = !(Minecraft.getInstance().gui.screen() instanceof ChatScreen);
         super.tickT();
     }
 

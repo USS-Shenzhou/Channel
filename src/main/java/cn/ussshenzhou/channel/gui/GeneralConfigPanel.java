@@ -29,7 +29,7 @@ public class GeneralConfigPanel extends TOptionsPanel {
                     NeoForge.EVENT_BUS.post(new ResizeHudEvent());
                 },
                 entry -> entry.getContent() == cfg.showHudIcon
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.dispay.hud.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.dispay.hud.tooltip")));
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.dispay.hud_text"),
                 List.of(false, true),
@@ -37,7 +37,7 @@ public class GeneralConfigPanel extends TOptionsPanel {
                     ChannelClientConfig.write(c -> c.showHudText = bool);
                 },
                 entry -> entry.getContent() == cfg.showHudText
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.dispay.hud.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.dispay.hud.tooltip")));
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.unit"),
                 List.of(Unit.values()),

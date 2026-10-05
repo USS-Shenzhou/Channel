@@ -1,7 +1,6 @@
 package cn.ussshenzhou.channel.block;
 
 import cn.ussshenzhou.channel.blockentity.SpeakerBlockEntity;
-import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,7 +15,6 @@ import org.jspecify.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class SpeakerBlock extends ChanneledBlock {
     public static final MapCodec<SpeakerBlock> CODEC = simpleCodec(SpeakerBlock::new);
 

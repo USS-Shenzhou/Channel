@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.141'
+    id 'net.neoforged.moddev' version '2.0.147'
 }
 
 version = mod_version
@@ -109,7 +109,7 @@ dependencies {
     // compileOnly "mezz.jei:jei-${mc_version}-forge-api:${jei_version}"
     // runtimeOnly "mezz.jei:jei-${mc_version}-forge:${jei_version}"
 
-    implementation(annotationProcessor("cn.ussshenzhou:t88:26.1+"))
+    implementation(annotationProcessor("cn.ussshenzhou:t88:${minecraft_version}+"))
 
     implementation 'io.github.jaredmdobson:concentus:1.0.2'
     jarJar 'io.github.jaredmdobson:concentus:1.0.2'

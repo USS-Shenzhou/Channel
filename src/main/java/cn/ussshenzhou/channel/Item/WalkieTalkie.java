@@ -1,8 +1,6 @@
 package cn.ussshenzhou.channel.Item;
 
 import cn.ussshenzhou.channel.gui.ItemChannelSettingScreen;
-import cn.ussshenzhou.channel.util.AudioHelper;
-import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -18,15 +16,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static org.lwjgl.openal.AL10.*;
-import static org.lwjgl.openal.AL10.AL_FALSE;
-import static org.lwjgl.openal.AL10.AL_LOOPING;
-import static org.lwjgl.openal.AL10.AL_MAX_GAIN;
-import static org.lwjgl.openal.AL10.AL_REFERENCE_DISTANCE;
-import static org.lwjgl.openal.AL10.alSourcef;
-
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class WalkieTalkie extends Item {
     public WalkieTalkie(Properties properties) {
         super(properties);
@@ -40,7 +30,7 @@ public class WalkieTalkie extends Item {
         return new Supplier<InteractionResult>() {
             @Override
             public InteractionResult get() {
-                Minecraft.getInstance().setScreen(new ItemChannelSettingScreen(hand, player.getItemInHand(hand)));
+                Minecraft.getInstance().setScreenAndShow(new ItemChannelSettingScreen(hand, player.getItemInHand(hand)));
                 return InteractionResult.SUCCESS;
             }
         }.get();

@@ -32,7 +32,7 @@
     - [ ] GRPC
 - 游戏内：
   - [x] 话筒和音响方块
-  - [ ] 对讲机物品
+  - [x] 对讲机物品
 
 
 - Path-Traced Audio:
@@ -46,7 +46,7 @@
       - [ ] GRPC
 - In-game:
     - [x] Microphone and Speaker blocks
-    - [ ] Walkie-talkie items
+    - [x] Walkie-talkie items
 
 
 ## 给Linux/MacOS用户 | For Linux/MacOS Users

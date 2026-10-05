@@ -36,7 +36,7 @@ public class OutputConfigPanel extends TOptionsPanel {
                     AudioManager.reset();
                 },
                 entry -> entry.getContent() == cfg.rayTraceAudio
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.rt.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.post.rt.tooltip")));
         addOptionSliderDoubleInit(Component.translatable("channel.config.post.delay"),
                 20, 2000,
                 (_, v) -> Component.literal(v.intValue() + "ms"),
@@ -54,7 +54,7 @@ public class OutputConfigPanel extends TOptionsPanel {
                     AudioManager.reset();
                 },
                 entry -> entry.getContent() == cfg.hearMyself
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.hearself.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.post.hearself.tooltip")));
 
         addOptionSplitter(Component.translatable("channel.config.post.control"));
         addOptionSliderDoubleInit(Component.translatable("channel.config.post.control_adjust"),
@@ -73,12 +73,12 @@ public class OutputConfigPanel extends TOptionsPanel {
                     refreshVolumePanel();
                 },
                 entry -> entry.getContent() == cfg.muteAll
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.mute_all.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.post.mute_all.tooltip")));
         addOptionSplitter(Component.translatable("channel.config.post.player_control"));
         addOption(Component.empty(), new TButton(Component.translatable("channel.config.post.player_control_clear"), _ -> {
             ChannelPlayerConfig.clear();
             refreshVolumePanel();
-        })).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.post.player_control_clear.tooltip")));
+        })).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.post.player_control_clear.tooltip")));
         this.container.add(new PlayerVolumePanel());
     }
 

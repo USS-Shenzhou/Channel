@@ -2,7 +2,6 @@ package cn.ussshenzhou.channel.blockentity;
 
 import cn.ussshenzhou.channel.audio.client.receive.AudioReceiveHandler;
 import cn.ussshenzhou.channel.audio.server.RelayHandler;
-import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -23,7 +22,6 @@ import org.jspecify.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public abstract class ChanneledBlockEntity extends BlockEntity {
     protected int channel = 0;
 

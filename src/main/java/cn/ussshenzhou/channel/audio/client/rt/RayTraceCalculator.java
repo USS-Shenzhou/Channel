@@ -2,8 +2,8 @@ package cn.ussshenzhou.channel.audio.client.rt;
 
 import cn.ussshenzhou.channel.Channel;
 import cn.ussshenzhou.channel.util.AudioHelper;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Tuple;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
@@ -393,7 +393,7 @@ public class RayTraceCalculator {
     static SourceAudioData calculateSourceAudioData(Vec3 sourcePos) {
         var cameraPos = AudioHelper.getEarPos();
         var tuple = calculateVirtualDirection(sourcePos);
-        double meanReverbWeight = tuple.getA();
+        double meanReverbWeight = tuple.getFirst();
         var hitA = shoot(sourcePos, cameraPos, CHANNEL_OUTLINE);
         float wallThickness;
         if (hitA.getType() == HitResult.Type.MISS) {
@@ -404,7 +404,7 @@ public class RayTraceCalculator {
         }
         double wallDecay = Math.pow(inWater ? 0.5 : 0.25, wallThickness);
         double directWeight = wallDecay / Math.max(1, cameraPos.distanceTo(sourcePos) - Channel.DISTANCE_COMPENSATE);
-        var virtualPos = tuple.getB();
+        var virtualPos = tuple.getSecond();
         double directDirectionWeight = 10 * Math.pow(inWater ? 0.25 : 0.1, wallThickness);
         var finalPos = virtualPos.scale(meanReverbWeight).add(sourcePos.scale(directDirectionWeight)).scale(1 / (meanReverbWeight + directDirectionWeight));
         float directGain = (float) (Math.min(directWeight, 1));
@@ -417,7 +417,7 @@ public class RayTraceCalculator {
         return new SourceAudioData(directGain, wallThickness, directHF, reverbGain, finalPos, Util.getMillis());
     }
 
-    private static Tuple<Double, Vec3> calculateVirtualDirection(Vec3 sourcePos) {
+    private static Pair<Double, Vec3> calculateVirtualDirection(Vec3 sourcePos) {
         synchronized (HIT_POINTS) {
             double weightXSum = 0, weightYSum = 0, weightZSum = 0, totalWeight = 0;
             int n = 0;
@@ -464,9 +464,9 @@ public class RayTraceCalculator {
                 n++;
             }
             if (totalWeight == 0) {
-                return new Tuple<>(0d, new Vec3(0, 0, 0));
+                return new Pair<>(0d, new Vec3(0, 0, 0));
             }
-            return new Tuple<>(totalWeight / n, new Vec3(weightXSum / totalWeight, weightYSum / totalWeight, weightZSum / totalWeight));
+            return new Pair<>(totalWeight / n, new Vec3(weightXSum / totalWeight, weightYSum / totalWeight, weightZSum / totalWeight));
         }
     }
 

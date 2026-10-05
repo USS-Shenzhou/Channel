@@ -2,7 +2,6 @@ package cn.ussshenzhou.channel.block;
 
 import cn.ussshenzhou.channel.blockentity.ChanneledBlockEntity;
 import cn.ussshenzhou.channel.gui.BlockChannelSettingScreen;
-import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,7 +24,6 @@ import org.jspecify.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public abstract class ChanneledBlock extends BaseEntityBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -41,7 +39,7 @@ public abstract class ChanneledBlock extends BaseEntityBlock {
                 new Runnable() {
                     @Override
                     public void run() {
-                        Minecraft.getInstance().setScreen(new BlockChannelSettingScreen(channeledBlockEntity));
+                        Minecraft.getInstance().setScreenAndShow(new BlockChannelSettingScreen(channeledBlockEntity));
                     }
                 }.run();
             }

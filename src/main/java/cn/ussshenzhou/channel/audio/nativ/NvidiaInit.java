@@ -32,11 +32,11 @@ public class NvidiaInit {
             return;
         }
         var gpudevice = RenderSystem.getDevice();
-        if (!gpudevice.getRenderer().contains("RTX")) {
+        if (!gpudevice.getDeviceInfo().name().contains("RTX")) {
             NvidiaHelper.stat = NvidiaHelper.Stat.UNSUPPORTED_GPU;
             return;
         }
-        var splitDriver = gpudevice.getVersion().split(" ");
+        var splitDriver = gpudevice.getDeviceInfo().driverInfo().split(" ");
         var driver = splitDriver[splitDriver.length - 1];
         int version = Integer.parseInt(driver.split("\\.")[0]);
         if (version < 570) {

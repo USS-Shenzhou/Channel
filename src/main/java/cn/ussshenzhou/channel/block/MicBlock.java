@@ -2,7 +2,6 @@ package cn.ussshenzhou.channel.block;
 
 import cn.ussshenzhou.channel.Item.ModItems;
 import cn.ussshenzhou.channel.blockentity.MicBlockEntity;
-import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,7 +24,6 @@ import org.jspecify.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class MicBlock extends ChanneledBlock {
     public static final MapCodec<MicBlock> CODEC = simpleCodec(MicBlock::new);
     public static final IntegerProperty MIC = IntegerProperty.create("mic", 1, 4);

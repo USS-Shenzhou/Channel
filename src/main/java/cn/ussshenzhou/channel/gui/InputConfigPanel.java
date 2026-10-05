@@ -53,12 +53,12 @@ public class InputConfigPanel extends TOptionsPanel {
                     notifyMicManager();
                 },
                 entry -> entry.getContent().equals(cfg.useDevice)
-        ).getB();
+        ).getSecond();
         updateDeviceTooltip(deviceList);
         addOption(Component.translatable("channel.config.mic.samplerate"), new TLabel(Component.literal(String.valueOf(cfg.micSampleRate))))
-                .getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.samplerate.tooltip")));
+                .getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.samplerate.tooltip")));
         addOption(Component.translatable("channel.config.mic.samplebits"), new TLabel(Component.literal(String.valueOf(ModConstant.MIC_SAMPLE_BITS))))
-                .getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.samplebits.tooltip")));
+                .getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.samplebits.tooltip")));
         addOption(
                 Component.translatable("channel.config.level"),
                 new TProgressBar(ModConstant.ABS_MIN_DBFS) {
@@ -93,7 +93,7 @@ public class InputConfigPanel extends TOptionsPanel {
                     InputConfigPanel.this.layout();
                 },
                 entry -> entry.getContent() == cfg.noiseCanceling
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.nc.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.nc.tooltip")));
         aiNCRatio = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.nc.ai_intense"),
                 0, 1,
@@ -104,7 +104,7 @@ public class InputConfigPanel extends TOptionsPanel {
                     NvidiaHelper.refresh();
                 },
                 cfg.aiNoiseCancelingRatio, false
-        ).getB().getParent();
+        ).getSecond().getParent();
         aiNCRatio.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
 
         addOptionCycleButtonInit(
@@ -118,7 +118,7 @@ public class InputConfigPanel extends TOptionsPanel {
                     InputConfigPanel.this.layout();
                 },
                 entry -> entry.getContent() == cfg.trigger
-        ).getB().setTooltip(Tooltip.create(Component.translatable(cfg.trigger.directTranslateKey() + ".tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable(cfg.trigger.directTranslateKey() + ".tooltip")));
         thresholdLevel = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.threshold"),
                 -ModConstant.ABS_MIN_DBFS, -1,
@@ -126,7 +126,7 @@ public class InputConfigPanel extends TOptionsPanel {
                 Component.translatable("channel.config.pre.threshold.tooltip"),
                 (slider, _) -> ChannelClientConfig.write(c -> c.triggerThresholdDBFS = (float) slider.getAbsValue()),
                 cfg.triggerThresholdDBFS, false
-        ).getB().getParent();
+        ).getSecond().getParent();
         //noinspection DataFlowIssue
         thresholdLevel.setVisibleT(cfg.trigger == Trigger.THRESHOLD);
         var tuple = addOptionCycleButtonInit(
@@ -135,8 +135,8 @@ public class InputConfigPanel extends TOptionsPanel {
                 v -> _ -> ChannelClientConfig.write(c -> c.voiceDetectThreshold = v),
                 entry -> entry.getContent() == cfg.voiceDetectThreshold
         );
-        tuple.getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.vad.tooltip")));
-        vad = (HorizontalTitledOption<?>) tuple.getB().getParent();
+        tuple.getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.vad.tooltip")));
+        vad = (HorizontalTitledOption<?>) tuple.getSecond().getParent();
         //noinspection DataFlowIssue
         vad.setVisibleT(cfg.trigger == Trigger.VAD);
 
@@ -148,17 +148,17 @@ public class InputConfigPanel extends TOptionsPanel {
                     WebRTCHelper.refresh();
                 },
                 entry -> entry.getContent() == cfg.echoCanceling
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.ec.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.ec.tooltip")));
         nvidiaLogo = (HorizontalTitledOption<?>) addOption(Component.literal("Powered by"), new TImage(Identifier.fromNamespaceAndPath(Channel.MODID, "textures/gui/nvidia.png")) {
             @Override
             public Vector2i getPreferredSize() {
                 return new Vector2i(0, 50);
             }
-        }).getB().getParent();
+        }).getSecond().getParent();
         //noinspection DataFlowIssue
         ((TImage) nvidiaLogo.getController()).setImageFit(ImageFit.FIT);
         nvidiaLogo.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() == NvidiaHelper.Stat.OK);
-        nvidiaCaution = (HorizontalTitledOption<?>) addOption(Component.empty(), new NvidiaCautionPanel(NvidiaHelper.getStat())).getB().getParent();
+        nvidiaCaution = (HorizontalTitledOption<?>) addOption(Component.empty(), new NvidiaCautionPanel(NvidiaHelper.getStat())).getSecond().getParent();
         //noinspection DataFlowIssue
         nvidiaCaution.setVisibleT(cfg.noiseCanceling == NC.AI && NvidiaHelper.getStat() != NvidiaHelper.Stat.OK);
 
@@ -170,7 +170,7 @@ public class InputConfigPanel extends TOptionsPanel {
                     WebRTCHelper.refresh();
                 },
                 entry -> entry.getContent() == cfg.highPassFilter
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.hpf.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.hpf.tooltip")));
         addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.mgc"),
                 0, 30,
@@ -181,7 +181,7 @@ public class InputConfigPanel extends TOptionsPanel {
                     WebRTCHelper.refresh();
                 },
                 cfg.forceGainControl, false
-        ).getB().getParent();
+        ).getSecond().getParent();
         addOptionCycleButtonInit(
                 Component.translatable("channel.config.pre.agc"),
                 List.of(false, true),
@@ -193,7 +193,7 @@ public class InputConfigPanel extends TOptionsPanel {
                     InputConfigPanel.this.layout();
                 },
                 entry -> entry.getContent() == cfg.autoGainControl
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.agc.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.pre.agc.tooltip")));
         targetLevel = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.target"),
                 -26, -2,
@@ -204,7 +204,7 @@ public class InputConfigPanel extends TOptionsPanel {
                     WebRTCHelper.refresh();
                 },
                 cfg.targetLevel, false
-        ).getB().getParent();
+        ).getSecond().getParent();
         maxGain = (HorizontalTitledOption<?>) addOptionSliderDoubleInit(
                 Component.translatable("channel.config.pre.max_gain"),
                 0, 30,
@@ -215,7 +215,7 @@ public class InputConfigPanel extends TOptionsPanel {
                     WebRTCHelper.refresh();
                 },
                 cfg.maxGain, false
-        ).getB().getParent();
+        ).getSecond().getParent();
         targetLevel.setVisibleT(cfg.autoGainControl);
         maxGain.setVisibleT(cfg.autoGainControl);
         addOption(
@@ -240,7 +240,7 @@ public class InputConfigPanel extends TOptionsPanel {
                 List.of(false, true),
                 bool -> _ -> ChannelClientConfig.write(c -> c.listen = bool),
                 entry -> entry.getContent() == cfg.listen
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.listen.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.mic.listen.tooltip")));
     }
 
     private void notifyMicManager() {

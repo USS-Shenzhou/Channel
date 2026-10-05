@@ -35,7 +35,7 @@ public class LoginNotificationHelper {
         );
         if (ChannelClientConfig.get().onAir) {
             Thread.startVirtualThread(() -> {
-                while (Minecraft.getInstance().screen != null) {
+                while (Minecraft.getInstance().gui.screen() != null) {
                     LockSupport.parkNanos(1000_000_000);
                 }
                 Minecraft.getInstance().execute(Initializer::init);

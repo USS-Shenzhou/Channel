@@ -46,13 +46,13 @@ public class ModKeyMappingRegistry {
     public static void onKeyInput(InputEvent.Key event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (CONFIG.consumeClick()) {
-            minecraft.setScreen(new ConfigScreen());
+            minecraft.setScreenAndShow(new ConfigScreen());
         }
     }
 
     @SubscribeEvent
     public static void switchMute(InputEvent.Key event) {
-        var screen = Minecraft.getInstance().screen;
+        var screen = Minecraft.getInstance().gui.screen();
         if (screen != null) {
             return;
         }

@@ -44,7 +44,7 @@ public class TransmitConfigPanel extends TOptionsPanel {
                     DebugManager.refresh();
                 },
                 entry -> entry.getContent() == cfg.frameLengthMs
-        ).getB().setTooltip(Tooltip.create(Component.translatable("channel.config.net.length.tooltip")));
+        ).getSecond().setTooltip(Tooltip.create(Component.translatable("channel.config.net.length.tooltip")));
         var netSampleRate = addOptionCycleButtonInit(
                 Component.translatable("channel.config.net.samplerate"),
                 ModConstant.USABLE_NETWORK_SAMPLE_RATE,
@@ -53,18 +53,18 @@ public class TransmitConfigPanel extends TOptionsPanel {
                     rawBitrate.setText(Component.literal(getRawBitRate()));
                 },
                 entry -> entry.getContent() == cfg.networkSampleRate
-        ).getB();
-        rawBitrate = addOption(Component.translatable("channel.config.net.bitrate"), new TLabel(Component.literal(getRawBitRate()))).getB();
-        opusBitrate = addOption(Component.translatable("channel.config.net.opus_bitrate"), new TLabel(Component.literal(getOpusBitRate()))).getB();
-        speed = addOption(Component.translatable("channel.config.net.flow"), new TLabel(Component.empty())).getB();
+        ).getSecond();
+        rawBitrate = addOption(Component.translatable("channel.config.net.bitrate"), new TLabel(Component.literal(getRawBitRate()))).getSecond();
+        opusBitrate = addOption(Component.translatable("channel.config.net.opus_bitrate"), new TLabel(Component.literal(getOpusBitRate()))).getSecond();
+        speed = addOption(Component.translatable("channel.config.net.flow"), new TLabel(Component.empty())).getSecond();
         netSampleRate.setTooltip(Tooltip.create(Component.translatable("channel.config.net.samplerate.tooltip")));
 
         addOptionSplitter(Component.translatable("channel.config.subspace"));
-        off = (HorizontalTitledOption<TLabel>) addOption(Component.empty(), new TLabel(Component.translatable("channel.config.subspace.off"))).getB().getParent();
-        address = (HorizontalTitledOption<TLabel>) addOption(Component.translatable("channel.config.subspace.address"), new TLabel(Component.empty())).getB().getParent();
-        port = (HorizontalTitledOption<TLabel>) addOption(Component.translatable("channel.config.subspace.port"), new TLabel(Component.empty())).getB().getParent();
-        protocol = (HorizontalTitledOption<TLabel>) addOption(Component.translatable("channel.config.subspace.protocol"), new TLabel(Component.empty())).getB().getParent();
-        security = (HorizontalTitledOption<TLabel>) addOption(Component.translatable("channel.config.subspace.security"), new TLabel(Component.empty())).getB().getParent();
+        off = (HorizontalTitledOption<TLabel>) addOption(Component.empty(), new TLabel(Component.translatable("channel.config.subspace.off"))).getSecond().getParent();
+        address = (HorizontalTitledOption<TLabel>) addOption(Component.translatable("channel.config.subspace.address"), new TLabel(Component.empty())).getSecond().getParent();
+        port = (HorizontalTitledOption<TLabel>) addOption(Component.translatable("channel.config.subspace.port"), new TLabel(Component.empty())).getSecond().getParent();
+        protocol = (HorizontalTitledOption<TLabel>) addOption(Component.translatable("channel.config.subspace.protocol"), new TLabel(Component.empty())).getSecond().getParent();
+        security = (HorizontalTitledOption<TLabel>) addOption(Component.translatable("channel.config.subspace.security"), new TLabel(Component.empty())).getSecond().getParent();
         updateSubspace();
     }
 

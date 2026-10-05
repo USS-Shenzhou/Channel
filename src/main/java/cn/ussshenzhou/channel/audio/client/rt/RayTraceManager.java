@@ -5,8 +5,6 @@ import cn.ussshenzhou.channel.audio.client.receive.AudioManager;
 import cn.ussshenzhou.channel.audio.client.receive.AudioReceiveHandler;
 import cn.ussshenzhou.channel.config.ChannelClientConfig;
 import cn.ussshenzhou.channel.util.AudioHelper;
-import com.mojang.logging.LogUtils;
-import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -38,7 +36,6 @@ import static org.lwjgl.openal.EXTEfx.*;
  * @author USS_Shenzhou
  */
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @EventBusSubscriber(Dist.CLIENT)
 public class RayTraceManager {
     static final int MAX_DISTANCE = 64;
@@ -204,7 +201,7 @@ public class RayTraceManager {
 
     private static void updateReflectionPan() {
         var earPos = AudioHelper.getEarPos();
-        var inverseRotation = new Quaternionf(Minecraft.getInstance().gameRenderer.getMainCamera().rotation()).conjugate();
+        var inverseRotation = new Quaternionf(Minecraft.getInstance().gameRenderer.mainCamera().rotation()).conjugate();
 
         var earlyPos = new Vector3f(
                 (float) (earlyRefX - earPos.x),
